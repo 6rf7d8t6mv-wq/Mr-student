@@ -1,0 +1,27 @@
+.DS_Store
+
+# Flutter SDK in this workspace, not part of the app.
+/flutter/
+
+# Laravel local/runtime files.
+backend/osamah/.env
+backend/osamah/vendor/
+backend/osamah/node_modules/
+backend/osamah/storage/app/*.plist
+backend/osamah/storage/framework/cache/*
+backend/osamah/storage/framework/sessions/*
+backend/osamah/storage/framework/testing/*
+backend/osamah/storage/framework/views/*
+backend/osamah/storage/logs/*
+backend/osamah/bootstrap/cache/*
+!backend/osamah/storage/**/.gitignore
+!backend/osamah/bootstrap/cache/.gitignore
+
+# Flutter generated files.
+mobile_app/.dart_tool/
+mobile_app/.flutter-plugins
+mobile_app/.flutter-plugins-dependencies
+mobile_app/build/
+
+# IDE/local files.
+mobile_app/.idea/
