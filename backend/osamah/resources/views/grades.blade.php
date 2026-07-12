@@ -61,6 +61,8 @@
             .files-list-item.has-academic-university { min-width: 1200px; grid-template-columns: 2fr 0.7fr 0.7fr 0.65fr 1.45fr 0.85fr 0.85fr 0.85fr 0.7fr 0.45fr; }
             .files-list-header.has-thesis-project,
             .files-list-item.has-thesis-project { min-width: 1320px; grid-template-columns: 2fr 0.7fr 0.7fr 0.65fr 1.15fr 1.45fr 0.85fr 0.85fr 0.85fr 0.7fr 0.45fr; }
+            .files-list-header.has-formatting-price,
+            .files-list-item.has-formatting-price { min-width: 820px; grid-template-columns: 2fr 0.8fr 0.8fr 1fr 1fr 0.7fr 0.45fr; }
             .files-list-item:last-child { border-bottom: none; }
             .file-name-cell { color: #111827; font-weight: 800; word-break: normal; overflow-wrap: anywhere; line-height: 1.6; }
             .file-pages { color: #475569; }
@@ -91,6 +93,12 @@
             .binding-required { color: #b91c1c; font-weight: 600; font-size: 12px; }
             .pricing-summary { margin-top: 16px; padding: 14px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; color: #111827; font-weight: 700; line-height: 1.7; }
             .pricing-summary.empty { color: #6b7280; font-weight: 600; }
+            .delivery-notice { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: #eff6ff; color: #1e3a8a; border: 1px solid #bfdbfe; font-size: 13px; font-weight: 800; line-height: 1.7; }
+            .research-form-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(130px, 0.6fr); gap: 14px; align-items: end; }
+            .research-field { display: flex; flex-direction: column; gap: 8px; }
+            .research-field label { color: #111827; font-size: 13px; font-weight: 900; }
+            .research-input { width: 100%; padding: 12px 13px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #111827; font-weight: 700; }
+            .research-input:focus { outline: 2px solid rgba(14, 165, 233, 0.18); border-color: #38bdf8; }
             .checkout-row { margin-top: 14px; display: flex; justify-content: flex-end; }
             .checkout-button { display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; background: #047857; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 800; border: 0; cursor: pointer; }
             .checkout-button:hover { background: #065f46; }
@@ -121,6 +129,7 @@
                 .files-list-item.has-price,
                 .files-list-item.has-copies-price,
                 .files-list-item.has-academic-university,
+                .files-list-item.has-formatting-price,
                 .files-list-item.has-thesis-project {
                     min-width: 0;
                     display: flex;
@@ -171,6 +180,7 @@
                     width: min(100%, 220px);
                     min-width: 0;
                 }
+                .research-form-grid { grid-template-columns: 1fr; }
             }
             @media (max-width: 420px) {
                 :root { --sidebar-width: 92px; --page-gap: 8px; }
@@ -228,6 +238,20 @@
                     <h3 class="service-title">طباعة وتجليد رسالة دكتوراه</h3>
                     <p class="service-description">تجهيز ملفات الدكتوراه للطباعة والتجليد مع عرض كامل للتكاليف قبل الدفع.</p>
                     <button class="service-entry" type="button" onclick="selectService('phd')">الدخول للخدمة</button>
+                </article>
+
+                <article class="service-card">
+                    <div class="service-icon">✍️</div>
+                    <h3 class="service-title">تنسيق الرسائل الجامعية</h3>
+                    <p class="service-description">رفع ملف Word فقط واحتساب سعر التنسيق تلقائيًا حسب عدد الصفحات.</p>
+                    <button class="service-entry" type="button" onclick="selectService('formatting')">الدخول للخدمة</button>
+                </article>
+
+                <article class="service-card">
+                    <div class="service-icon">🔎</div>
+                    <h3 class="service-title">إنشاء بحث</h3>
+                    <p class="service-description">اكتب اسم البحث وعدد الصفحات المطلوبة، ويتم احتساب سعر الخدمة تلقائيًا.</p>
+                    <button class="service-entry" type="button" onclick="selectService('research')">الدخول للخدمة</button>
                 </article>
             </div>
 
@@ -449,6 +473,73 @@
                     <div id="phdPricingSummary" class="pricing-summary empty">ارفع الملفات لعرض الإجمالي.</div>
                 </div>
             </div>
+
+            <!-- Upload Section for Formatting -->
+            <div id="uploadFormatting" class="upload-content">
+                <button class="back-button" onclick="backToServices()">← العودة للخدمات</button>
+                <h2>تنسيق الرسائل الجامعية</h2>
+
+                <div class="upload-section">
+                    <div class="upload-box" id="formattingWordBox">
+                        <div class="file-icon">📄</div>
+                        <h3>تحميل ملف Word</h3>
+                        <input type="file" id="formattingWordFile" accept=".doc,.docx" multiple />
+                        <p class="file-info">صيغ مدعومة: .doc, .docx</p>
+                        <p class="file-info">سعر التنسيق: 10 ريال لكل صفحة</p>
+                        <button class="upload-button" id="formattingWordUploadBtn" onclick="document.getElementById('formattingWordFile').click()">اختر ملفات</button>
+                        <div class="progress-bar" id="formattingWordProgress"><div class="progress-bar-fill"></div></div>
+                        <div id="formattingWordError" class="error-msg" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; margin-bottom: 40px;">
+                    <h3 style="margin-bottom: 16px; color: #111827;">📄 ملفات Word المحملة</h3>
+                    <div class="files-list">
+                        <div class="files-list-header has-formatting-price">
+                            <div>اسم الملف</div>
+                            <div>الصفحات</div>
+                            <div>الحجم</div>
+                            <div>سعر التنسيق</div>
+                            <div>الإجمالي</div>
+                            <div>الحالة</div>
+                            <div></div>
+                        </div>
+                        <div id="formattingWordFilesList" class="empty-message">لم يتم تحميل أي ملفات</div>
+                    </div>
+                </div>
+
+                <div class="binding-section">
+                    <h3>إجمالي تنسيق الرسائل الجامعية</h3>
+                    <div id="formattingPricingSummary" class="pricing-summary empty">ارفع ملفات Word لعرض الإجمالي.</div>
+                </div>
+            </div>
+
+            <!-- Research Creation Service -->
+            <div id="uploadResearch" class="upload-content">
+                <button class="back-button" onclick="backToServices()">← العودة للخدمات</button>
+                <h2>إنشاء بحث</h2>
+
+                <div class="binding-section">
+                    <h3>تفاصيل البحث</h3>
+                    <div class="research-form-grid">
+                        <div class="research-field">
+                            <label for="researchTitle">اسم البحث المطلوب</label>
+                            <input class="research-input" id="researchTitle" type="text" maxlength="255" placeholder="مثال: أثر التقنية في التعليم" oninput="updateResearchPricingSummary()" />
+                        </div>
+                        <div class="research-field">
+                            <label for="researchPages">عدد الصفحات</label>
+                            <input class="research-input" id="researchPages" type="number" min="1" step="1" value="1" oninput="updateResearchPricingSummary()" />
+                        </div>
+                    </div>
+                    <button class="upload-button" id="researchSaveButton" type="button" onclick="saveResearchRequest()">حفظ الطلب</button>
+                    <div id="researchError" class="error-msg" style="display: none;"></div>
+                </div>
+
+                <div class="binding-section">
+                    <h3>إجمالي إنشاء البحث</h3>
+                    <div id="researchPricingSummary" class="pricing-summary empty">اكتب اسم البحث وعدد الصفحات لعرض الإجمالي.</div>
+                </div>
+            </div>
         </main>
 
         <datalist id="saudiUniversitiesList"></datalist>
@@ -458,12 +549,20 @@
             const uploadedFiles = {
                 notes: { word: [], pdf: [] },
                 thesis: { word: [], pdf: [] },
-                phd: { word: [], pdf: [] }
+                phd: { word: [], pdf: [] },
+                formatting: { word: [], pdf: [] },
+                research: { word: [], pdf: [] }
             };
             const currentOrders = {
                 notes: null,
                 thesis: null,
-                phd: null
+                phd: null,
+                formatting: null,
+                research: null
+            };
+            const savedResearchRequest = {
+                title: '',
+                pages: 0
             };
 
             const OTHER_UNIVERSITY_VALUE = 'أخرى';
@@ -599,7 +698,8 @@
                 thesisWord: { inputId: 'thesisWordFile', boxId: 'thesisWordBox', progressId: 'thesisWordProgress', errorId: 'thesisWordError', listId: 'thesisWordFilesList', service: 'thesis', type: 'word' },
                 thesisPdf: { inputId: 'thesisPdfFile', boxId: 'thesisPdfBox', progressId: 'thesisPdfProgress', errorId: 'thesisPdfError', listId: 'thesisPdfFilesList', service: 'thesis', type: 'pdf' },
                 phdWord: { inputId: 'phdWordFile', boxId: 'phdWordBox', progressId: 'phdWordProgress', errorId: 'phdWordError', listId: 'phdWordFilesList', service: 'phd', type: 'word' },
-                phdPdf: { inputId: 'phdPdfFile', boxId: 'phdPdfBox', progressId: 'phdPdfProgress', errorId: 'phdPdfError', listId: 'phdPdfFilesList', service: 'phd', type: 'pdf' }
+                phdPdf: { inputId: 'phdPdfFile', boxId: 'phdPdfBox', progressId: 'phdPdfProgress', errorId: 'phdPdfError', listId: 'phdPdfFilesList', service: 'phd', type: 'pdf' },
+                formattingWord: { inputId: 'formattingWordFile', boxId: 'formattingWordBox', progressId: 'formattingWordProgress', errorId: 'formattingWordError', listId: 'formattingWordFilesList', service: 'formatting', type: 'word' }
             };
 
             const fileTypes = {
@@ -619,6 +719,8 @@
                 document.getElementById('uploadNotes').classList.remove('active');
                 document.getElementById('uploadThesis').classList.remove('active');
                 document.getElementById('uploadPhd').classList.remove('active');
+                document.getElementById('uploadFormatting').classList.remove('active');
+                document.getElementById('uploadResearch').classList.remove('active');
             }
 
             function initializeService(service) {
@@ -680,6 +782,26 @@
                 };
             }
 
+            function calculateFormattingFilePrice(pages) {
+                const formattingPrice = (Number(pages) || 1) * 10;
+
+                return {
+                    printPrice: 0,
+                    bindingPrice: formattingPrice,
+                    total: formattingPrice
+                };
+            }
+
+            function calculateResearchPrice(pages) {
+                const researchPrice = Math.max(1, Number(pages) || 1) * 10;
+
+                return {
+                    printPrice: 0,
+                    bindingPrice: researchPrice,
+                    total: researchPrice
+                };
+            }
+
             function getAllNotesFiles() {
                 return [
                     ...uploadedFiles.notes.word,
@@ -703,19 +825,35 @@
                         <div>${message}</div>
                         <div class="checkout-row">
                             <span class="checkout-button disabled">إتمام الطلب</span>
-                            ${orderId ? '<a class="checkout-button" style="margin-inline-start: 8px; background: #0f172a;" href="{{ route('orders.index') }}">طلباتي</a>' : ''}
                         </div>
                     `;
                     return;
                 }
 
-                const bindingLabel = service === 'notes' ? 'سعر التغليف' : 'سعر التجليد';
+                const noPrintServiceLabels = {
+                    formatting: 'سعر التنسيق',
+                    research: 'سعر إنشاء البحث'
+                };
+                const bindingLabel = service === 'notes'
+                    ? 'سعر التغليف'
+                    : (noPrintServiceLabels[service] || 'سعر التجليد');
+
+                const totalsText = noPrintServiceLabels[service]
+                    ? `${noPrintServiceLabels[service]}: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال`
+                    : `سعر الطباعة: ${totals.print} ريال | ${bindingLabel}: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال`;
+                const deliveryNoticeMessages = {
+                    formatting: 'سيتم إرسال الملف بعد الانتهاء داخل التطبيق في صفحة طلباتي فور الانتهاء من التنسيق إن شاء الله.',
+                    research: 'سيتم إرسال الملف بعد الانتهاء داخل التطبيق في صفحة طلباتي خلال ٢٤ ساعة إلى ٤٨ ساعة إن شاء الله.'
+                };
+                const deliveryNotice = deliveryNoticeMessages[service]
+                    ? `<div class="delivery-notice">${deliveryNoticeMessages[service]}</div>`
+                    : '';
 
                 summary.innerHTML = `
-                    <div>سعر الطباعة: ${totals.print} ريال | ${bindingLabel}: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال</div>
+                    <div>${totalsText}</div>
+                    ${deliveryNotice}
                     <div class="checkout-row">
-                        <button class="checkout-button" type="button" onclick="openCartModal(${orderId})">إتمام الطلب</button>
-                        <a class="checkout-button" style="margin-inline-start: 8px; background: #0f172a;" href="{{ route('orders.index') }}">طلباتي</a>
+                        <a class="checkout-button" href="{{ route('orders.index') }}">إتمام الطلب</a>
                     </div>
                 `;
             }
@@ -777,6 +915,121 @@
                 }, { print: 0, binding: 0, total: 0 });
 
                 renderCheckoutSummary(summary, service, '', totals, true);
+            }
+
+            function updateFormattingPricingSummary() {
+                const summary = document.getElementById('formattingPricingSummary');
+                if (!summary) return;
+
+                const files = uploadedFiles.formatting.word;
+
+                if (files.length === 0) {
+                    renderCheckoutSummary(summary, 'formatting', 'ارفع ملفات Word لعرض الإجمالي.');
+                    return;
+                }
+
+                const totals = files.reduce((sum, fileData) => {
+                    const price = calculateFormattingFilePrice(fileData.pages);
+                    sum.print += price.printPrice;
+                    sum.binding += price.bindingPrice;
+                    sum.total += price.total;
+                    return sum;
+                }, { print: 0, binding: 0, total: 0 });
+
+                renderCheckoutSummary(summary, 'formatting', '', totals, true);
+            }
+
+            function updateResearchPricingSummary() {
+                const summary = document.getElementById('researchPricingSummary');
+                if (!summary) return;
+
+                const title = document.getElementById('researchTitle')?.value.trim() || '';
+                const pages = Math.max(1, Number(document.getElementById('researchPages')?.value) || 0);
+
+                if (!title) {
+                    renderCheckoutSummary(summary, 'research', 'اكتب اسم البحث المطلوب أولًا.');
+                    return;
+                }
+
+                if (!pages) {
+                    renderCheckoutSummary(summary, 'research', 'حدد عدد الصفحات المطلوبة.');
+                    return;
+                }
+
+                const price = calculateResearchPrice(pages);
+                const totals = {
+                    print: price.printPrice,
+                    binding: price.bindingPrice,
+                    total: price.total
+                };
+
+                const hasSavedCurrentRequest = currentOrders.research
+                    && savedResearchRequest.title === title
+                    && savedResearchRequest.pages === pages;
+
+                if (!hasSavedCurrentRequest) {
+                    summary.classList.remove('empty');
+                    summary.innerHTML = `
+                        <div>سعر إنشاء البحث: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال</div>
+                        <div class="checkout-row">
+                            <span class="checkout-button disabled">احفظ الطلب أولًا</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderCheckoutSummary(summary, 'research', '', totals, true);
+            }
+
+            async function saveResearchRequest() {
+                const titleInput = document.getElementById('researchTitle');
+                const pagesInput = document.getElementById('researchPages');
+                const button = document.getElementById('researchSaveButton');
+                const errorDiv = document.getElementById('researchError');
+                const title = titleInput.value.trim();
+                const pages = Math.max(1, Number(pagesInput.value) || 0);
+
+                if (!title || !pages) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'اكتب اسم البحث وحدد عدد الصفحات.';
+                    updateResearchPricingSummary();
+                    return;
+                }
+
+                errorDiv.style.display = 'none';
+                button.disabled = true;
+                button.textContent = 'جاري الحفظ...';
+
+                try {
+                    const response = await fetch('/research-order', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': getCsrfToken(),
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            research_title: title,
+                            pages
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.message || 'تعذر حفظ طلب إنشاء البحث');
+                    }
+
+                    currentOrders.research = result.order_id;
+                    savedResearchRequest.title = title;
+                    savedResearchRequest.pages = pages;
+                    updateResearchPricingSummary();
+                } catch (error) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = error.message || 'تعذر حفظ طلب إنشاء البحث';
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'حفظ الطلب';
+                }
             }
 
             async function countPDFPages(file) {
@@ -850,6 +1103,7 @@
                 const files = uploadedFiles[config.service][config.type];
                 const showPrice = config.service === 'notes';
                 const showAcademicPrice = config.service === 'thesis' || config.service === 'phd';
+                const showFormattingPrice = config.service === 'formatting';
                 const showThesisProject = config.service === 'thesis' && config.type === 'pdf';
 
                 if (files.length === 0) {
@@ -858,6 +1112,8 @@
                         updateNotesPricingSummary();
                     } else if (showAcademicPrice) {
                         updateAcademicPricingSummary(config.service);
+                    } else if (showFormattingPrice) {
+                        updateFormattingPricingSummary();
                     }
                     return;
                 }
@@ -888,6 +1144,7 @@
                         ? `<div class="file-price" data-label="الإجمالي">${price ? `${price.total} ريال` : 'اختر التغليف'}${price?.note ? `<span class="file-price-note">${price.note}</span>` : ''}</div>`
                         : '';
                     const academicPrice = showAcademicPrice ? calculateAcademicFilePrice(config.service, fileData.pages, fileData.copies) : null;
+                    const formattingPrice = showFormattingPrice ? calculateFormattingFilePrice(fileData.pages) : null;
                     const copiesHtml = showAcademicPrice
                         ? `<div data-label="عدد النسخ"><input class="copies-input" type="number" min="1" step="1" value="${fileData.copies || 1}" onchange="setAcademicFileCopies('${config.service}', '${config.type}', ${index}, this.value)" /></div>`
                         : '';
@@ -915,9 +1172,15 @@
                     const academicTotalPriceHtml = showAcademicPrice
                         ? `<div class="file-price" data-label="الإجمالي">${academicPrice.total} ريال</div>`
                         : '';
+                    const formattingPriceHtml = showFormattingPrice
+                        ? `<div class="file-price" data-label="سعر التنسيق">${formattingPrice.bindingPrice} ريال</div>`
+                        : '';
+                    const formattingTotalPriceHtml = showFormattingPrice
+                        ? `<div class="file-price" data-label="الإجمالي">${formattingPrice.total} ريال</div>`
+                        : '';
 
                     html += `
-                        <div class="files-list-item${showPrice ? ' has-price' : ''}${showAcademicPrice ? ' has-academic-university' : ''}${showThesisProject ? ' has-thesis-project' : ''}">
+                        <div class="files-list-item${showPrice ? ' has-price' : ''}${showAcademicPrice ? ' has-academic-university' : ''}${showThesisProject ? ' has-thesis-project' : ''}${showFormattingPrice ? ' has-formatting-price' : ''}">
                             <div class="file-name-cell" data-label="اسم الملف">${fileData.filename}</div>
                             <div class="file-pages" data-label="الصفحات">${fileData.pages} صفحة</div>
                             <div class="file-size" data-label="الحجم">${fileData.size}</div>
@@ -931,6 +1194,8 @@
                             ${academicPrintPriceHtml}
                             ${academicBindingPriceHtml}
                             ${academicTotalPriceHtml}
+                            ${formattingPriceHtml}
+                            ${formattingTotalPriceHtml}
                             <div data-label="الحالة" style="color: #047857; font-weight: 600;">✓ مرفوع</div>
                             <div class="file-remove" data-label="الإجراء" onclick="removeFile('${config.service}', '${config.type}', ${index})">حذف</div>
                         </div>
@@ -942,6 +1207,8 @@
                     updateNotesPricingSummary();
                 } else if (showAcademicPrice) {
                     updateAcademicPricingSummary(config.service);
+                } else if (showFormattingPrice) {
+                    updateFormattingPricingSummary();
                 }
             }
 
@@ -971,6 +1238,8 @@
                     updateNotesPricingSummary();
                 } else if (service === 'thesis' || service === 'phd') {
                     updateAcademicPricingSummary(service);
+                } else if (service === 'formatting') {
+                    updateFormattingPricingSummary();
                 }
             }
 

@@ -29,6 +29,7 @@ Route::get('/', function () {
 })->middleware('auth')->name('home');
 
 Route::post('/upload-file', [FileUploadController::class, 'upload'])->middleware('auth');
+Route::post('/research-order', [FileUploadController::class, 'saveResearchOrder'])->middleware('auth');
 Route::patch('/order-files/{file}', [FileUploadController::class, 'updateFile'])->middleware('auth');
 Route::delete('/order-files/{file}', [FileUploadController::class, 'destroyFile'])->middleware('auth');
 
@@ -43,6 +44,9 @@ Route::get('/my-orders', [CustomerOrderController::class, 'index'])
 Route::delete('/my-orders/{order}', [CustomerOrderController::class, 'destroy'])
     ->middleware('auth')
     ->name('orders.destroy');
+Route::get('/my-orders/{order}/delivered-files/{deliveredFile}', [CustomerOrderController::class, 'downloadDeliveredFile'])
+    ->middleware('auth')
+    ->name('orders.delivered-file');
 
 Route::middleware('auth')->prefix('account')->name('account.')->group(function () {
     Route::get('/settings', [AccountController::class, 'edit'])->name('settings');
@@ -58,8 +62,13 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
     Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
     Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::patch('/users/{user}/permissions', [AdminController::class, 'updateUserPermissions'])->name('users.permissions.update');
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+    Route::delete('/orders/{order}', [AdminController::class, 'destroyOrder'])->name('orders.destroy');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::patch('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/orders/{order}/delivered-file', [AdminController::class, 'uploadDeliveredFile'])->name('orders.delivered-file.upload');
+    Route::get('/delivered-files/{deliveredFile}/download', [AdminController::class, 'downloadDeliveredFile'])->name('delivered-files.download');
+    Route::delete('/delivered-files/{deliveredFile}', [AdminController::class, 'destroyDeliveredFile'])->name('delivered-files.destroy');
     Route::get('/files/{file}/download', [AdminController::class, 'download'])->name('files.download');
 });

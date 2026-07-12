@@ -22,7 +22,7 @@
         .errors { background: #fef2f2; color: #b91c1c; }
         .section { border-top: 1px solid #e5e7eb; padding-top: 22px; margin-top: 22px; }
         .section:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .section-header { margin-bottom: 14px; }
         .section-title { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; }
         .details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
         .detail { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 13px 14px; }
@@ -30,13 +30,14 @@
         .detail-label { color: #64748b; font-size: 12px; font-weight: 800; margin-bottom: 6px; }
         .detail-value { color: #111827; font-weight: 800; line-height: 1.7; min-height: 24px; }
         .empty { color: #94a3b8; }
+        .section-actions { margin-top: 14px; display: flex; justify-content: flex-end; }
         .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
         label { display: block; color: #334155; font-weight: 800; font-size: 13px; margin-bottom: 6px; }
         input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 9px; font-size: 16px; }
         input[readonly] { background: #e2e8f0; color: #475569; }
         .full { grid-column: 1 / -1; }
         button { margin-top: 18px; padding: 12px 16px; border: 0; border-radius: 9px; background: #0f172a; color: #ffffff; font-weight: 800; cursor: pointer; }
-        .section-header button { margin-top: 0; padding: 10px 14px; }
+        .section-actions button { margin-top: 0; padding: 10px 14px; }
         .secondary { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
         .edit-panel { display: none; margin-top: 16px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; }
         .edit-panel.active { display: block; }
@@ -44,7 +45,7 @@
             :root { --sidebar-width: 112px; --page-gap: 8px; }
             .header { padding: 14px 7px; }
             .form-grid, .details-grid { grid-template-columns: 1fr; }
-            .section-header { align-items: flex-start; flex-direction: column; }
+            .section-actions { justify-content: stretch; }
             .home-button, button { width: 100%; text-align: center; }
         }
     </style>
@@ -78,7 +79,6 @@
             <div class="section">
                 <div class="section-header">
                     <h2 class="section-title">بياناتي</h2>
-                    <button class="secondary" type="button" onclick="togglePanel('profilePanel')">تعديل بياناتي</button>
                 </div>
 
                 <div class="details-grid">
@@ -90,6 +90,9 @@
                         <div class="detail-label">رقم الجوال</div>
                         <div class="detail-value">{{ $user->phone }}</div>
                     </div>
+                </div>
+                <div class="section-actions">
+                    <button class="secondary" type="button" onclick="togglePanel('profilePanel')">تعديل بياناتي</button>
                 </div>
 
                 <div id="profilePanel" class="edit-panel {{ $errors->has('name') || $errors->has('phone') ? 'active' : '' }}">
@@ -114,7 +117,6 @@
             <div class="section">
                 <div class="section-header">
                     <h2 class="section-title">عنواني</h2>
-                    <button class="secondary" type="button" onclick="togglePanel('addressPanel')">{{ $hasAddress ? 'تعديل عنواني' : 'إضافة عنواني' }}</button>
                 </div>
 
                 <div class="details-grid">
@@ -138,6 +140,9 @@
                         <div class="detail-label">الرمز البريدي</div>
                         <div class="detail-value {{ $user->postal_code ? '' : 'empty' }}">{{ $user->postal_code ?: 'لم تتم الإضافة بعد' }}</div>
                     </div>
+                </div>
+                <div class="section-actions">
+                    <button class="secondary" type="button" onclick="togglePanel('addressPanel')">{{ $hasAddress ? 'تعديل عنواني' : 'إضافة عنواني' }}</button>
                 </div>
 
                 <div id="addressPanel" class="edit-panel {{ $errors->has('city') || $errors->has('district') || $errors->has('street') || $errors->has('postal_code') ? 'active' : '' }}">
@@ -177,7 +182,18 @@
             </div>
 
             <div class="section">
-                <button class="secondary" type="button" onclick="togglePanel('passwordPanel')">تغيير كلمة المرور</button>
+                <div class="section-header">
+                    <h2 class="section-title">كلمة المرور</h2>
+                </div>
+                <div class="details-grid">
+                    <div class="detail full">
+                        <div class="detail-label">كلمة المرور</div>
+                        <div class="detail-value">يمكنك تغيير كلمة المرور عند الحاجة.</div>
+                    </div>
+                </div>
+                <div class="section-actions">
+                    <button class="secondary" type="button" onclick="togglePanel('passwordPanel')">تغيير كلمة المرور</button>
+                </div>
 
                 <div id="passwordPanel" class="edit-panel {{ $errors->has('current_password') || $errors->has('password') ? 'active' : '' }}">
                     <h2 class="section-title">تغيير كلمة المرور</h2>

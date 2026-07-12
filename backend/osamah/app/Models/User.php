@@ -24,6 +24,7 @@ class User extends Authenticatable
         'postal_code',
         'password',
         'role',
+        'admin_permissions',
     ];
 
     protected $hidden = [
@@ -46,6 +47,31 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'admin_permissions' => 'array',
         ];
+    }
+
+    public function hasAdminPermission(string $permission): bool
+    {
+        if ($this->role !== 'admin') {
+            return false;
+        }
+
+        if ($this->admin_permissions === null) {
+            return true;
+        }
+
+        return in_array($permission, $this->admin_permissions, true);
+    }
+
+    public function hasAnyAdminPermission(array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($this->hasAdminPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

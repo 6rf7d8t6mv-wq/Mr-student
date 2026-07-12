@@ -24,7 +24,7 @@ class FileUploadController extends Controller
             $type = $request->input('type', 'unknown');
             $service = $request->input('service', 'notes');
 
-            if (!in_array($service, ['notes', 'thesis', 'phd'], true)) {
+            if (!in_array($service, ['notes', 'thesis', 'phd', 'formatting', 'research'], true)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'نوع الخدمة غير معروف'
@@ -221,11 +221,85 @@ class FileUploadController extends Controller
         ]);
     }
 
+    public function saveResearchOrder(Request $request)
+    {
+        $data = $request->validate([
+            'research_title' => ['required', 'string', 'max:255'],
+            'pages' => ['required', 'integer', 'min:1', 'max:9999'],
+        ]);
+
+        $researchTitle = trim($data['research_title']);
+        $pages = (int) $data['pages'];
+        $prices = $this->calculatePrices('research', $pages, 1, null);
+
+        $order = Order::query()->firstOrCreate([
+            'user_id' => Auth::id(),
+            'service_type' => 'research',
+            'status' => 'new',
+            'payment_status' => 'unpaid',
+        ], [
+            'print_total' => 0,
+            'binding_total' => 0,
+            'grand_total' => 0,
+        ]);
+
+        $orderFile = $order->files()->where('file_type', 'research')->first();
+        $payload = [
+            'file_type' => 'research',
+            'original_name' => $researchTitle,
+            'stored_name' => 'research-request-' . $order->id,
+            'path' => 'research-request',
+            'size' => 0,
+            'pages' => $pages,
+            'copies' => 1,
+            'thesis_project_type' => null,
+            'university_name' => null,
+            'research_title' => $researchTitle,
+            'binding_type' => null,
+            ...$prices,
+        ];
+
+        if ($orderFile) {
+            $orderFile->fill($payload)->save();
+        } else {
+            $orderFile = $order->files()->create($payload);
+        }
+
+        $this->refreshOrderTotals($order);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حفظ طلب إنشاء البحث بنجاح',
+            'file_id' => $orderFile->id,
+            'order_id' => $order->id,
+            'research_title' => $orderFile->research_title,
+            'pages' => $orderFile->pages,
+            'print_price' => $orderFile->print_price,
+            'binding_price' => $orderFile->binding_price,
+            'total_price' => $orderFile->total_price,
+            'order_totals' => $this->orderTotalsPayload($order->fresh()),
+        ]);
+    }
+
     public function destroyFile(OrderFile $file)
     {
         abort_unless($file->order->user_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
         $order = $file->order;
+
+        if ($order->payment_status === 'paid' && Auth::user()?->role !== 'admin') {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكن حذف ملف بعد إتمام الدفع.',
+                ], 422);
+            }
+
+            return back()->withErrors([
+                'file' => 'لا يمكن حذف ملف بعد إتمام الدفع.',
+            ]);
+        }
+
         $absolutePath = storage_path('app/' . $file->path);
 
         $file->delete();
@@ -235,6 +309,10 @@ class FileUploadController extends Controller
         }
 
         $this->refreshOrderTotals($order);
+
+        if (!request()->expectsJson()) {
+            return back()->with('status', 'تم حذف الملف من الطلب بنجاح.');
+        }
 
         return response()->json([
             'success' => true,
@@ -281,6 +359,16 @@ class FileUploadController extends Controller
 
     private function calculatePrices(string $service, int $pages, int $copies, ?string $binding): array
     {
+        if (in_array($service, ['formatting', 'research'], true)) {
+            $servicePrice = $pages * 10;
+
+            return [
+                'print_price' => 0,
+                'binding_price' => $servicePrice,
+                'total_price' => $servicePrice,
+            ];
+        }
+
         if ($service === 'notes') {
             $printPrice = $this->printPrice($pages, 1);
             $bindingPrice = 0;
@@ -327,10 +415,13 @@ class FileUploadController extends Controller
     private function refreshOrderTotals(Order $order): void
     {
         $order->load('files');
-        $printUnits = $order->files->sum(
-            fn (OrderFile $file) => $file->pages * max(1, (int) $file->copies)
-        );
-        $printTotal = $this->printPrice((int) $printUnits, 1);
+        $printTotal = 0;
+        if (!in_array($order->service_type, ['formatting', 'research'], true)) {
+            $printUnits = $order->files->sum(
+                fn (OrderFile $file) => $file->pages * max(1, (int) $file->copies)
+            );
+            $printTotal = $this->printPrice((int) $printUnits, 1);
+        }
         $bindingTotal = (int) $order->files->sum('binding_price');
 
         $order->update([

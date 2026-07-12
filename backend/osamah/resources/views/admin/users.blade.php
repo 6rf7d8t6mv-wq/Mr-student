@@ -6,9 +6,11 @@
     <div class="page-title">
         <div>
             <h1>المستخدمين</h1>
-            <p class="subtitle">إدارة المدراء بدون ازدحام داخل الجدول.</p>
+            <p class="subtitle">إدارة المستخدمين الذين يعملون على الطلبات داخل لوحة النظام.</p>
         </div>
-        <button class="save" type="button" onclick="openAdminModal('إضافة مدير', 'create-admin-template')">إضافة مدير</button>
+        @if (auth()->user()->hasAdminPermission('users_create'))
+            <button class="save" type="button" onclick="openAdminModal('إضافة مستخدم', 'create-admin-template')">إضافة مستخدم</button>
+        @endif
     </div>
 
     <div class="panel">
@@ -25,7 +27,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>المدير</th>
+                    <th>المستخدم</th>
                     <th>رقم الجوال</th>
                     <th>الطلبات</th>
                     <th>الصلاحية</th>
@@ -38,17 +40,20 @@
                         <td>
                             <div class="identity">
                                 <strong>{{ $user->name }}</strong>
-                                <span class="id-badge">مدير {{ $loop->iteration }}</span>
+                                <span class="id-badge">مستخدم {{ $loop->iteration }}</span>
                             </div>
                         </td>
                         <td>{{ $user->phone }}</td>
                         <td>{{ $user->orders_count }}</td>
-                        <td><span class="badge">مدير</span></td>
+                        <td><span class="badge">مستخدم إداري</span></td>
                         <td>
                             <div class="actions">
-                                <button class="ghost" type="button" onclick="openAdminModal('تعديل مدير', 'edit-admin-{{ $user->id }}')">تعديل</button>
-                                @if (!auth()->user()->is($user))
-                                    <form method="post" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('حذف هذا المدير؟')">
+                                @if (auth()->user()->hasAdminPermission('users_update'))
+                                    <button class="ghost" type="button" onclick="openAdminModal('تعديل بيانات المستخدم', 'edit-admin-{{ $user->id }}')">تعديل البيانات</button>
+                                    <button class="ghost" type="button" onclick="openAdminModal('صلاحيات المستخدم', 'permissions-admin-{{ $user->id }}')">الصلاحيات</button>
+                                @endif
+                                @if (auth()->user()->hasAdminPermission('users_delete') && !auth()->user()->is($user))
+                                    <form method="post" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('حذف هذا المستخدم؟')">
                                         @csrf
                                         @method('delete')
                                         <button class="danger small-button" type="submit">حذف</button>
@@ -58,7 +63,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="empty">لا يوجد مدراء.</td></tr>
+                    <tr><td colspan="5" class="empty">لا يوجد مستخدمين.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -71,24 +76,69 @@
             <div class="form-grid">
                 <div><label>الاسم</label><input name="name" required></div>
                 <div><label>رقم الجوال</label><input name="phone" required></div>
-                <div class="full"><label>كلمة المرور</label><input name="password" type="password" required></div>
+                <div><label>كلمة المرور</label><input name="password" type="password" required></div>
+                <div><label>تأكيد كلمة المرور</label><input name="password_confirmation" type="password" required></div>
             </div>
-            <button class="save" type="submit">إضافة مدير</button>
+            <div class="form-section">
+                <h3 class="form-section-title">صلاحيات المستخدم</h3>
+                <div class="permissions-grid">
+                    @foreach ($permissionOptions as $permissionKey => $permissionLabel)
+                        <label class="permission-option">
+                            <input type="checkbox" name="admin_permissions[]" value="{{ $permissionKey }}">
+                            <span>{{ $permissionLabel }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+            <button class="save" type="submit">إضافة مستخدم</button>
         </form>
     </template>
 
     @foreach ($users as $user)
+        @php
+            $selectedPermissions = $user->admin_permissions ?? array_keys($permissionOptions);
+        @endphp
         <template id="edit-admin-{{ $user->id }}">
             <form method="post" action="{{ route('admin.users.update', $user) }}">
                 @csrf
                 @method('patch')
                 <input type="hidden" name="role" value="admin">
-                <div class="form-grid">
-                    <div><label>الاسم</label><input name="name" value="{{ $user->name }}" required></div>
-                    <div><label>رقم الجوال</label><input name="phone" value="{{ $user->phone }}" required></div>
-                    <div class="full"><label>كلمة مرور جديدة</label><input name="password" type="password" placeholder="اتركها فارغة بدون تغيير"></div>
+                <div class="form-section">
+                    <h3 class="form-section-title">بيانات المستخدم</h3>
+                    <div class="form-grid">
+                        <div><label>الاسم</label><input name="name" value="{{ $user->name }}" required></div>
+                        <div><label>رقم الجوال</label><input name="phone" value="{{ $user->phone }}" required></div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3 class="form-section-title">تغيير كلمة المرور</h3>
+                    <p class="form-note">اترك الحقول فارغة إذا ما تبغى تغير كلمة المرور.</p>
+                    <div class="form-grid">
+                        <div><label>كلمة المرور الجديدة</label><input name="password" type="password" placeholder="كلمة مرور جديدة"></div>
+                        <div><label>تأكيد كلمة المرور الجديدة</label><input name="password_confirmation" type="password" placeholder="تأكيد كلمة المرور"></div>
+                    </div>
                 </div>
                 <button class="save" type="submit">حفظ التعديل</button>
+            </form>
+        </template>
+
+        <template id="permissions-admin-{{ $user->id }}">
+            <form method="post" action="{{ route('admin.users.permissions.update', $user) }}">
+                @csrf
+                @method('patch')
+                <div class="form-section">
+                    <h3 class="form-section-title">صلاحيات المستخدم</h3>
+                    <p class="form-note">حدد العمليات التي يستطيع {{ $user->name }} تنفيذها داخل لوحة النظام.</p>
+                    <div class="permissions-grid">
+                        @foreach ($permissionOptions as $permissionKey => $permissionLabel)
+                            <label class="permission-option">
+                                <input type="checkbox" name="admin_permissions[]" value="{{ $permissionKey }}" @checked(in_array($permissionKey, $selectedPermissions, true))>
+                                <span>{{ $permissionLabel }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+                <button class="save" type="submit">حفظ الصلاحيات</button>
             </form>
         </template>
     @endforeach

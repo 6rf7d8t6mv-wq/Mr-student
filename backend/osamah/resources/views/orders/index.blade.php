@@ -64,6 +64,9 @@
         .total-card span { display: block; color: #cbd5e1; font-size: 13px; margin-bottom: 8px; }
         .total-card strong { font-size: 24px; }
         .modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+        .delivered-files-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+        .delivered-file-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; }
+        .delivered-file-name { color: #0f172a; font-weight: 900; line-height: 1.6; word-break: break-word; }
         @media (max-width: 820px) {
             :root { --sidebar-width: 112px; --page-gap: 8px; }
             .header { padding: 14px 7px; }
@@ -122,6 +125,8 @@
                                     'notes' => 'مذكرات',
                                     'thesis' => 'ماجستير',
                                     'phd' => 'دكتوراه',
+                                    'formatting' => 'تنسيق الرسائل الجامعية',
+                                    'research' => 'إنشاء بحث',
                                 ];
                                 $projectNames = [
                                     'thesis' => 'رسالة ماجستير',
@@ -142,9 +147,10 @@
                                     'completed' => 'مكتمل',
                                     'cancelled' => 'ملغي',
                                 ];
-                                $isPaid = $order->payment_status === 'paid';
-                                $isCompleted = $order->status === 'completed';
-                                $isCancelled = $order->status === 'cancelled';
+                        $isPaid = $order->payment_status === 'paid';
+                        $isCompleted = $order->status === 'completed';
+                        $isCancelled = $order->status === 'cancelled';
+                        $hasDeliveredFile = in_array($order->service_type, ['formatting', 'research'], true) && $order->deliveredFiles->isNotEmpty();
                                 $projectTypes = $order->service_type === 'thesis'
                                     ? $order->files
                                         ->pluck('thesis_project_type')
@@ -189,6 +195,9 @@
                                 <td>
                                     <div class="actions">
                                         <button class="action ghost" type="button" onclick="openOrderModal('orderModal{{ $order->id }}')">عرض الطلب</button>
+                                        @if ($hasDeliveredFile)
+                                            <button class="action secondary" type="button" onclick="openOrderModal('orderModal{{ $order->id }}')">الملفات المستلمة</button>
+                                        @endif
                                         @if (! $isPaid && $order->files_count > 0)
                                             <a class="action secondary" href="{{ route('cart.show', $order) }}">إكمال الدفع</a>
                                         @else
@@ -214,12 +223,18 @@
                             'notes' => 'مذكرات',
                             'thesis' => 'ماجستير',
                             'phd' => 'دكتوراه',
+                            'formatting' => 'تنسيق الرسائل الجامعية',
+                            'research' => 'إنشاء بحث',
                         ];
                         $serviceFullNames = [
                             'notes' => 'طباعة وتغليف المذكرات',
                             'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
                             'phd' => 'طباعة وتجليد رسالة دكتوراه',
+                            'formatting' => 'تنسيق الرسائل الجامعية',
+                            'research' => 'إنشاء بحث',
                         ];
+                        $noPrintServices = ['formatting', 'research'];
+                        $hasDeliveredFile = in_array($order->service_type, $noPrintServices, true) && $order->deliveredFiles->isNotEmpty();
                         $projectNames = [
                             'thesis' => 'رسالة ماجستير',
                             'supplementary' => 'بحث تكميلي',
@@ -231,8 +246,12 @@
                             'normal' => $order->service_type === 'notes' ? 'تغليف عادي' : 'تجليد عادي',
                             'none' => $order->service_type === 'notes' ? 'بدون تغليف' : 'بدون تجليد',
                         ];
-                        $bindingLabel = $order->service_type === 'notes' ? 'التغليف' : 'التجليد';
-                        $bindingPriceLabel = $order->service_type === 'notes' ? 'سعر التغليف' : 'سعر التجليد';
+                        $bindingLabel = $order->service_type === 'notes'
+                            ? 'التغليف'
+                            : ($order->service_type === 'formatting' ? 'التنسيق' : ($order->service_type === 'research' ? 'إنشاء البحث' : 'التجليد'));
+                        $bindingPriceLabel = $order->service_type === 'notes'
+                            ? 'سعر التغليف'
+                            : ($order->service_type === 'formatting' ? 'سعر التنسيق' : ($order->service_type === 'research' ? 'سعر إنشاء البحث' : 'سعر التجليد'));
                         $statusNames = [
                             'new' => 'بانتظار الدفع',
                             'reviewing' => 'قيد المراجعة',
@@ -275,6 +294,26 @@
                                     <div class="detail-card"><span>حالة الطلب</span><strong>{{ $statusNames[$order->status] ?? $order->status }}</strong></div>
                                     <div class="detail-card"><span>الدفع</span><strong>{{ $order->payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع' }}</strong></div>
                                     <div class="detail-card"><span>تاريخ الطلب</span><strong>{{ $order->created_at->format('Y-m-d H:i') }}</strong></div>
+                                    @if (in_array($order->service_type, $noPrintServices, true))
+                                        <div class="detail-card full">
+                                            <span>ملف التسليم</span>
+                                            @if ($hasDeliveredFile)
+                                                <div class="delivered-files-list">
+                                                    @foreach ($order->deliveredFiles as $deliveredFile)
+                                                        <div class="delivered-file-item">
+                                                            <div>
+                                                                <div class="delivered-file-name">{{ $deliveredFile->original_name }}</div>
+                                                                <div class="service-detail">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
+                                                            </div>
+                                                            <a class="action secondary" href="{{ route('orders.delivered-file', [$order, $deliveredFile]) }}">تحميل</a>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <strong>لم يتم إرفاق الملف المستلم بعد.</strong>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                                 @if ($missingRequirements->isNotEmpty())
                                     <div class="missing-info">
@@ -294,7 +333,9 @@
                                             <thead>
                                                 <tr>
                                                     <th>الملف</th>
-                                                    <th>النوع</th>
+                                                    @if ($order->service_type !== 'research')
+                                                        <th>النوع</th>
+                                                    @endif
                                                     @if ($order->service_type === 'thesis')
                                                         <th>مشروع الرسالة</th>
                                                     @endif
@@ -302,18 +343,29 @@
                                                         <th>الجامعة/المعهد</th>
                                                     @endif
                                                     <th>الصفحات</th>
-                                                    <th>النسخ</th>
-                                                    <th>{{ $bindingLabel }}</th>
-                                                    <th>سعر الطباعة</th>
+                                                    @if ($order->service_type !== 'research')
+                                                        <th>النسخ</th>
+                                                    @endif
+                                                    @if (! in_array($order->service_type, $noPrintServices, true))
+                                                        <th>{{ $bindingLabel }}</th>
+                                                    @endif
+                                                    @if (! in_array($order->service_type, $noPrintServices, true))
+                                                        <th>سعر الطباعة</th>
+                                                    @endif
                                                     <th>{{ $bindingPriceLabel }}</th>
                                                     <th>إجمالي الملف</th>
+                                                    @if ($order->payment_status !== 'paid')
+                                                        <th>حذف</th>
+                                                    @endif
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($order->files as $file)
                                                     <tr>
                                                         <td>{{ $file->original_name }}</td>
-                                                        <td>{{ strtoupper($file->file_type) }}</td>
+                                                        @if ($order->service_type !== 'research')
+                                                            <td>{{ strtoupper($file->file_type) }}</td>
+                                                        @endif
                                                         @if ($order->service_type === 'thesis')
                                                             <td>{{ $projectNames[$file->thesis_project_type] ?? '-' }}</td>
                                                         @endif
@@ -321,11 +373,26 @@
                                                             <td>{{ $file->university_name ?: '-' }}</td>
                                                         @endif
                                                         <td>{{ $file->pages }}</td>
-                                                        <td>{{ $file->copies }}</td>
-                                                        <td>{{ $bindingNames[$file->binding_type] ?? '-' }}</td>
-                                                        <td class="price-cell">{{ $file->print_price }} ريال</td>
+                                                        @if ($order->service_type !== 'research')
+                                                            <td>{{ $file->copies }}</td>
+                                                        @endif
+                                                        @if (! in_array($order->service_type, $noPrintServices, true))
+                                                            <td>{{ $bindingNames[$file->binding_type] ?? '-' }}</td>
+                                                        @endif
+                                                        @if (! in_array($order->service_type, $noPrintServices, true))
+                                                            <td class="price-cell">{{ $file->print_price }} ريال</td>
+                                                        @endif
                                                         <td class="price-cell">{{ $file->binding_price }} ريال</td>
                                                         <td class="price-cell">{{ $file->total_price }} ريال</td>
+                                                        @if ($order->payment_status !== 'paid')
+                                                            <td>
+                                                                <form class="inline-form" method="post" action="{{ url('/order-files/' . $file->id) }}" onsubmit="return confirm('هل تريد حذف هذا الملف من الطلب؟')">
+                                                                    @csrf
+                                                                    @method('delete')
+                                                                    <button class="action danger" type="submit">حذف</button>
+                                                                </form>
+                                                            </td>
+                                                        @endif
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -334,7 +401,9 @@
                                 </div>
 
                                 <div class="totals-grid">
-                                    <div class="total-card"><span>سعر الطباعة</span><strong>{{ $order->print_total }} ريال</strong></div>
+                                    @if (! in_array($order->service_type, $noPrintServices, true))
+                                        <div class="total-card"><span>سعر الطباعة</span><strong>{{ $order->print_total }} ريال</strong></div>
+                                    @endif
                                     <div class="total-card"><span>{{ $bindingPriceLabel }}</span><strong>{{ $order->binding_total }} ريال</strong></div>
                                     <div class="total-card"><span>الإجمالي</span><strong>{{ $order->grand_total }} ريال</strong></div>
                                 </div>

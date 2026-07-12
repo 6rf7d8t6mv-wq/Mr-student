@@ -21,12 +21,19 @@ class Order extends Model
         'grand_total',
         'customer_notes',
         'admin_notes',
+        'delivered_file_original_name',
+        'delivered_file_stored_name',
+        'delivered_file_path',
+        'delivered_file_mime',
+        'delivered_file_size',
+        'delivered_file_uploaded_at',
     ];
 
     protected function casts(): array
     {
         return [
             'paid_at' => 'datetime',
+            'delivered_file_uploaded_at' => 'datetime',
         ];
     }
 
@@ -38,5 +45,10 @@ class Order extends Model
     public function files(): HasMany
     {
         return $this->hasMany(OrderFile::class);
+    }
+
+    public function deliveredFiles(): HasMany
+    {
+        return $this->hasMany(OrderDeliveredFile::class)->latest();
     }
 }

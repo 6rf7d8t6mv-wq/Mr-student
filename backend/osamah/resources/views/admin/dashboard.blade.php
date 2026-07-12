@@ -14,9 +14,9 @@
         <div class="stat"><span>كل الطلبات</span><strong>{{ $stats['orders'] }}</strong></div>
         <div class="stat"><span>طلبات جديدة</span><strong>{{ $stats['new_orders'] }}</strong></div>
         <div class="stat"><span>العملاء</span><strong>{{ $stats['customers'] }}</strong></div>
-        <div class="stat"><span>المدراء</span><strong>{{ $stats['admins'] }}</strong></div>
+        <div class="stat"><span>المستخدمين الإداريين</span><strong>{{ $stats['admins'] }}</strong></div>
         <div class="stat"><span>إجمالي الطباعة</span><strong>{{ $stats['print_total'] }} ريال</strong></div>
-        <div class="stat"><span>إجمالي التجليد/التغليف</span><strong>{{ $stats['binding_total'] }} ريال</strong></div>
+        <div class="stat"><span>إجمالي التجليد/التغليف/التنسيق</span><strong>{{ $stats['binding_total'] }} ريال</strong></div>
         <div class="stat"><span>الإجمالي الكلي</span><strong>{{ $stats['grand_total'] }} ريال</strong></div>
     </div>
 
@@ -41,7 +41,7 @@
                         <tr>
                             <td>#{{ $order->id }}</td>
                             <td>{{ $order->user->name }} - {{ $order->user->phone }}</td>
-                            <td>{{ ['notes' => 'مذكرات', 'thesis' => 'ماجستير', 'phd' => 'دكتوراه'][$order->service_type] ?? $order->service_type }}</td>
+                            <td>{{ ['notes' => 'مذكرات', 'thesis' => 'ماجستير', 'phd' => 'دكتوراه', 'formatting' => 'تنسيق الرسائل الجامعية', 'research' => 'إنشاء بحث'][$order->service_type] ?? $order->service_type }}</td>
                             <td>{{ $order->status }}</td>
                             <td>{{ $order->payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع' }}</td>
                             <td>{{ $order->grand_total }} ريال</td>

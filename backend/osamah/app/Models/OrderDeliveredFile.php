@@ -5,28 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderFile extends Model
+class OrderDeliveredFile extends Model
 {
     protected $fillable = [
         'order_id',
-        'file_type',
         'original_name',
         'stored_name',
         'path',
+        'mime',
         'size',
-        'pages',
-        'copies',
-        'thesis_project_type',
-        'university_name',
-        'research_title',
-        'binding_type',
-        'print_price',
-        'binding_price',
-        'total_price',
+        'uploaded_by',
     ];
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function uploader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 }

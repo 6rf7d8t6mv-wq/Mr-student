@@ -86,7 +86,10 @@
                     'notes' => 'طباعة وتغليف المذكرات',
                     'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
                     'phd' => 'طباعة وتجليد رسالة دكتوراه',
+                    'formatting' => 'تنسيق الرسائل الجامعية',
+                    'research' => 'إنشاء بحث',
                 ];
+                $noPrintServices = ['formatting', 'research'];
                 $projectNames = [
                     'thesis' => 'رسالة ماجستير',
                     'supplementary' => 'بحث تكميلي',
@@ -98,8 +101,12 @@
                     'normal' => $order->service_type === 'notes' ? 'تغليف عادي' : 'تجليد عادي',
                     'none' => $order->service_type === 'notes' ? 'بدون تغليف' : 'بدون تجليد',
                 ];
-                $bindingLabel = $order->service_type === 'notes' ? 'التغليف' : 'التجليد';
-                $bindingPriceLabel = $order->service_type === 'notes' ? 'سعر التغليف' : 'سعر التجليد';
+                $bindingLabel = $order->service_type === 'notes'
+                    ? 'التغليف'
+                    : ($order->service_type === 'formatting' ? 'التنسيق' : ($order->service_type === 'research' ? 'إنشاء البحث' : 'التجليد'));
+                $bindingPriceLabel = $order->service_type === 'notes'
+                    ? 'سعر التغليف'
+                    : ($order->service_type === 'formatting' ? 'سعر التنسيق' : ($order->service_type === 'research' ? 'سعر إنشاء البحث' : 'سعر التجليد'));
                 $statusNames = [
                     'new' => 'بانتظار الدفع',
                     'reviewing' => 'قيد المراجعة',
@@ -157,7 +164,9 @@
                         <thead>
                             <tr>
                                 <th>الملف</th>
-                                <th>النوع</th>
+                                @if ($order->service_type !== 'research')
+                                    <th>النوع</th>
+                                @endif
                                 @if ($order->service_type === 'thesis')
                                     <th>مشروع الرسالة</th>
                                 @endif
@@ -165,9 +174,15 @@
                                     <th>الجامعة/المعهد</th>
                                 @endif
                                 <th>الصفحات</th>
-                                <th>النسخ</th>
-                                <th>{{ $bindingLabel }}</th>
-                                <th>سعر الطباعة</th>
+                                @if ($order->service_type !== 'research')
+                                    <th>النسخ</th>
+                                @endif
+                                @if (! in_array($order->service_type, $noPrintServices, true))
+                                    <th>{{ $bindingLabel }}</th>
+                                @endif
+                                @if (! in_array($order->service_type, $noPrintServices, true))
+                                    <th>سعر الطباعة</th>
+                                @endif
                                 <th>{{ $bindingPriceLabel }}</th>
                                 <th>إجمالي الملف</th>
                             </tr>
@@ -176,7 +191,9 @@
                             @foreach ($order->files as $file)
                                 <tr>
                                     <td>{{ $file->original_name }}</td>
-                                    <td>{{ strtoupper($file->file_type) }}</td>
+                                    @if ($order->service_type !== 'research')
+                                        <td>{{ strtoupper($file->file_type) }}</td>
+                                    @endif
                                     @if ($order->service_type === 'thesis')
                                         <td>{{ $projectNames[$file->thesis_project_type] ?? '-' }}</td>
                                     @endif
@@ -184,9 +201,15 @@
                                         <td>{{ $file->university_name ?: '-' }}</td>
                                     @endif
                                     <td>{{ $file->pages }}</td>
-                                    <td>{{ $file->copies }}</td>
-                                    <td>{{ $bindingNames[$file->binding_type] ?? '-' }}</td>
-                                    <td class="price-cell">{{ $file->print_price }} ريال</td>
+                                    @if ($order->service_type !== 'research')
+                                        <td>{{ $file->copies }}</td>
+                                    @endif
+                                    @if (! in_array($order->service_type, $noPrintServices, true))
+                                        <td>{{ $bindingNames[$file->binding_type] ?? '-' }}</td>
+                                    @endif
+                                    @if (! in_array($order->service_type, $noPrintServices, true))
+                                        <td class="price-cell">{{ $file->print_price }} ريال</td>
+                                    @endif
                                     <td class="price-cell">{{ $file->binding_price }} ريال</td>
                                     <td class="price-cell">{{ $file->total_price }} ريال</td>
                                 </tr>
@@ -200,7 +223,9 @@
         <section class="panel">
             <h2>الإجمالي</h2>
             <div class="totals">
-                <div class="total-card"><span>سعر الطباعة</span><strong>{{ $order->print_total }} ريال</strong></div>
+                @if (! in_array($order->service_type, $noPrintServices, true))
+                    <div class="total-card"><span>سعر الطباعة</span><strong>{{ $order->print_total }} ريال</strong></div>
+                @endif
                 <div class="total-card"><span>{{ $bindingPriceLabel }}</span><strong>{{ $order->binding_total }} ريال</strong></div>
                 <div class="total-card"><span>الإجمالي</span><strong>{{ $order->grand_total }} ريال</strong></div>
             </div>
