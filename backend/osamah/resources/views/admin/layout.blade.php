@@ -13,7 +13,9 @@
         .admin-name { color: #cbd5e1; font-size: 13px; margin-bottom: 24px; line-height: 1.6; }
         nav { display: flex; flex-direction: column; gap: 8px; }
         nav a, .logout { color: #f8fafc; text-decoration: none; border: 1px solid transparent; border-radius: 8px; padding: 11px 12px; background: transparent; text-align: right; font: inherit; cursor: pointer; }
+        nav a { position: relative; display: block; }
         nav a:hover, nav a.active, .logout:hover { background: #1e293b; border-color: #334155; }
+        .nav-notice-dot { position: absolute; top: 8px; left: 9px; width: 7px; height: 7px; border-radius: 999px; background: #dc2626; box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.95); }
         .logout { width: 100%; margin-top: 18px; }
         main { min-width: 0; padding: clamp(16px, 3vw, 28px); overflow: auto; }
         .page-title { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 20px; }
@@ -57,6 +59,10 @@
         .small-button { margin-top: 0; padding: 7px 10px; border-radius: 7px; font-size: 12px; line-height: 1; }
         .ghost { margin-top: 0; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 7px; background: #ffffff; color: #0f172a; font-size: 12px; font-weight: 800; cursor: pointer; }
         .badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 12px; font-weight: 800; }
+        .tiny-status-dot { display: inline-flex; width: 8px; height: 8px; border-radius: 999px; vertical-align: middle; margin-inline-start: 6px; box-shadow: 0 0 0 2px #ffffff; }
+        .tiny-status-dot.red { background: #dc2626; }
+        .tiny-status-dot.yellow { background: #facc15; }
+        .tiny-status-dot.green { background: #16a34a; }
         .id-badge { display: inline-flex; align-items: center; margin-inline-start: 8px; padding: 2px 7px; border-radius: 999px; background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 800; }
         .identity { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .muted { color: #64748b; font-size: 12px; }
@@ -64,6 +70,9 @@
         .delivered-file-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; }
         .delivered-file-name { color: #0f172a; font-weight: 900; line-height: 1.6; word-break: break-word; }
         .delivered-file-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .delivered-file-actions .ghost,
+        .delivered-file-actions .save,
+        .delivered-file-actions .danger { min-width: 110px; justify-content: center; text-align: center; }
         .modal-backdrop { position: fixed; inset: 0; display: none; place-items: center; padding: clamp(10px, 3vw, 20px); background: rgba(15, 23, 42, 0.55); z-index: 40; overflow-y: auto; }
         .modal-backdrop.active { display: grid; }
         .modal { width: min(560px, 100%); max-height: calc(100vh - 20px); background: #ffffff; border-radius: 12px; box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28); overflow: hidden; display: flex; flex-direction: column; }
@@ -91,11 +100,22 @@
 <body>
     <div class="layout">
         <aside>
+            @php
+                $hasUnopenedOrdersForAdmin = \App\Models\Order::query()
+                    ->whereNull('admin_notification_seen_at')
+                    ->where('status', '!=', 'completed')
+                    ->exists();
+            @endphp
             <div class="brand">Mr-Student</div>
             <div class="admin-name">{{ auth()->user()->name }}<br>مدير النظام</div>
             <nav>
                 <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">الرئيسية</a>
-                <a class="{{ request()->routeIs('admin.orders') ? 'active' : '' }}" href="{{ route('admin.orders') }}">الطلبات</a>
+                <a class="{{ request()->routeIs('admin.orders') ? 'active' : '' }}" href="{{ route('admin.orders') }}">
+                    الطلبات
+                    @if ($hasUnopenedOrdersForAdmin)
+                        <span class="nav-notice-dot" aria-label="طلبات جديدة"></span>
+                    @endif
+                </a>
                 <a class="{{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('admin.users') }}">المستخدمين</a>
                 <a class="{{ request()->routeIs('admin.customers') ? 'active' : '' }}" href="{{ route('admin.customers') }}">العملاء</a>
                 <a class="{{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">الإعدادات</a>
@@ -150,14 +170,80 @@
             if (event.key === 'Escape') closeAdminModal();
         });
 
-        document.querySelectorAll('.auto-search-form').forEach((form) => {
-            const input = form.querySelector('input[name="search"]');
-            let timeoutId;
+        let activeSearchRequest = null;
 
-            input?.addEventListener('input', () => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => form.submit(), 450);
+        function bindAutoSearchForms(root = document) {
+            root.querySelectorAll('.auto-search-form').forEach((form) => {
+                if (form.dataset.searchBound === 'true') return;
+
+                const input = form.querySelector('input[name="search"]');
+                let timeoutId;
+
+                const runSearch = () => {
+                    if (!input) return;
+
+                    const caretPosition = input.selectionStart ?? input.value.length;
+                    const params = new URLSearchParams(new FormData(form));
+                    const url = `${form.action}?${params.toString()}`;
+
+                    activeSearchRequest?.abort();
+                    activeSearchRequest = new AbortController();
+
+                    fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        signal: activeSearchRequest.signal,
+                    })
+                        .then((response) => response.text())
+                        .then((html) => {
+                            const nextDocument = new DOMParser().parseFromString(html, 'text/html');
+                            const nextMain = nextDocument.querySelector('main');
+                            const currentMain = document.querySelector('main');
+
+                            if (!nextMain || !currentMain) {
+                                window.location.href = url;
+                                return;
+                            }
+
+                            currentMain.innerHTML = nextMain.innerHTML;
+                            window.history.replaceState({}, '', url);
+                            bindAutoSearchForms(currentMain);
+
+                            const nextInput = currentMain.querySelector('.auto-search-form input[name="search"]');
+                            if (nextInput) {
+                                nextInput.focus();
+                                const nextCaretPosition = Math.min(caretPosition, nextInput.value.length);
+                                nextInput.setSelectionRange(nextCaretPosition, nextCaretPosition);
+                            }
+                        })
+                        .catch((error) => {
+                            if (error.name !== 'AbortError') form.submit();
+                        });
+                };
+
+                input?.addEventListener('input', () => {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(runSearch, 450);
+                });
+
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    clearTimeout(timeoutId);
+                    runSearch();
+                });
+
+                form.dataset.searchBound = 'true';
             });
+        }
+
+        bindAutoSearchForms();
+
+        document.addEventListener('click', (event) => {
+            const link = event.target.closest('[data-complete-order-download]');
+            if (!link) return;
+
+            const dot = link.closest('.order')?.querySelector('[data-order-status-dot]');
+            dot?.classList.remove('red', 'yellow');
+            dot?.classList.add('green');
         });
     </script>
 </body>

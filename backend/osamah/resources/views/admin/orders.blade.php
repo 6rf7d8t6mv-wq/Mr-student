@@ -37,11 +37,17 @@
                 'normal' => $order->service_type === 'notes' ? 'تغليف عادي' : 'تجليد عادي',
                 'none' => $order->service_type === 'notes' ? 'بدون تغليف' : 'بدون تجليد',
             ];
+            $orderDotColor = in_array($order->status, ['completed', 'finished'], true)
+                ? 'green'
+                : (blank($order->admin_opened_at) ? 'red' : 'yellow');
+            $dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            $createdAtText = $dayNames[$order->created_at->dayOfWeek] . ' - ' . $order->created_at->format('Y-m-d H:i');
         @endphp
-        <div class="order">
+        <div class="order" data-order-id="{{ $order->id }}">
             <div class="order-head">
-                <div><span class="label">رقم الطلب</span>#{{ $order->id }}</div>
+                <div><span class="label">رقم الطلب</span><span class="tiny-status-dot {{ $orderDotColor }}" data-order-status-dot></span>#{{ $order->id }}</div>
                 <div><span class="label">العميل</span>{{ $order->user->name }} - {{ $order->user->phone }}</div>
+                <div><span class="label">تاريخ إنشاء الطلب</span>{{ $createdAtText }}</div>
                 <div><span class="label">الخدمة</span>{{ ['notes' => 'مذكرات', 'thesis' => 'ماجستير', 'phd' => 'دكتوراه', 'formatting' => 'تنسيق الرسائل الجامعية', 'research' => 'إنشاء بحث'][$order->service_type] ?? $order->service_type }}</div>
                 <div><span class="label">الحالة</span>{{ $order->status }}</div>
                 <div><span class="label">الدفع</span>{{ $order->payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع' }}{{ $order->payment_method ? ' - ' . (['apple_pay' => 'Apple Pay', 'card' => 'بطاقة'][$order->payment_method] ?? $order->payment_method) : '' }}</div>
@@ -115,7 +121,7 @@
                                 @if ($order->service_type === 'research')
                                     -
                                 @else
-                                    <a href="{{ route('admin.files.download', $file) }}">تنزيل</a>
+                                    <a class="save small-button" href="{{ route('admin.files.download', $file) }}" data-complete-order-download>تنزيل الملف</a>
                                 @endif
                             </td>
                         </tr>
@@ -134,7 +140,8 @@
                                         <div class="muted">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
                                     </div>
                                     <div class="delivered-file-actions">
-                                        <a class="ghost" href="{{ route('admin.delivered-files.download', $deliveredFile) }}">عرض / تحميل</a>
+                                        <a class="ghost" href="{{ route('admin.delivered-files.download', ['deliveredFile' => $deliveredFile, 'view' => 1]) }}" target="_blank" rel="noopener">عرض</a>
+                                        <a class="save small-button" href="{{ route('admin.delivered-files.download', $deliveredFile) }}">تحميل</a>
                                         <form method="post" action="{{ route('admin.delivered-files.destroy', $deliveredFile) }}" onsubmit="return confirm('حذف ملف التسليم هذا؟')">
                                             @csrf
                                             @method('delete')

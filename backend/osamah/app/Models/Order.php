@@ -21,6 +21,8 @@ class Order extends Model
         'grand_total',
         'customer_notes',
         'admin_notes',
+        'admin_opened_at',
+        'admin_notification_seen_at',
         'delivered_file_original_name',
         'delivered_file_stored_name',
         'delivered_file_path',
@@ -33,6 +35,8 @@ class Order extends Model
     {
         return [
             'paid_at' => 'datetime',
+            'admin_opened_at' => 'datetime',
+            'admin_notification_seen_at' => 'datetime',
             'delivered_file_uploaded_at' => 'datetime',
         ];
     }

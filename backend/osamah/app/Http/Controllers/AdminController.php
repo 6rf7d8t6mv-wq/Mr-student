@@ -56,10 +56,19 @@ class AdminController extends Controller
     {
         $this->ensureAdmin();
 
+        Order::query()
+            ->whereNull('admin_notification_seen_at')
+            ->update(['admin_notification_seen_at' => now()]);
+
+        Order::query()
+            ->whereNull('admin_opened_at')
+            ->whereNotIn('status', ['completed', 'finished'])
+            ->update(['admin_opened_at' => now()]);
+
         $search = trim((string) $request->query('search', ''));
 
         $orders = Order::query()
-            ->with(['user', 'files'])
+            ->with(['user', 'files', 'deliveredFiles'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where('id', $search)
                     ->orWhereHas('user', function ($userQuery) use ($search) {
@@ -264,6 +273,10 @@ class AdminController extends Controller
 
         abort_unless(is_file($absolutePath), 404);
 
+        if (! in_array($file->order->service_type, ['formatting', 'research'], true)) {
+            $file->order->update(['status' => 'completed']);
+        }
+
         return Response::download($absolutePath, $file->original_name);
     }
 
@@ -300,6 +313,7 @@ class AdminController extends Controller
         ]);
 
         $order->update([
+            'status' => 'completed',
             'delivered_file_original_name' => $file->getClientOriginalName(),
             'delivered_file_stored_name' => $storedName,
             'delivered_file_path' => $path,
@@ -311,6 +325,17 @@ class AdminController extends Controller
         return back()->with('status', 'تم إرفاق ملف التسليم للعميل بنجاح.');
     }
 
+    public function openOrder(Order $order)
+    {
+        $this->ensureAdmin();
+
+        if (blank($order->admin_opened_at)) {
+            $order->update(['admin_opened_at' => now()]);
+        }
+
+        return redirect()->route('admin.orders')->with('status', 'تم فتح الطلب.');
+    }
+
     public function downloadDeliveredFile(OrderDeliveredFile $deliveredFile)
     {
         $this->ensureAdmin();
@@ -318,6 +343,13 @@ class AdminController extends Controller
         $absolutePath = storage_path('app/' . $deliveredFile->path);
 
         abort_unless(File::isFile($absolutePath), 404);
+
+        if (request()->boolean('view')) {
+            return response()->file($absolutePath, [
+                'Content-Type' => $deliveredFile->mime ?: 'application/octet-stream',
+                'Content-Disposition' => 'inline; filename="' . addslashes($deliveredFile->original_name) . '"',
+            ]);
+        }
 
         return Response::download($absolutePath, $deliveredFile->original_name);
     }

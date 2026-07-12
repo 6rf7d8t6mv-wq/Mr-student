@@ -64,6 +64,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::patch('/users/{user}/permissions', [AdminController::class, 'updateUserPermissions'])->name('users.permissions.update');
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+    Route::patch('/orders/{order}/open', [AdminController::class, 'openOrder'])->name('orders.open');
     Route::delete('/orders/{order}', [AdminController::class, 'destroyOrder'])->name('orders.destroy');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::patch('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');

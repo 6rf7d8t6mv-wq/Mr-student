@@ -65,8 +65,9 @@
         .total-card strong { font-size: 24px; }
         .modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
         .delivered-files-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-        .delivered-file-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; }
+        .delivered-file-item { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; }
         .delivered-file-name { color: #0f172a; font-weight: 900; line-height: 1.6; word-break: break-word; }
+        .delivered-file-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
         @media (max-width: 820px) {
             :root { --sidebar-width: 112px; --page-gap: 8px; }
             .header { padding: 14px 7px; }
@@ -114,7 +115,7 @@
                             <th>حالة الدفع</th>
                             <th>حالة الطلب</th>
                             <th>الإجمالي</th>
-                            <th>التاريخ</th>
+                            <th>تاريخ الإنشاء</th>
                             <th>الإجراء</th>
                         </tr>
                     </thead>
@@ -172,6 +173,8 @@
                                 $serviceDetail = $order->service_type === 'thesis' && $projectTypes->isNotEmpty()
                                     ? $projectTypes->implode('، ')
                                     : 'اضغط عرض الطلب للتفاصيل';
+                                $dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+                                $createdAtText = $dayNames[$order->created_at->dayOfWeek] . ' - ' . $order->created_at->format('Y-m-d H:i');
                             @endphp
                             <tr>
                                 <td>#{{ $order->id }}</td>
@@ -191,12 +194,12 @@
                                     </span>
                                 </td>
                                 <td>{{ $order->grand_total }} ريال</td>
-                                <td>{{ $order->created_at->format('Y-m-d') }}</td>
+                                <td>{{ $createdAtText }}</td>
                                 <td>
                                     <div class="actions">
                                         <button class="action ghost" type="button" onclick="openOrderModal('orderModal{{ $order->id }}')">عرض الطلب</button>
                                         @if ($hasDeliveredFile)
-                                            <button class="action secondary" type="button" onclick="openOrderModal('orderModal{{ $order->id }}')">الملفات المستلمة</button>
+                                            <button class="action secondary" type="button" onclick="openOrderModal('deliveredFilesModal{{ $order->id }}')">الملفات المستلمة</button>
                                         @endif
                                         @if (! $isPaid && $order->files_count > 0)
                                             <a class="action secondary" href="{{ route('cart.show', $order) }}">إكمال الدفع</a>
@@ -278,6 +281,8 @@
                         if ($order->service_type === 'thesis' && $order->files->contains(fn ($file) => $file->file_type === 'pdf' && blank($file->thesis_project_type))) {
                             $missingRequirements->push('اختيار نوع مشروع الرسالة لكل ملف PDF.');
                         }
+                        $dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+                        $createdAtText = $dayNames[$order->created_at->dayOfWeek] . ' - ' . $order->created_at->format('Y-m-d H:i');
                     @endphp
                     <div class="modal-backdrop" id="orderModal{{ $order->id }}" tabindex="-1" onclick="closeOrderModal(event, 'orderModal{{ $order->id }}')">
                         <div class="modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
@@ -293,27 +298,7 @@
                                     @endif
                                     <div class="detail-card"><span>حالة الطلب</span><strong>{{ $statusNames[$order->status] ?? $order->status }}</strong></div>
                                     <div class="detail-card"><span>الدفع</span><strong>{{ $order->payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع' }}</strong></div>
-                                    <div class="detail-card"><span>تاريخ الطلب</span><strong>{{ $order->created_at->format('Y-m-d H:i') }}</strong></div>
-                                    @if (in_array($order->service_type, $noPrintServices, true))
-                                        <div class="detail-card full">
-                                            <span>ملف التسليم</span>
-                                            @if ($hasDeliveredFile)
-                                                <div class="delivered-files-list">
-                                                    @foreach ($order->deliveredFiles as $deliveredFile)
-                                                        <div class="delivered-file-item">
-                                                            <div>
-                                                                <div class="delivered-file-name">{{ $deliveredFile->original_name }}</div>
-                                                                <div class="service-detail">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
-                                                            </div>
-                                                            <a class="action secondary" href="{{ route('orders.delivered-file', [$order, $deliveredFile]) }}">تحميل</a>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <strong>لم يتم إرفاق الملف المستلم بعد.</strong>
-                                            @endif
-                                        </div>
-                                    @endif
+                                    <div class="detail-card"><span>تاريخ إنشاء الطلب</span><strong>{{ $createdAtText }}</strong></div>
                                 </div>
                                 @if ($missingRequirements->isNotEmpty())
                                     <div class="missing-info">
@@ -423,6 +408,37 @@
                             </div>
                         </div>
                     </div>
+
+                    @if (in_array($order->service_type, $noPrintServices, true))
+                        <div class="modal-backdrop" id="deliveredFilesModal{{ $order->id }}" tabindex="-1" onclick="closeOrderModal(event, 'deliveredFilesModal{{ $order->id }}')">
+                            <div class="modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+                                <div class="modal-head">
+                                    <div class="modal-title">الملفات المستلمة للطلب #{{ $order->id }}</div>
+                                    <button class="modal-close" type="button" onclick="closeOrderModal(null, 'deliveredFilesModal{{ $order->id }}')">إغلاق</button>
+                                </div>
+                                <div class="modal-body">
+                                    @if ($hasDeliveredFile)
+                                        <div class="delivered-files-list">
+                                            @foreach ($order->deliveredFiles as $deliveredFile)
+                                                <div class="delivered-file-item">
+                                                    <div>
+                                                        <div class="delivered-file-name">{{ $deliveredFile->original_name }}</div>
+                                                        <div class="service-detail">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
+                                                    </div>
+                                                    <div class="delivered-file-buttons">
+                                                        <a class="action ghost" href="{{ route('orders.delivered-file', ['order' => $order, 'deliveredFile' => $deliveredFile, 'view' => 1]) }}" target="_blank" rel="noopener">عرض</a>
+                                                        <a class="action secondary" href="{{ route('orders.delivered-file', [$order, $deliveredFile]) }}">تحميل</a>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="empty">لم يتم إرفاق ملفات مستلمة بعد.</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 @endforeach
             @endif
         </section>

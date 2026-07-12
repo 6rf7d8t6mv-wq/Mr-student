@@ -133,9 +133,12 @@
                 if ($order->service_type === 'thesis' && $order->files->contains(fn ($file) => $file->file_type === 'pdf' && blank($file->thesis_project_type))) {
                     $missingRequirements->push('اختيار نوع مشروع الرسالة لكل ملف PDF.');
                 }
+                $dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+                $createdAtText = $dayNames[$order->created_at->dayOfWeek] . ' - ' . $order->created_at->format('Y-m-d H:i');
             @endphp
             <div class="meta">
                 <div class="meta-card"><span>رقم الطلب</span><strong>#{{ $order->id }}</strong></div>
+                <div class="meta-card"><span>تاريخ إنشاء الطلب</span><strong>{{ $createdAtText }}</strong></div>
                 <div class="meta-card"><span>حالة الطلب</span><strong>{{ $statusNames[$order->status] ?? $order->status }}</strong></div>
                 <div class="meta-card"><span>الدفع</span><strong>{{ $order->payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع' }}</strong></div>
                 <div class="meta-card"><span>عدد الملفات</span><strong>{{ $order->files->count() }}</strong></div>

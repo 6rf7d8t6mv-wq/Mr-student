@@ -112,6 +112,10 @@ class FileUploadController extends Controller
                 'binding_total' => 0,
                 'grand_total' => 0,
             ]);
+            $order->forceFill([
+                'admin_opened_at' => null,
+                'admin_notification_seen_at' => null,
+            ])->save();
 
             $orderFile = OrderFile::query()->create([
                 'order_id' => $order->id,
@@ -242,6 +246,10 @@ class FileUploadController extends Controller
             'binding_total' => 0,
             'grand_total' => 0,
         ]);
+        $order->forceFill([
+            'admin_opened_at' => null,
+            'admin_notification_seen_at' => null,
+        ])->save();
 
         $orderFile = $order->files()->where('file_type', 'research')->first();
         $payload = [

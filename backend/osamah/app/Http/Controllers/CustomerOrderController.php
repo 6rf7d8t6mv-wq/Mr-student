@@ -66,6 +66,13 @@ class CustomerOrderController extends Controller
 
         abort_unless(File::isFile($absolutePath), 404);
 
+        if (request()->boolean('view')) {
+            return response()->file($absolutePath, [
+                'Content-Type' => $deliveredFile->mime ?: 'application/octet-stream',
+                'Content-Disposition' => 'inline; filename="' . addslashes($deliveredFile->original_name) . '"',
+            ]);
+        }
+
         return Response::download($absolutePath, $deliveredFile->original_name);
     }
 }
