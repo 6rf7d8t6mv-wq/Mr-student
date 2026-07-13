@@ -23,7 +23,7 @@ class AccountController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', Rule::unique('users', 'phone')->ignore($user->id)],
         ]);
 
         $user->update($data);
@@ -39,7 +39,7 @@ class AccountController extends Controller
             'city' => ['required', 'string', 'max:120', Rule::in($this->saudiCities())],
             'district' => ['required', 'string', 'max:120'],
             'street' => ['required', 'string', 'max:180'],
-            'postal_code' => ['required', 'string', 'max:20'],
+            'postal_code' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
         ]);
 
         $data['address'] = implode(' - ', [
@@ -61,7 +61,7 @@ class AccountController extends Controller
 
         $data = $request->validate([
             'current_password' => ['required', 'string'],
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'password' => ['required', 'confirmed', Password::min(6), 'regex:/^[A-Za-z0-9]+$/'],
         ]);
 
         if (!Hash::check($data['current_password'], $user->password)) {
@@ -75,6 +75,26 @@ class AccountController extends Controller
         ]);
 
         return redirect()->route('account.settings')->with('status', 'تم تغيير كلمة المرور بنجاح.');
+    }
+
+    public function destroy(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'admin' && $user->admin_permissions === null) {
+            return back()->withErrors([
+                'account' => 'لا يمكن حذف حساب مدير النظام الأساسي.',
+            ]);
+        }
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        $user->delete();
+
+        return redirect()->route('login')->with('status', 'تم حذف حسابك بنجاح.');
     }
 
     private function saudiCities(): array

@@ -40,7 +40,7 @@
                         <td>
                             <div class="identity">
                                 <strong>{{ $user->name }}</strong>
-                                <span class="id-badge">مستخدم {{ $loop->iteration }}</span>
+                                <span class="id-badge">{{ auth()->user()->is($user) ? 'حسابك الحالي' : 'مستخدم ' . $loop->iteration }}</span>
                             </div>
                         </td>
                         <td>{{ $user->phone }}</td>
@@ -48,9 +48,11 @@
                         <td><span class="badge">مستخدم إداري</span></td>
                         <td>
                             <div class="actions">
-                                @if (auth()->user()->hasAdminPermission('users_update'))
+                                @if (!auth()->user()->is($user) && auth()->user()->hasAdminPermission('users_update'))
                                     <button class="ghost" type="button" onclick="openAdminModal('تعديل بيانات المستخدم', 'edit-admin-{{ $user->id }}')">تعديل البيانات</button>
                                     <button class="ghost" type="button" onclick="openAdminModal('صلاحيات المستخدم', 'permissions-admin-{{ $user->id }}')">الصلاحيات</button>
+                                @elseif (auth()->user()->is($user))
+                                    <span class="muted">تعديل حسابك من الإعدادات</span>
                                 @endif
                                 @if (auth()->user()->hasAdminPermission('users_delete') && !auth()->user()->is($user))
                                     <form method="post" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('حذف هذا المستخدم؟')">
@@ -112,8 +114,9 @@
                 </div>
                 <div class="form-section">
                     <h3 class="form-section-title">تغيير كلمة المرور</h3>
-                    <p class="form-note">اترك الحقول فارغة إذا ما تبغى تغير كلمة المرور.</p>
-                    <div class="form-grid">
+                    <p class="form-note">اضغط الزر إذا كنت تريد تغيير كلمة مرور هذا المستخدم.</p>
+                    <button class="ghost" type="button" onclick="toggleInlinePasswordPanel(this)">تغيير كلمة المرور</button>
+                    <div class="form-grid inline-password-panel" style="display: none; margin-top: 12px;">
                         <div><label>كلمة المرور الجديدة</label><input name="password" type="password" placeholder="كلمة مرور جديدة"></div>
                         <div><label>تأكيد كلمة المرور الجديدة</label><input name="password_confirmation" type="password" placeholder="تأكيد كلمة المرور"></div>
                     </div>

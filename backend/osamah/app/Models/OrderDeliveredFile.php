@@ -15,7 +15,15 @@ class OrderDeliveredFile extends Model
         'mime',
         'size',
         'uploaded_by',
+        'customer_downloaded_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'customer_downloaded_at' => 'datetime',
+        ];
+    }
 
     public function order(): BelongsTo
     {

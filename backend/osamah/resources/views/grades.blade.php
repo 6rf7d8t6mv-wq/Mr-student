@@ -10,13 +10,20 @@
             * { box-sizing: border-box; }
             body { font-family: Arial, sans-serif; background: #f3f4f6; color: #1f2937; margin: 0; padding: 0 calc(var(--sidebar-width) + var(--page-gap)) 0 var(--page-gap); }
             .page-header { width: var(--sidebar-width); min-height: 100vh; max-height: 100vh; overflow-y: auto; background: #0f172a; color: #f8fafc; padding: clamp(16px, 2vw, 24px) clamp(12px, 1.6vw, 18px); box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); position: fixed; top: 0; right: 0; z-index: 10; }
-            .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 28px; }
-            .brand { font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+            .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 0; }
+            .brand { font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: 0.02em; overflow-wrap: anywhere; margin-bottom: 4px; }
             .brand-subtitle { margin: 4px 0 0; color: #cbd5e1; font-size: clamp(11px, 1.2vw, 14px); }
-            .header-actions { display: flex; flex-direction: column; align-items: stretch; gap: clamp(8px, 1.2vw, 12px); color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); }
+            .header-actions { display: flex; flex-direction: column; align-items: stretch; gap: clamp(8px, 1.2vw, 12px); color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin-top: 24px; }
             .header-actions a { color: #f8fafc; text-decoration: none; }
-            .header-user, .header-link { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); box-sizing: border-box; white-space: normal; line-height: 1.5; }
-            .logout-button { width: 100%; background: transparent; color: #f8fafc; border: 1px solid #64748b; border-radius: 10px; padding: 10px 12px; cursor: pointer; text-align: center; }
+            .header-user { display: block; color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin: 0 0 12px; line-height: 1.6; }
+            .header-link { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.06); box-sizing: border-box; white-space: normal; line-height: 1.5; border: 1px solid transparent; }
+            .header-link:hover { background: #1e293b; border-color: #334155; }
+            .header-link { position: relative; }
+            .header-link.settings-link { background: #0f4c81; border: 1px solid rgba(96, 165, 250, 0.35); }
+            .header-link.settings-link:hover { background: #1d6fa5; border-color: #60a5fa; }
+            .customer-notice-dot { position: absolute; top: 8px; left: 9px; width: 7px; height: 7px; border-radius: 999px; background: #dc2626; box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.95); }
+            .logout-button { width: 100%; background: #b91c1c; color: #f8fafc; border: 1px solid rgba(248, 113, 113, 0.5); border-radius: 10px; padding: 10px 12px; cursor: pointer; text-align: center; font-weight: 800; }
+            .logout-button:hover { background: #dc2626; border-color: #f87171; }
             .container { width: min(100%, 1000px); margin: clamp(16px, 3vw, 32px) auto 24px; padding: clamp(18px, 3vw, 32px); background: #ffffff; border-radius: clamp(16px, 2vw, 24px); box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08); }
             h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 36px); color: #111827; }
             h2 { margin: 28px 0 16px; font-size: clamp(20px, 2.4vw, 24px); color: #1f2937; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
@@ -99,6 +106,8 @@
             .research-field label { color: #111827; font-size: 13px; font-weight: 900; }
             .research-input { width: 100%; padding: 12px 13px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #111827; font-weight: 700; }
             .research-input:focus { outline: 2px solid rgba(14, 165, 233, 0.18); border-color: #38bdf8; }
+            .english-number-warning { display: none; margin-top: 5px; color: #b91c1c; font-size: 12px; font-weight: 800; }
+            .english-number-warning.active { display: block; }
             .checkout-row { margin-top: 14px; display: flex; justify-content: flex-end; }
             .checkout-button { display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; background: #047857; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 800; border: 0; cursor: pointer; }
             .checkout-button:hover { background: #065f46; }
@@ -200,15 +209,27 @@
                     <p class="brand-subtitle">خدمات الطباعة والتجليد</p>
                 </div>
                 <div class="header-actions">
+                    @php
+                        $hasCustomerOrderNotice = \App\Models\Order::query()
+                            ->where('user_id', auth()->id())
+                            ->whereNull('customer_notification_seen_at')
+                            ->whereHas('deliveredFiles', fn ($query) => $query->whereNull('customer_downloaded_at'))
+                            ->exists();
+                    @endphp
                     <span class="header-user">👤 {{ auth()->user()->name }}</span>
-                    <a class="header-link" href="{{ route('orders.index') }}">🧾 طلباتي</a>
-                    <a class="header-link" href="{{ route('account.settings') }}">⚙️ إعداداتي</a>
+                    <a class="header-link" href="{{ route('orders.index') }}">
+                        🧾 طلباتي
+                        @if ($hasCustomerOrderNotice)
+                            <span class="customer-notice-dot" data-customer-orders-dot aria-label="تحديث جديد في طلباتك"></span>
+                        @endif
+                    </a>
+                    <a class="header-link settings-link" href="{{ route('account.settings') }}">⚙️ إعداداتي</a>
                     @if (auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.orders') }}">لوحة المدير</a>
+                        <a class="header-link" href="{{ route('admin.orders') }}">لوحة المدير</a>
                     @endif
-                    <form method="post" action="{{ route('logout') }}">
+                    <form class="header-form" method="post" action="{{ route('logout') }}">
                         @csrf
-                        <button class="logout-button" type="submit">خروج</button>
+                        <button class="logout-button" type="submit">🚪 خروج</button>
                     </form>
                 </div>
             </div>
@@ -528,7 +549,7 @@
                         </div>
                         <div class="research-field">
                             <label for="researchPages">عدد الصفحات</label>
-                            <input class="research-input" id="researchPages" type="number" min="1" step="1" value="1" oninput="updateResearchPricingSummary()" />
+                            <input class="research-input" id="researchPages" type="text" inputmode="numeric" placeholder="اكتب عدد الصفحات" oninput="updateResearchPricingSummary()" />
                         </div>
                     </div>
                     <button class="upload-button" id="researchSaveButton" type="button" onclick="saveResearchRequest()">حفظ الطلب</button>
@@ -736,6 +757,62 @@
                 return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
             }
 
+            function normalizeDigits(value) {
+                return String(value ?? '').replace(/[٠-٩۰-۹]/g, (digit) => ({
+                    '٠': '0',
+                    '١': '1',
+                    '٢': '2',
+                    '٣': '3',
+                    '٤': '4',
+                    '٥': '5',
+                    '٦': '6',
+                    '٧': '7',
+                    '٨': '8',
+                    '٩': '9',
+                    '۰': '0',
+                    '۱': '1',
+                    '۲': '2',
+                    '۳': '3',
+                    '۴': '4',
+                    '۵': '5',
+                    '۶': '6',
+                    '۷': '7',
+                    '۸': '8',
+                    '۹': '9',
+                })[digit] || digit);
+            }
+
+            function numericValue(value) {
+                return Number(String(value ?? '').trim());
+            }
+
+            function bindEnglishNumberWarnings(root = document) {
+                const selector = '#researchPages, .copies-input';
+                root.querySelectorAll(selector).forEach((input) => {
+                    if (input.dataset.englishNumberBound === 'true') return;
+
+                    const showWarning = () => {
+                        input.value = normalizeDigits(input.value);
+
+                        let warning = input.nextElementSibling;
+                        if (!warning || !warning.classList.contains('english-number-warning')) {
+                            warning = document.createElement('div');
+                            warning.className = 'english-number-warning';
+                            warning.textContent = 'تنبيه: لا يقبل هذا الحقل إلا الأرقام الإنجليزية فقط 0-9.';
+                            input.insertAdjacentElement('afterend', warning);
+                        }
+
+                        const invalid = input.value !== '' && !/^[0-9]+$/.test(input.value);
+                        warning.classList.toggle('active', invalid);
+                        input.setCustomValidity(invalid ? 'استخدم الأرقام الإنجليزية فقط 0-9.' : '');
+                    };
+
+                    input.addEventListener('input', showWarning);
+                    showWarning();
+                    input.dataset.englishNumberBound = 'true';
+                });
+            }
+
             function calculateNotesFilePrice(pages, binding) {
                 const printPrice = Math.ceil(pages / 15);
                 let bindingPrice = 0;
@@ -769,7 +846,7 @@
             }
 
             function calculateAcademicFilePrice(service, pages, copies) {
-                const copyCount = Math.max(1, Number(copies) || 1);
+                const copyCount = Math.max(1, numericValue(copies) || 1);
                 const printPrice = getPrintPrice(pages) * copyCount;
                 const bindingSinglePrice = service === 'phd' ? 90 : 70;
                 const bindingMultiPrice = service === 'phd' ? 70 : 55;
@@ -783,7 +860,7 @@
             }
 
             function calculateFormattingFilePrice(pages) {
-                const formattingPrice = (Number(pages) || 1) * 10;
+                const formattingPrice = (numericValue(pages) || 1) * 10;
 
                 return {
                     printPrice: 0,
@@ -793,7 +870,7 @@
             }
 
             function calculateResearchPrice(pages) {
-                const researchPrice = Math.max(1, Number(pages) || 1) * 10;
+                const researchPrice = Math.max(1, numericValue(pages) || 1) * 10;
 
                 return {
                     printPrice: 0,
@@ -944,7 +1021,8 @@
                 if (!summary) return;
 
                 const title = document.getElementById('researchTitle')?.value.trim() || '';
-                const pages = Math.max(1, Number(document.getElementById('researchPages')?.value) || 0);
+                const pagesValue = document.getElementById('researchPages')?.value.trim() || '';
+                const pages = /^[0-9]+$/.test(pagesValue) ? Math.max(1, numericValue(pagesValue) || 0) : 0;
 
                 if (!title) {
                     renderCheckoutSummary(summary, 'research', 'اكتب اسم البحث المطلوب أولًا.');
@@ -987,11 +1065,12 @@
                 const button = document.getElementById('researchSaveButton');
                 const errorDiv = document.getElementById('researchError');
                 const title = titleInput.value.trim();
-                const pages = Math.max(1, Number(pagesInput.value) || 0);
+                const pagesValue = pagesInput.value.trim();
+                const pages = /^[0-9]+$/.test(pagesValue) ? Math.max(1, numericValue(pagesValue) || 0) : 0;
 
                 if (!title || !pages) {
                     errorDiv.style.display = 'block';
-                    errorDiv.textContent = 'اكتب اسم البحث وحدد عدد الصفحات.';
+                    errorDiv.textContent = 'اكتب اسم البحث وحدد عدد الصفحات بالأرقام الإنجليزية فقط.';
                     updateResearchPricingSummary();
                     return;
                 }
@@ -1146,7 +1225,7 @@
                     const academicPrice = showAcademicPrice ? calculateAcademicFilePrice(config.service, fileData.pages, fileData.copies) : null;
                     const formattingPrice = showFormattingPrice ? calculateFormattingFilePrice(fileData.pages) : null;
                     const copiesHtml = showAcademicPrice
-                        ? `<div data-label="عدد النسخ"><input class="copies-input" type="number" min="1" step="1" value="${fileData.copies || 1}" onchange="setAcademicFileCopies('${config.service}', '${config.type}', ${index}, this.value)" /></div>`
+                        ? `<div data-label="عدد النسخ"><input class="copies-input" type="text" inputmode="numeric" value="${fileData.copies || 1}" onchange="setAcademicFileCopies('${config.service}', '${config.type}', ${index}, this.value)" /></div>`
                         : '';
                     const thesisProjectHtml = showThesisProject
                         ? `
@@ -1203,6 +1282,7 @@
                 });
 
                 listDiv.innerHTML = html;
+                bindEnglishNumberWarnings(listDiv);
                 if (showPrice) {
                     updateNotesPricingSummary();
                 } else if (showAcademicPrice) {
@@ -1259,7 +1339,14 @@
 
             function setAcademicFileCopies(service, type, index, copies) {
                 const fileData = uploadedFiles[service][type][index];
-                fileData.copies = Math.max(1, Number(copies) || 1);
+                const copiesValue = String(copies ?? '').trim();
+                if (!/^[0-9]+$/.test(copiesValue)) {
+                    updateFilesList(`${service}${type.charAt(0).toUpperCase() + type.slice(1)}`);
+                    updateAcademicPricingSummary(service);
+                    return;
+                }
+
+                fileData.copies = Math.max(1, numericValue(copiesValue) || 1);
                 const price = calculateAcademicFilePrice(service, fileData.pages, fileData.copies);
                 updateStoredFile(fileData, {
                     copies: fileData.copies,
@@ -1496,6 +1583,7 @@
                     closeCartModal();
                 }
             });
+            bindEnglishNumberWarnings();
 
             // Load JSZip library
             const script = document.createElement('script');

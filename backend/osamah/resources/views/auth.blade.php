@@ -19,6 +19,8 @@
         .secondary-action { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; }
         .switch-button { width: auto; margin-top: 10px; padding: 9px 13px; background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
         .error { margin: 0 0 16px; padding: 12px; background: #fef2f2; color: #b91c1c; border-radius: 8px; }
+        .english-number-warning { display: none; margin-top: 5px; color: #b91c1c; font-size: 12px; font-weight: 800; }
+        .english-number-warning.active { display: block; }
         .auth-panel { display: none; }
         .auth-panel.active { display: block; }
     </style>
@@ -42,7 +44,7 @@
                 <form method="post" action="{{ route('login.store') }}">
                     @csrf
                     <label for="loginPhone">رقم الجوال</label>
-                    <input id="loginPhone" name="phone" value="{{ old('phone') }}" required>
+                    <input id="loginPhone" name="phone" inputmode="numeric" value="{{ old('phone') }}" required>
 
                     <label for="loginPassword">كلمة المرور</label>
                     <input id="loginPassword" name="password" type="password" required>
@@ -66,7 +68,7 @@
                     <input id="name" name="name" required>
 
                     <label for="phone">رقم الجوال</label>
-                    <input id="phone" name="phone" required>
+                    <input id="phone" name="phone" inputmode="numeric" required>
 
                     <label for="password">كلمة المرور</label>
                     <input id="password" name="password" type="password" required>
@@ -90,6 +92,33 @@
             document.getElementById('loginPanel').classList.toggle('active', panel === 'login');
             document.getElementById('registerPanel').classList.toggle('active', panel === 'register');
         }
+
+        function bindInputRule(input, pattern, message) {
+            const showWarning = () => {
+                let warning = input.nextElementSibling;
+                if (!warning || !warning.classList.contains('english-number-warning')) {
+                    warning = document.createElement('div');
+                    warning.className = 'english-number-warning';
+                    input.insertAdjacentElement('afterend', warning);
+                }
+
+                const invalid = input.value !== '' && !pattern.test(input.value);
+                warning.textContent = message;
+                warning.classList.toggle('active', invalid);
+                input.setCustomValidity(invalid ? message : '');
+            };
+
+            input.addEventListener('input', showWarning);
+            showWarning();
+        }
+
+        document.querySelectorAll('#registerPanel input[name="phone"]').forEach((input) => {
+            bindInputRule(input, /^05[0-9]{8}$/, 'تنبيه: رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام إنجليزية فقط.');
+        });
+
+        document.querySelectorAll('#registerPanel input[name="password"], #registerPanel input[name="password_confirmation"]').forEach((input) => {
+            bindInputRule(input, /^[A-Za-z0-9]+$/, 'تنبيه: كلمة المرور تقبل حروف وأرقام إنجليزية فقط.');
+        });
     </script>
 </body>
 </html>

@@ -53,6 +53,7 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
     Route::patch('/profile', [AccountController::class, 'updateProfile'])->name('profile.update');
     Route::patch('/address', [AccountController::class, 'updateAddress'])->name('address.update');
     Route::patch('/password', [AccountController::class, 'updatePassword'])->name('password.update');
+    Route::delete('/profile', [AccountController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {

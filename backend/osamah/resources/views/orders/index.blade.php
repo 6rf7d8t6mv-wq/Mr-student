@@ -6,12 +6,21 @@
     <title>طلباتي</title>
     <style>
         * { box-sizing: border-box; }
-        :root { --sidebar-width: clamp(118px, 18vw, 220px); --page-gap: clamp(10px, 3vw, 28px); }
+        :root { --sidebar-width: clamp(180px, 20vw, 240px); --page-gap: clamp(14px, 3vw, 40px); }
         body { margin: 0; padding: 0 calc(var(--sidebar-width) + var(--page-gap)) 0 var(--page-gap); font-family: Arial, sans-serif; background: #f3f4f6; color: #111827; }
-        .header { width: var(--sidebar-width); min-height: 100vh; max-height: 100vh; overflow-y: auto; background: #0f172a; color: #ffffff; padding: clamp(14px, 2vw, 22px) clamp(8px, 1.5vw, 16px); position: fixed; top: 0; right: 0; z-index: 20; box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); }
-        .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 16px; }
-        .brand { font-size: clamp(19px, 4vw, 22px); font-weight: 900; }
-        .home-button { color: #0f172a; background: #ffffff; text-decoration: none; font-weight: 800; padding: 10px 12px; border-radius: 9px; text-align: center; line-height: 1.6; }
+        .header { width: var(--sidebar-width); min-height: 100vh; max-height: 100vh; overflow-y: auto; background: #0f172a; color: #ffffff; padding: clamp(16px, 2vw, 24px) clamp(12px, 1.6vw, 18px); position: fixed; top: 0; right: 0; z-index: 20; box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); }
+        .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 0; }
+        .brand { font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: 0.02em; overflow-wrap: anywhere; margin-bottom: 4px; }
+        .header-actions { display: flex; flex-direction: column; align-items: stretch; gap: clamp(8px, 1.2vw, 12px); color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin-top: 24px; }
+        .header-actions a { color: #f8fafc; text-decoration: none; }
+        .header-user { display: block; color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin: 0 0 12px; line-height: 1.6; }
+        .home-button { display: flex; align-items: center; gap: 8px; width: 100%; color: #f8fafc; background: rgba(255, 255, 255, 0.06); text-decoration: none; font-weight: 800; padding: 10px 12px; border-radius: 10px; border: 1px solid transparent; text-align: right; line-height: 1.5; }
+        .home-button:hover { background: #1e293b; border-color: #334155; }
+        .settings-button { display: flex; align-items: center; gap: 8px; width: 100%; color: #ffffff; background: #0f4c81; text-decoration: none; font-weight: 800; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(96, 165, 250, 0.35); text-align: right; line-height: 1.5; }
+        .settings-button:hover { background: #1d6fa5; border-color: #60a5fa; }
+        .header-form { margin: 0; }
+        .logout-button { width: 100%; color: #ffffff; background: #b91c1c; border: 1px solid rgba(248, 113, 113, 0.5); font-weight: 800; padding: 10px 12px; border-radius: 10px; text-align: center; line-height: 1.5; cursor: pointer; }
+        .logout-button:hover { background: #dc2626; border-color: #f87171; }
         main { width: min(1040px, 100%); margin: clamp(16px, 4vw, 28px) auto; padding: 0 clamp(12px, 4vw, 20px); }
         .panel { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: clamp(16px, 4vw, 22px); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08); }
         .page-title { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 18px; }
@@ -30,6 +39,8 @@
         .cancelled { background: #fee2e2; color: #991b1b; }
         .actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .action { display: inline-flex; color: #ffffff; background: #0f172a; text-decoration: none; font-weight: 900; padding: 9px 12px; border-radius: 8px; border: 0; cursor: pointer; font-family: inherit; font-size: 13px; }
+        .notice-action { position: relative; }
+        .order-notice-dot { position: absolute; top: -4px; left: -4px; width: 8px; height: 8px; border-radius: 999px; background: #dc2626; box-shadow: 0 0 0 2px #ffffff; }
         .action.secondary { background: #047857; }
         .action.ghost { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
         .action.danger { background: #b91c1c; }
@@ -69,12 +80,12 @@
         .delivered-file-name { color: #0f172a; font-weight: 900; line-height: 1.6; word-break: break-word; }
         .delivered-file-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
         @media (max-width: 820px) {
-            :root { --sidebar-width: 112px; --page-gap: 8px; }
-            .header { padding: 14px 7px; }
+            :root { --sidebar-width: 132px; --page-gap: 10px; }
+            .header { padding: 14px 8px; box-shadow: -8px 0 24px rgba(15, 23, 42, 0.14); }
             .page-title { align-items: flex-start; flex-direction: column; }
             table { display: block; overflow-x: auto; white-space: nowrap; }
             .detail-grid, .totals-grid { grid-template-columns: 1fr; }
-            .home-button, .action, .inline-form { width: 100%; justify-content: center; text-align: center; }
+            .home-button, .settings-button, .logout-button, .action, .inline-form { width: 100%; justify-content: center; text-align: center; }
             .modal-actions { justify-content: stretch; }
         }
     </style>
@@ -83,7 +94,15 @@
     <header class="header">
         <div class="header-inner">
             <div class="brand">Mr-Student</div>
-            <a class="home-button" href="{{ route('home') }}">العودة للصفحة الرئيسية</a>
+            <div class="header-actions">
+                <span class="header-user">👤 {{ auth()->user()->name }}</span>
+                <a class="home-button" href="{{ route('home') }}">🏠 الصفحة الرئيسية</a>
+                <a class="settings-button" href="{{ route('account.settings') }}">⚙️ إعداداتي</a>
+                <form class="header-form" method="post" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="logout-button" type="submit">🚪 خروج</button>
+                </form>
+            </div>
         </div>
     </header>
 
@@ -152,6 +171,7 @@
                         $isCompleted = $order->status === 'completed';
                         $isCancelled = $order->status === 'cancelled';
                         $hasDeliveredFile = in_array($order->service_type, ['formatting', 'research'], true) && $order->deliveredFiles->isNotEmpty();
+                        $hasUndownloadedDeliveredFiles = $hasDeliveredFile && $order->deliveredFiles->contains(fn ($file) => blank($file->customer_downloaded_at));
                                 $projectTypes = $order->service_type === 'thesis'
                                     ? $order->files
                                         ->pluck('thesis_project_type')
@@ -194,12 +214,17 @@
                                     </span>
                                 </td>
                                 <td>{{ $order->grand_total }} ريال</td>
-                                <td>{{ $createdAtText }}</td>
+                                <td data-local-datetime="{{ $order->created_at->toIso8601String() }}">{{ $createdAtText }}</td>
                                 <td>
                                     <div class="actions">
                                         <button class="action ghost" type="button" onclick="openOrderModal('orderModal{{ $order->id }}')">عرض الطلب</button>
                                         @if ($hasDeliveredFile)
-                                            <button class="action secondary" type="button" onclick="openOrderModal('deliveredFilesModal{{ $order->id }}')">الملفات المستلمة</button>
+                                            <button class="action secondary notice-action" type="button" data-delivered-files-button="{{ $order->id }}" onclick="openOrderModal('deliveredFilesModal{{ $order->id }}')">
+                                                الملفات المستلمة
+                                                @if ($hasUndownloadedDeliveredFiles)
+                                                    <span class="order-notice-dot" data-delivered-files-dot="{{ $order->id }}" aria-label="ملفات لم يتم تحميلها"></span>
+                                                @endif
+                                            </button>
                                         @endif
                                         @if (! $isPaid && $order->files_count > 0)
                                             <a class="action secondary" href="{{ route('cart.show', $order) }}">إكمال الدفع</a>
@@ -298,7 +323,7 @@
                                     @endif
                                     <div class="detail-card"><span>حالة الطلب</span><strong>{{ $statusNames[$order->status] ?? $order->status }}</strong></div>
                                     <div class="detail-card"><span>الدفع</span><strong>{{ $order->payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع' }}</strong></div>
-                                    <div class="detail-card"><span>تاريخ إنشاء الطلب</span><strong>{{ $createdAtText }}</strong></div>
+                                    <div class="detail-card"><span>تاريخ إنشاء الطلب</span><strong data-local-datetime="{{ $order->created_at->toIso8601String() }}">{{ $createdAtText }}</strong></div>
                                 </div>
                                 @if ($missingRequirements->isNotEmpty())
                                     <div class="missing-info">
@@ -423,11 +448,16 @@
                                                 <div class="delivered-file-item">
                                                     <div>
                                                         <div class="delivered-file-name">{{ $deliveredFile->original_name }}</div>
-                                                        <div class="service-detail">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
+                                                        <div class="service-detail" data-local-datetime="{{ $deliveredFile->created_at->toIso8601String() }}">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
                                                     </div>
                                                     <div class="delivered-file-buttons">
                                                         <a class="action ghost" href="{{ route('orders.delivered-file', ['order' => $order, 'deliveredFile' => $deliveredFile, 'view' => 1]) }}" target="_blank" rel="noopener">عرض</a>
-                                                        <a class="action secondary" href="{{ route('orders.delivered-file', [$order, $deliveredFile]) }}">تحميل</a>
+                                                        <a class="action secondary notice-action" href="{{ route('orders.delivered-file', [$order, $deliveredFile]) }}" data-delivered-file-download data-order-id="{{ $order->id }}" data-delivered-file-id="{{ $deliveredFile->id }}">
+                                                            تحميل
+                                                            @if (blank($deliveredFile->customer_downloaded_at))
+                                                                <span class="order-notice-dot" data-delivered-file-dot="{{ $deliveredFile->id }}" aria-label="ملف لم يتم تحميله"></span>
+                                                            @endif
+                                                        </a>
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -444,9 +474,32 @@
         </section>
     </main>
     <script>
+        function localizeDateTimes(root = document) {
+            const formatter = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', {
+                weekday: 'long',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            });
+
+            root.querySelectorAll('[data-local-datetime]').forEach((element) => {
+                const date = new Date(element.dataset.localDatetime);
+                if (Number.isNaN(date.getTime())) return;
+
+                element.textContent = formatter.format(date).replace('،', ' -');
+            });
+        }
+
+        localizeDateTimes();
+
         function openOrderModal(id) {
             const modal = document.getElementById(id);
             modal?.classList.add('active');
+            localizeDateTimes(modal);
             modal?.focus();
             document.body.style.overflow = 'hidden';
         }
@@ -464,6 +517,32 @@
                 });
                 document.body.style.overflow = '';
             }
+        });
+
+        function clearDeliveredFileNotice(link) {
+            if (!link || link.dataset.noticeCleared === 'true') return;
+
+            link.dataset.noticeCleared = 'true';
+            const orderId = link.dataset.orderId;
+            const deliveredFileId = link.dataset.deliveredFileId;
+
+            document.querySelectorAll(`[data-delivered-file-dot="${deliveredFileId}"]`).forEach((dot) => dot.remove());
+            document.querySelectorAll(`[data-delivered-files-dot="${orderId}"]`).forEach((dot) => dot.remove());
+            document.querySelectorAll('.customer-notice-dot').forEach((dot) => dot.remove());
+        }
+
+        document.addEventListener('pointerdown', (event) => {
+            const link = event.target.closest('[data-delivered-file-download]');
+            if (!link) return;
+
+            clearDeliveredFileNotice(link);
+        });
+
+        document.addEventListener('click', (event) => {
+            const link = event.target.closest('[data-delivered-file-download]');
+            if (!link) return;
+
+            clearDeliveredFileNotice(link);
         });
     </script>
 </body>

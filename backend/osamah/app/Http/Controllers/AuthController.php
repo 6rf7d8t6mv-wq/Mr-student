@@ -18,8 +18,8 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', 'unique:users,phone'],
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', 'unique:users,phone'],
+            'password' => ['required', 'confirmed', Password::min(6), 'regex:/^[A-Za-z0-9]+$/'],
         ]);
 
         $user = User::query()->create([
@@ -50,7 +50,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return Auth::user()->role === 'admin'
-            ? redirect()->route('admin.orders')
+            ? redirect()->route('admin.dashboard')
             : redirect()->route('home');
     }
 

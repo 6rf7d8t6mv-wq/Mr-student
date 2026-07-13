@@ -6,13 +6,20 @@
     <title>إعدادات الحساب</title>
     <style>
         * { box-sizing: border-box; }
-        :root { --sidebar-width: clamp(118px, 18vw, 220px); --page-gap: clamp(10px, 3vw, 28px); }
+        :root { --sidebar-width: clamp(180px, 20vw, 240px); --page-gap: clamp(14px, 3vw, 40px); }
         body { margin: 0; padding: 0 calc(var(--sidebar-width) + var(--page-gap)) 0 var(--page-gap); font-family: Arial, sans-serif; background: #f3f4f6; color: #111827; }
-        .header { width: var(--sidebar-width); min-height: 100vh; max-height: 100vh; overflow-y: auto; background: #0f172a; color: #ffffff; padding: clamp(14px, 2vw, 22px) clamp(8px, 1.5vw, 16px); position: fixed; top: 0; right: 0; z-index: 20; box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); }
-        .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 16px; }
-        .brand { font-size: clamp(19px, 4vw, 22px); font-weight: 800; }
-        .home-button { color: #0f172a; background: #ffffff; text-decoration: none; font-weight: 800; padding: 10px 12px; border-radius: 9px; border: 1px solid rgba(255, 255, 255, 0.35); text-align: center; line-height: 1.6; }
-        .home-button:hover { background: #e2e8f0; }
+        .header { width: var(--sidebar-width); min-height: 100vh; max-height: 100vh; overflow-y: auto; background: #0f172a; color: #ffffff; padding: clamp(16px, 2vw, 24px) clamp(12px, 1.6vw, 18px); position: fixed; top: 0; right: 0; z-index: 20; box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); }
+        .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 0; }
+        .brand { font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: 0.02em; overflow-wrap: anywhere; margin-bottom: 4px; }
+        .header-actions { display: flex; flex-direction: column; align-items: stretch; gap: clamp(8px, 1.2vw, 12px); color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin-top: 24px; }
+        .header-user { display: block; color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin: 0 0 12px; line-height: 1.6; }
+        .home-button { display: flex; align-items: center; gap: 8px; width: 100%; color: #f8fafc; background: rgba(255, 255, 255, 0.06); text-decoration: none; font-weight: 800; padding: 10px 12px; border-radius: 10px; border: 1px solid transparent; text-align: right; line-height: 1.5; }
+        .home-button:hover { background: #1e293b; border-color: #334155; }
+        .settings-button { display: flex; align-items: center; gap: 8px; width: 100%; color: #ffffff; background: #0f4c81; text-decoration: none; font-weight: 800; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(96, 165, 250, 0.35); text-align: right; line-height: 1.5; }
+        .settings-button:hover { background: #1d6fa5; border-color: #60a5fa; }
+        .header-form { margin: 0; }
+        .logout-button { width: 100%; color: #ffffff; background: #b91c1c; border: 1px solid rgba(248, 113, 113, 0.5); font-weight: 800; padding: 10px 12px; border-radius: 10px; text-align: center; line-height: 1.5; cursor: pointer; margin-top: 0; }
+        .logout-button:hover { background: #dc2626; border-color: #f87171; }
         main { width: min(900px, 100%); margin: clamp(16px, 4vw, 28px) auto; padding: 0 clamp(12px, 4vw, 20px); }
         .panel { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: clamp(16px, 4vw, 24px); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08); }
         h1 { margin: 0 0 8px; font-size: clamp(24px, 6vw, 28px); }
@@ -35,18 +42,22 @@
         label { display: block; color: #334155; font-weight: 800; font-size: 13px; margin-bottom: 6px; }
         input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 9px; font-size: 16px; }
         input[readonly] { background: #e2e8f0; color: #475569; }
+        .english-number-warning { display: none; margin-top: 5px; color: #b91c1c; font-size: 12px; font-weight: 800; }
+        .english-number-warning.active { display: block; }
         .full { grid-column: 1 / -1; }
         button { margin-top: 18px; padding: 12px 16px; border: 0; border-radius: 9px; background: #0f172a; color: #ffffff; font-weight: 800; cursor: pointer; }
         .section-actions button { margin-top: 0; padding: 10px 14px; }
         .secondary { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
+        .danger-button { background: #b91c1c; color: #ffffff; }
+        .danger-button:hover { background: #dc2626; }
         .edit-panel { display: none; margin-top: 16px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; }
         .edit-panel.active { display: block; }
         @media (max-width: 720px) {
-            :root { --sidebar-width: 112px; --page-gap: 8px; }
-            .header { padding: 14px 7px; }
+            :root { --sidebar-width: 132px; --page-gap: 10px; }
+            .header { padding: 14px 8px; box-shadow: -8px 0 24px rgba(15, 23, 42, 0.14); }
             .form-grid, .details-grid { grid-template-columns: 1fr; }
             .section-actions { justify-content: stretch; }
-            .home-button, button { width: 100%; text-align: center; }
+            .home-button, .settings-button, .logout-button, button { width: 100%; text-align: center; }
         }
     </style>
 </head>
@@ -54,7 +65,15 @@
     <header class="header">
         <div class="header-inner">
             <div class="brand">Mr-Student</div>
-            <a class="home-button" href="{{ route('home') }}">العودة للصفحة الرئيسية</a>
+            <div class="header-actions">
+                <span class="header-user">👤 {{ auth()->user()->name }}</span>
+                <a class="home-button" href="{{ route('home') }}">🏠 الصفحة الرئيسية</a>
+                <a class="home-button" href="{{ route('orders.index') }}">🧾 طلباتي</a>
+                <form class="header-form" method="post" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="logout-button" type="submit">🚪 خروج</button>
+                </form>
+            </div>
         </div>
     </header>
 
@@ -106,7 +125,7 @@
                             </div>
                             <div>
                                 <label>رقم الجوال</label>
-                                <input name="phone" value="{{ old('phone', $user->phone) }}" required>
+                                <input name="phone" inputmode="numeric" value="{{ old('phone', $user->phone) }}" required>
                             </div>
                         </div>
                         <button type="submit">حفظ بياناتي</button>
@@ -173,7 +192,7 @@
                             </div>
                             <div>
                                 <label>الرمز البريدي</label>
-                                <input name="postal_code" value="{{ old('postal_code', $user->postal_code) }}" required>
+                                <input name="postal_code" inputmode="numeric" value="{{ old('postal_code', $user->postal_code) }}" required>
                             </div>
                         </div>
                         <button type="submit">حفظ العنوان</button>
@@ -220,6 +239,25 @@
                     </form>
                 </div>
             </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">حذف الحساب</h2>
+                </div>
+                <div class="details-grid">
+                    <div class="detail full">
+                        <div class="detail-label">حذف حسابي</div>
+                        <div class="detail-value">يمكنك حذف حسابك نهائيًا عند الحاجة.</div>
+                    </div>
+                </div>
+                <div class="section-actions">
+                    <form method="post" action="{{ route('account.profile.destroy') }}" onsubmit="return confirm('هل أنت متأكد من حذف حسابك نهائيًا؟');">
+                        @csrf
+                        @method('delete')
+                        <button class="danger-button" type="submit">حذف حسابي</button>
+                    </form>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -227,6 +265,37 @@
         function togglePanel(id) {
             document.getElementById(id).classList.toggle('active');
         }
+
+        function bindInputRule(input, pattern, message) {
+            const showWarning = () => {
+                let warning = input.nextElementSibling;
+                if (!warning || !warning.classList.contains('english-number-warning')) {
+                    warning = document.createElement('div');
+                    warning.className = 'english-number-warning';
+                    input.insertAdjacentElement('afterend', warning);
+                }
+
+                const invalid = input.value !== '' && !pattern.test(input.value);
+                warning.textContent = message;
+                warning.classList.toggle('active', invalid);
+                input.setCustomValidity(invalid ? message : '');
+            };
+
+            input.addEventListener('input', showWarning);
+            showWarning();
+        }
+
+        document.querySelectorAll('input[name="phone"]').forEach((input) => {
+            bindInputRule(input, /^05[0-9]{8}$/, 'تنبيه: رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام إنجليزية فقط.');
+        });
+
+        document.querySelectorAll('input[name="postal_code"]').forEach((input) => {
+            bindInputRule(input, /^[0-9]+$/, 'تنبيه: لا يقبل هذا الحقل إلا الأرقام الإنجليزية فقط 0-9.');
+        });
+
+        document.querySelectorAll('input[name="password"], input[name="password_confirmation"]').forEach((input) => {
+            bindInputRule(input, /^[A-Za-z0-9]+$/, 'تنبيه: كلمة المرور تقبل حروف وأرقام إنجليزية فقط.');
+        });
     </script>
 </body>
 </html>

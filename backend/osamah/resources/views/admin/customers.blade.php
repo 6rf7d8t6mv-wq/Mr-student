@@ -97,8 +97,9 @@
                 </div>
                 <div class="form-section">
                     <h3 class="form-section-title">تغيير كلمة المرور</h3>
-                    <p class="form-note">اترك الحقول فارغة إذا ما تبغى تغير كلمة المرور.</p>
-                    <div class="form-grid">
+                    <p class="form-note">اضغط الزر إذا كنت تريد تغيير كلمة مرور هذا العميل.</p>
+                    <button class="ghost" type="button" onclick="toggleInlinePasswordPanel(this)">تغيير كلمة المرور</button>
+                    <div class="form-grid inline-password-panel" style="display: none; margin-top: 12px;">
                         <div><label>كلمة المرور الجديدة</label><input name="password" type="password" placeholder="كلمة مرور جديدة"></div>
                         <div><label>تأكيد كلمة المرور الجديدة</label><input name="password_confirmation" type="password" placeholder="تأكيد كلمة المرور"></div>
                     </div>

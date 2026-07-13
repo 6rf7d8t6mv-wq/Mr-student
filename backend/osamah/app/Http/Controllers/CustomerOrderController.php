@@ -73,6 +73,18 @@ class CustomerOrderController extends Controller
             ]);
         }
 
+        if (blank($deliveredFile->customer_downloaded_at)) {
+            $deliveredFile->update(['customer_downloaded_at' => now()]);
+        }
+
+        $hasPendingDeliveredFiles = $order->deliveredFiles()
+            ->whereNull('customer_downloaded_at')
+            ->exists();
+
+        if (! $hasPendingDeliveredFiles) {
+            $order->update(['customer_notification_seen_at' => now()]);
+        }
+
         return Response::download($absolutePath, $deliveredFile->original_name);
     }
 }

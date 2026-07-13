@@ -60,26 +60,39 @@ class AdminController extends Controller
             ->whereNull('admin_notification_seen_at')
             ->update(['admin_notification_seen_at' => now()]);
 
-        Order::query()
-            ->whereNull('admin_opened_at')
-            ->whereNotIn('status', ['completed', 'finished'])
-            ->update(['admin_opened_at' => now()]);
-
         $search = trim((string) $request->query('search', ''));
+        $statusFilter = (string) $request->query('status_filter', '');
+
+        if (! in_array($statusFilter, ['new', 'in_progress', 'completed'], true)) {
+            $statusFilter = '';
+        }
 
         $orders = Order::query()
             ->with(['user', 'files', 'deliveredFiles'])
             ->when($search !== '', function ($query) use ($search) {
-                $query->where('id', $search)
+                $query->where(function ($searchQuery) use ($search) {
+                    $searchQuery->where('id', $search)
                     ->orWhereHas('user', function ($userQuery) use ($search) {
                         $userQuery->where('name', 'like', "%{$search}%")
                             ->orWhere('phone', 'like', "%{$search}%");
                     });
+                });
+            })
+            ->when($statusFilter === 'new', function ($query) {
+                $query->whereNull('admin_opened_at')
+                    ->whereNotIn('status', ['completed', 'finished']);
+            })
+            ->when($statusFilter === 'in_progress', function ($query) {
+                $query->whereNotNull('admin_opened_at')
+                    ->whereNotIn('status', ['completed', 'finished']);
+            })
+            ->when($statusFilter === 'completed', function ($query) {
+                $query->whereIn('status', ['completed', 'finished']);
             })
             ->latest()
             ->get();
 
-        return view('admin.orders', compact('orders', 'search'));
+        return view('admin.orders', compact('orders', 'search', 'statusFilter'));
     }
 
     public function users(Request $request)
@@ -91,7 +104,6 @@ class AdminController extends Controller
         $users = User::query()
             ->where('role', 'admin')
             ->whereNotNull('admin_permissions')
-            ->whereKeyNot(Auth::id())
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery->where('name', 'like', "%{$search}%")
@@ -141,8 +153,8 @@ class AdminController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', 'unique:users,phone'],
-            'password' => ['required', Password::min(6), 'confirmed'],
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', 'unique:users,phone'],
+            'password' => ['required', Password::min(6), 'regex:/^[A-Za-z0-9]+$/', 'confirmed'],
             'role' => ['required', Rule::in(['customer', 'admin'])],
             'admin_permissions' => ['nullable', 'array'],
             'admin_permissions.*' => ['string', Rule::in(self::ADMIN_PERMISSION_KEYS)],
@@ -179,8 +191,8 @@ class AdminController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
-            'password' => ['nullable', Password::min(6), 'confirmed'],
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', Rule::unique('users', 'phone')->ignore($user->id)],
+            'password' => ['nullable', Password::min(6), 'regex:/^[A-Za-z0-9]+$/', 'confirmed'],
             'role' => ['required', Rule::in(['customer', 'admin'])],
         ]);
 
@@ -248,12 +260,17 @@ class AdminController extends Controller
         $this->ensureAdmin();
 
         $user = Auth::user();
-        $data = $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
-            'current_password' => ['nullable', 'required_with:password', 'current_password'],
-            'password' => ['nullable', Password::min(6), 'confirmed'],
-        ]);
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', Rule::unique('users', 'phone')->ignore($user->id)],
+            'password' => ['nullable', Password::min(6), 'regex:/^[A-Za-z0-9]+$/', 'confirmed'],
+        ];
+
+        if ($user->admin_permissions !== null) {
+            $rules['current_password'] = ['nullable', 'required_with:password', 'current_password'];
+        }
+
+        $data = $request->validate($rules);
 
         if (blank($data['password'] ?? null)) {
             unset($data['password']);
@@ -274,7 +291,10 @@ class AdminController extends Controller
         abort_unless(is_file($absolutePath), 404);
 
         if (! in_array($file->order->service_type, ['formatting', 'research'], true)) {
-            $file->order->update(['status' => 'completed']);
+            $file->order->update([
+                'status' => 'completed',
+                'customer_notification_seen_at' => null,
+            ]);
         }
 
         return Response::download($absolutePath, $file->original_name);
@@ -314,6 +334,7 @@ class AdminController extends Controller
 
         $order->update([
             'status' => 'completed',
+            'customer_notification_seen_at' => null,
             'delivered_file_original_name' => $file->getClientOriginalName(),
             'delivered_file_stored_name' => $storedName,
             'delivered_file_path' => $path,
@@ -331,6 +352,10 @@ class AdminController extends Controller
 
         if (blank($order->admin_opened_at)) {
             $order->update(['admin_opened_at' => now()]);
+        }
+
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true]);
         }
 
         return redirect()->route('admin.orders')->with('status', 'تم فتح الطلب.');

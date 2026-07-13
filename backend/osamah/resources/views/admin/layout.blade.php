@@ -3,20 +3,28 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'لوحة المدير')</title>
     <style>
         * { box-sizing: border-box; }
+        :root { --sidebar-width: clamp(180px, 20vw, 240px); --page-gap: clamp(14px, 3vw, 40px); }
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; color: #111827; }
-        .layout { min-height: 100vh; display: grid; grid-template-columns: clamp(112px, 18vw, 240px) minmax(0, 1fr); }
-        aside { background: #0f172a; color: #f8fafc; padding: clamp(16px, 2vw, 24px) clamp(12px, 1.8vw, 18px); position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-        .brand { font-size: clamp(19px, 2.2vw, 23px); font-weight: 800; margin-bottom: 6px; }
-        .admin-name { color: #cbd5e1; font-size: 13px; margin-bottom: 24px; line-height: 1.6; }
-        nav { display: flex; flex-direction: column; gap: 8px; }
-        nav a, .logout { color: #f8fafc; text-decoration: none; border: 1px solid transparent; border-radius: 8px; padding: 11px 12px; background: transparent; text-align: right; font: inherit; cursor: pointer; }
-        nav a { position: relative; display: block; }
-        nav a:hover, nav a.active, .logout:hover { background: #1e293b; border-color: #334155; }
+        .layout { min-height: 100vh; display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
+        aside { background: #0f172a; color: #f8fafc; padding: clamp(16px, 2vw, 24px) clamp(12px, 1.6vw, 18px); position: sticky; top: 0; height: 100vh; overflow-y: auto; box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); }
+        .brand { font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: 0.02em; overflow-wrap: anywhere; margin-bottom: 4px; }
+        .admin-name { color: #cbd5e1; font-size: clamp(12px, 1.15vw, 14px); margin: 0 0 24px; line-height: 1.6; }
+        nav { display: flex; flex-direction: column; align-items: stretch; gap: clamp(8px, 1.2vw, 12px); }
+        nav a, .logout { display: flex; align-items: center; gap: 8px; width: 100%; color: #f8fafc; text-decoration: none; border: 1px solid rgba(148, 163, 184, 0.14); border-radius: 10px; padding: 9px 10px; background: rgba(255, 255, 255, 0.055); text-align: right; font: inherit; font-size: clamp(12px, 1.15vw, 14px); font-weight: 800; line-height: 1.45; cursor: pointer; box-sizing: border-box; white-space: normal; transition: background 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease; }
+        nav a { position: relative; }
+        nav a:hover, nav a.active, .logout:hover { background: #1e293b; border-color: #475569; transform: translateX(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14); }
+        .nav-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 26px; width: 26px; height: 26px; border-radius: 8px; background: rgba(255, 255, 255, 0.10); font-size: 14px; line-height: 1; }
+        .nav-text { min-width: 0; flex: 1; }
         .nav-notice-dot { position: absolute; top: 8px; left: 9px; width: 7px; height: 7px; border-radius: 999px; background: #dc2626; box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.95); }
-        .logout { width: 100%; margin-top: 18px; }
+        nav a.settings-link { background: #0f4c81; border-color: rgba(96, 165, 250, 0.35); }
+        nav a.settings-link:hover, nav a.settings-link.active { background: #1d6fa5; border-color: #60a5fa; }
+        .logout { margin-top: 0; justify-content: center; background: #b91c1c; border-color: rgba(248, 113, 113, 0.5); font-weight: 800; }
+        .logout:hover { background: #dc2626; border-color: #f87171; }
+        .logout .nav-text { flex: 0 1 auto; }
         main { min-width: 0; padding: clamp(16px, 3vw, 28px); overflow: auto; }
         .page-title { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 20px; }
         h1 { margin: 0; font-size: clamp(24px, 4vw, 30px); }
@@ -50,9 +58,17 @@
         .permission-option input { width: auto; }
         label { display: block; color: #475569; font-weight: 700; font-size: 12px; margin-bottom: 5px; }
         input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 16px; }
+        .english-number-warning { display: none; margin-top: 5px; color: #b91c1c; font-size: 12px; font-weight: 800; }
+        .english-number-warning.active { display: block; }
         .save { margin-top: 10px; padding: 10px 14px; border: 0; border-radius: 8px; background: #0f172a; color: #ffffff; font-weight: 800; cursor: pointer; }
         .danger { margin-top: 10px; padding: 10px 14px; border: 0; border-radius: 8px; background: #b91c1c; color: #ffffff; font-weight: 800; cursor: pointer; }
         .toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: end; margin-bottom: 16px; }
+        .order-filter-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 1.5vw, 12px); margin-bottom: 16px; }
+        .order-filter-button { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: clamp(48px, 8vw, 64px); padding: clamp(8px, 2vw, 14px) clamp(6px, 1.8vw, 14px); border-radius: 10px; color: #ffffff; text-decoration: none; font-size: clamp(11px, 2.4vw, 18px); font-weight: 900; line-height: 1.35; text-align: center; box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12); border: 2px solid transparent; white-space: normal; overflow-wrap: anywhere; }
+        .order-filter-button.red { background: #dc2626; }
+        .order-filter-button.yellow { background: #facc15; color: #422006; }
+        .order-filter-button.green { background: #16a34a; }
+        .order-filter-button.active { border-color: #0f172a; transform: translateY(-1px); }
         .search-form { display: flex; gap: 8px; align-items: center; min-width: min(520px, 100%); }
         .search-form input { min-width: 280px; }
         .actions { display: flex; gap: 8px; align-items: center; }
@@ -63,6 +79,15 @@
         .tiny-status-dot.red { background: #dc2626; }
         .tiny-status-dot.yellow { background: #facc15; }
         .tiny-status-dot.green { background: #16a34a; }
+        .summary-action { display: flex; align-items: end; justify-content: flex-start; }
+        .order-detail-modal { min-width: 0; }
+        .order-detail-section { margin-bottom: 16px; }
+        .order-detail-section:last-child { margin-bottom: 0; }
+        .order-detail-table-wrap { width: 100%; overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff; }
+        .order-detail-table-wrap table { width: 100%; min-width: 760px; }
+        .order-detail-table-wrap.research table { min-width: 0; table-layout: fixed; }
+        .order-detail-table-wrap.research th,
+        .order-detail-table-wrap.research td { width: 25%; white-space: normal; word-break: break-word; }
         .id-badge { display: inline-flex; align-items: center; margin-inline-start: 8px; padding: 2px 7px; border-radius: 999px; background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 800; }
         .identity { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .muted { color: #64748b; font-size: 12px; }
@@ -75,23 +100,27 @@
         .delivered-file-actions .danger { min-width: 110px; justify-content: center; text-align: center; }
         .modal-backdrop { position: fixed; inset: 0; display: none; place-items: center; padding: clamp(10px, 3vw, 20px); background: rgba(15, 23, 42, 0.55); z-index: 40; overflow-y: auto; }
         .modal-backdrop.active { display: grid; }
-        .modal { width: min(560px, 100%); max-height: calc(100vh - 20px); background: #ffffff; border-radius: 12px; box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28); overflow: hidden; display: flex; flex-direction: column; }
+        .modal { width: min(1120px, 100%); max-height: calc(100vh - 20px); background: #ffffff; border-radius: 12px; box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28); overflow: hidden; display: flex; flex-direction: column; }
         .modal-head { padding: 18px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .modal-head h2 { margin: 0; }
         .modal-body { padding: clamp(14px, 3vw, 20px); overflow-y: auto; }
         .modal-close { border: 0; background: #f1f5f9; border-radius: 8px; padding: 7px 10px; cursor: pointer; font-weight: 800; }
         .full { grid-column: 1 / -1; }
         @media (max-width: 980px) {
-            .layout { grid-template-columns: 112px minmax(0, 1fr); }
-            aside { position: sticky; top: 0; height: 100vh; padding: 14px 7px; }
+            :root { --sidebar-width: 132px; --page-gap: 10px; }
+            .layout { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
+            aside { position: sticky; top: 0; height: 100vh; padding: 14px 8px; box-shadow: -8px 0 24px rgba(15, 23, 42, 0.14); }
             nav { flex-direction: column; flex-wrap: nowrap; }
             .stats, .forms-grid, .form-grid, .permissions-grid { grid-template-columns: 1fr; }
             .toolbar, .search-form { align-items: stretch; flex-direction: column; }
             .order-head { grid-template-columns: 1fr; }
             table { display: block; overflow-x: auto; white-space: nowrap; }
+            .order-detail-table-wrap table { display: table; overflow: visible; white-space: normal; }
+            .order-detail-table-wrap.research th,
+            .order-detail-table-wrap.research td { font-size: 12px; padding: 9px 7px; }
             .search-form input { min-width: 0; }
             .actions, nav form { width: 100%; }
-            nav a, .logout, .save, .danger, .ghost { width: 100%; text-align: center; }
+            nav a, .logout, .save, .danger, .ghost { width: 100%; text-align: center; justify-content: center; }
             .delivered-file-item { align-items: stretch; flex-direction: column; }
             .delivered-file-actions { width: 100%; }
         }
@@ -107,21 +136,22 @@
                     ->exists();
             @endphp
             <div class="brand">Mr-Student</div>
-            <div class="admin-name">{{ auth()->user()->name }}<br>مدير النظام</div>
+            <div class="admin-name">👤 {{ auth()->user()->name }}</div>
             <nav>
                 <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">الرئيسية</a>
                 <a class="{{ request()->routeIs('admin.orders') ? 'active' : '' }}" href="{{ route('admin.orders') }}">
-                    الطلبات
+                    <span class="nav-icon" aria-hidden="true">🧾</span>
+                    <span class="nav-text">الطلبات</span>
                     @if ($hasUnopenedOrdersForAdmin)
                         <span class="nav-notice-dot" aria-label="طلبات جديدة"></span>
                     @endif
                 </a>
-                <a class="{{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('admin.users') }}">المستخدمين</a>
-                <a class="{{ request()->routeIs('admin.customers') ? 'active' : '' }}" href="{{ route('admin.customers') }}">العملاء</a>
-                <a class="{{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}">الإعدادات</a>
+                <a class="{{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('admin.users') }}"><span class="nav-icon" aria-hidden="true">👥</span><span class="nav-text">المستخدمين</span></a>
+                <a class="{{ request()->routeIs('admin.customers') ? 'active' : '' }}" href="{{ route('admin.customers') }}"><span class="nav-icon" aria-hidden="true">👤</span><span class="nav-text">العملاء</span></a>
+                <a class="settings-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}"><span class="nav-icon" aria-hidden="true">⚙️</span><span class="nav-text">الإعدادات</span></a>
                 <form method="post" action="{{ route('logout') }}">
                     @csrf
-                    <button class="logout" type="submit">تسجيل الخروج</button>
+                    <button class="logout" type="submit"><span class="nav-icon" aria-hidden="true">🚪</span><span class="nav-text">تسجيل الخروج</span></button>
                 </form>
             </nav>
         </aside>
@@ -158,12 +188,69 @@
             document.getElementById('adminModalTitle').textContent = title;
             body.innerHTML = '';
             body.appendChild(template.content.cloneNode(true));
+            localizeDateTimes(body);
+            bindEnglishNumberWarnings(body);
             modal.classList.add('active');
+            markVisibleOrdersAsOpened(body);
+        }
+
+        function localizeDateTimes(root = document) {
+            const formatter = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', {
+                weekday: 'long',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            });
+
+            root.querySelectorAll('[data-local-datetime]').forEach((element) => {
+                const date = new Date(element.dataset.localDatetime);
+                if (Number.isNaN(date.getTime())) return;
+
+                element.textContent = formatter.format(date).replace('،', ' -');
+            });
+        }
+
+        function markVisibleOrdersAsOpened(root) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!token) return;
+
+            root.querySelectorAll('[data-open-order-url]').forEach((orderElement) => {
+                if (orderElement.dataset.openedSent === 'true') return;
+
+                orderElement.dataset.openedSent = 'true';
+
+                fetch(orderElement.dataset.openOrderUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                }).catch(() => {});
+
+                const orderId = orderElement.dataset.orderId;
+                document.querySelectorAll(`[data-order-id="${orderId}"] [data-order-status-dot]`).forEach((dot) => {
+                    if (dot.classList.contains('green')) return;
+                    dot.classList.remove('red');
+                    dot.classList.add('yellow');
+                });
+            });
         }
 
         function closeAdminModal(event) {
             if (event && event.target.id !== 'adminModal') return;
             document.getElementById('adminModal').classList.remove('active');
+        }
+
+        function toggleInlinePasswordPanel(button) {
+            const panel = button.closest('.form-section')?.querySelector('.inline-password-panel');
+            if (!panel) return;
+
+            panel.style.display = panel.style.display === 'none' ? 'grid' : 'none';
         }
 
         document.addEventListener('keydown', (event) => {
@@ -206,7 +293,9 @@
 
                             currentMain.innerHTML = nextMain.innerHTML;
                             window.history.replaceState({}, '', url);
+                            localizeDateTimes(currentMain);
                             bindAutoSearchForms(currentMain);
+                            bindEnglishNumberWarnings(currentMain);
 
                             const nextInput = currentMain.querySelector('.auto-search-form input[name="search"]');
                             if (nextInput) {
@@ -235,15 +324,56 @@
             });
         }
 
+        function bindEnglishNumberWarnings(root = document) {
+            const rules = [
+                { selector: 'input[name="phone"]', pattern: /^05[0-9]{8}$/, message: 'تنبيه: رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام إنجليزية فقط.' },
+                { selector: 'input[name="password"], input[name="password_confirmation"]', pattern: /^[A-Za-z0-9]+$/, message: 'تنبيه: كلمة المرور تقبل حروف وأرقام إنجليزية فقط.' },
+                { selector: 'input[name="postal_code"], input[name="card_cvc"], input[name="pages"], #researchPages, .copies-input', pattern: /^[0-9]+$/, message: 'تنبيه: لا يقبل هذا الحقل إلا الأرقام الإنجليزية فقط 0-9.' },
+                { selector: 'input[name="card_number"]', pattern: /^[0-9 ]+$/, message: 'تنبيه: رقم البطاقة يقبل الأرقام الإنجليزية والمسافات فقط.' },
+                { selector: 'input[name="card_expiry"]', pattern: /^(0[1-9]|1[0-2])\/[0-9]{2}$/, message: 'تنبيه: اكتب تاريخ الانتهاء بالأرقام الإنجليزية بصيغة MM/YY.' },
+            ];
+            const selector = rules.map((rule) => rule.selector).join(', ');
+            root.querySelectorAll(selector).forEach((input) => {
+                if (input.dataset.englishNumberBound === 'true') return;
+
+                const showWarning = () => {
+                    const rule = rules.find((item) => input.matches(item.selector));
+                    if (!rule) return;
+
+                    let warning = input.nextElementSibling;
+                    if (!warning || !warning.classList.contains('english-number-warning')) {
+                        warning = document.createElement('div');
+                        warning.className = 'english-number-warning';
+                        input.insertAdjacentElement('afterend', warning);
+                    }
+
+                    const invalid = input.value !== '' && !rule.pattern.test(input.value);
+                    warning.textContent = rule.message;
+                    warning.classList.toggle('active', invalid);
+                    input.setCustomValidity(invalid ? rule.message : '');
+                };
+
+                input.addEventListener('input', showWarning);
+                showWarning();
+                input.dataset.englishNumberBound = 'true';
+            });
+        }
+
+        localizeDateTimes();
         bindAutoSearchForms();
+        bindEnglishNumberWarnings();
 
         document.addEventListener('click', (event) => {
             const link = event.target.closest('[data-complete-order-download]');
             if (!link) return;
 
-            const dot = link.closest('.order')?.querySelector('[data-order-status-dot]');
-            dot?.classList.remove('red', 'yellow');
-            dot?.classList.add('green');
+            const orderId = link.closest('[data-order-id]')?.dataset.orderId;
+            if (!orderId) return;
+
+            document.querySelectorAll(`[data-order-id="${orderId}"] [data-order-status-dot]`).forEach((dot) => {
+                dot.classList.remove('red', 'yellow');
+                dot.classList.add('green');
+            });
         });
     </script>
 </body>

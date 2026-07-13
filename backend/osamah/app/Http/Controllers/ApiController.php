@@ -41,8 +41,8 @@ class ApiController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', 'unique:users,phone'],
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', 'unique:users,phone'],
+            'password' => ['required', 'confirmed', Password::min(6), 'regex:/^[A-Za-z0-9]+$/'],
         ]);
 
         $user = User::query()->create([
@@ -147,7 +147,7 @@ class ApiController extends Controller
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
+            'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', Rule::unique('users', 'phone')->ignore($user->id)],
         ]);
 
         $user->update($data);
@@ -167,7 +167,7 @@ class ApiController extends Controller
             'city' => ['required', 'string', 'max:120'],
             'district' => ['required', 'string', 'max:120'],
             'street' => ['required', 'string', 'max:180'],
-            'postal_code' => ['required', 'string', 'max:20'],
+            'postal_code' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
         ]);
 
         $data['address'] = implode(' - ', [
@@ -193,7 +193,7 @@ class ApiController extends Controller
 
         $data = $request->validate([
             'current_password' => ['required', 'string'],
-            'password' => ['required', 'confirmed', Password::min(6)],
+            'password' => ['required', 'confirmed', Password::min(6), 'regex:/^[A-Za-z0-9]+$/'],
         ]);
 
         if (! Hash::check($data['current_password'], $user->password)) {
