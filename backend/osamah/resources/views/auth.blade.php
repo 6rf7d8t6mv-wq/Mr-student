@@ -9,6 +9,8 @@
         body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; color: #111827; }
         .page { min-height: 100vh; display: grid; place-items: center; padding: clamp(14px, 4vw, 24px); }
         .auth-card { width: min(430px, 100%); background: #ffffff; border: 1px solid #e5e7eb; border-radius: clamp(12px, 3vw, 14px); padding: clamp(18px, 4vw, 26px); box-shadow: 0 22px 55px rgba(15, 23, 42, 0.10); }
+        .web-back { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-bottom: 16px; padding: 11px 14px; border-radius: 12px; background: linear-gradient(135deg, #0f4c81, #1d6fa5); color: #fff; text-decoration: none; font-size: 14px; font-weight: 900; border: 1px solid rgba(96, 165, 250, 0.35); box-shadow: 0 12px 24px rgba(15, 76, 129, 0.18); transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
+        .web-back:hover { background: linear-gradient(135deg, #123f68, #0f4c81); transform: translateY(-1px); box-shadow: 0 14px 28px rgba(15, 76, 129, 0.24); }
         .brand { margin-bottom: 22px; text-align: center; }
         h1 { margin: 0; font-size: clamp(24px, 7vw, 28px); }
         h2 { margin: 0 0 6px; font-size: clamp(20px, 5vw, 22px); }
@@ -69,6 +71,7 @@
 <body>
     <main class="page">
         <section class="auth-card">
+            <a class="web-back" href="{{ route('public.home') }}"><span aria-hidden="true">←</span><span>الصفحة الرئيسية</span></a>
             <div class="brand">
                 <h1>Mr-Student</h1>
                 <p>خدمات الطباعة والتجليد</p>
@@ -166,6 +169,10 @@
         function showPanel(panel) {
             document.getElementById('loginPanel').classList.toggle('active', panel === 'login');
             document.getElementById('registerPanel').classList.toggle('active', panel === 'register');
+        }
+
+        if (window.location.hash === '#register') {
+            showPanel('register');
         }
 
         function bindInputRule(input, pattern, message) {

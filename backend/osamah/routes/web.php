@@ -21,6 +21,10 @@ Route::get('/educational-institutions', [EducationalInstitutionController::class
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('/', function () {
+    return view('public.home');
+})->name('public.home');
+
+Route::get('/home', function () {
     $students = [
         ['name' => 'أحمد', 'subject' => 'رياضيات', 'grade' => 95],
         ['name' => 'سارة', 'subject' => 'علوم', 'grade' => 88],
