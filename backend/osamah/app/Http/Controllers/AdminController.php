@@ -293,7 +293,9 @@ class AdminController extends Controller
         $this->ensureAdmin();
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required_without:name', 'string', 'max:120'],
+            'second_name' => ['nullable', 'string', 'max:120'],
+            'name' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', 'unique:users,phone'],
             'email' => ['nullable', 'email:rfc,dns', 'max:255', 'regex:/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/', 'unique:users,email'],
             'password' => ['required', Password::min(6), 'regex:/^[A-Za-z0-9]+$/', 'confirmed'],
@@ -304,13 +306,17 @@ class AdminController extends Controller
 
         $this->ensurePermission($data['role'] === 'admin' ? 'users_create' : 'customers_create');
 
+        if (filled($data['first_name'] ?? null)) {
+            $data['name'] = trim($data['first_name'] . ' ' . ($data['second_name'] ?? ''));
+        }
+
         if ($data['role'] === 'admin') {
             $data['admin_permissions'] = $this->adminPermissionsFromRequest($request);
         } else {
             $data['admin_permissions'] = null;
         }
 
-        unset($data['password_confirmation']);
+        unset($data['first_name'], $data['second_name'], $data['password_confirmation']);
 
         $user = User::query()->create($data);
 
@@ -332,8 +338,11 @@ class AdminController extends Controller
         }
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:120'],
+            'second_name' => ['nullable', 'string', 'max:120'],
+            'name' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string', 'regex:/^05[0-9]{8}$/', Rule::unique('users', 'phone')->ignore($user->id)],
+            'email' => ['nullable', 'email:rfc,dns', 'max:255', 'regex:/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', Password::min(6), 'regex:/^[A-Za-z0-9]+$/', 'confirmed'],
             'role' => ['required', Rule::in(['customer', 'admin'])],
             'is_active' => ['nullable', 'boolean'],
@@ -343,12 +352,20 @@ class AdminController extends Controller
 
         $prefix = $user->role === 'admin' ? 'users' : 'customers';
 
+        if (filled($data['first_name'] ?? null)) {
+            $data['name'] = trim($data['first_name'] . ' ' . ($data['second_name'] ?? ''));
+        }
+
         if (($data['name'] ?? null) !== $user->name) {
             $this->ensurePermission($prefix . '_update');
         }
 
         if (($data['phone'] ?? null) !== $user->phone) {
             $this->ensurePermission($prefix . '_phone_update');
+        }
+
+        if (($data['email'] ?? null) !== $user->email) {
+            $this->ensurePermission($prefix . '_email_update');
         }
 
         if (filled($data['password'] ?? null)) {
@@ -358,7 +375,7 @@ class AdminController extends Controller
         if (blank($data['password'] ?? null)) {
             unset($data['password']);
         }
-        unset($data['password_confirmation']);
+        unset($data['first_name'], $data['second_name'], $data['password_confirmation']);
 
         if ($request->has('is_active')) {
             $this->ensurePermission($prefix . '_status');

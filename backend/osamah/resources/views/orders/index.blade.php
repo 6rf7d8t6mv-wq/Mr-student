@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ session('ui_locale', 'ar') === 'en' ? 'en' : 'ar' }}" dir="{{ session('ui_locale', 'ar') === 'en' ? 'ltr' : 'rtl' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -199,6 +199,7 @@
                     @csrf
                     <button class="logout-button" type="submit">🚪 خروج</button>
                 </form>
+                @include('shared.language-switcher')
             </div>
         </div>
     </header>
@@ -841,5 +842,6 @@
         }
     </script>
     @include('shared.chat-widget')
+    @include('shared.language-tools')
 </body>
 </html>

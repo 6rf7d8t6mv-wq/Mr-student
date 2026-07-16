@@ -1,13 +1,18 @@
 @php
     $siteUrl = rtrim(config('app.url') ?: url('/'), '/');
     $pageUrl = $siteUrl . '/';
-    $pageTitle = 'MrStudent | خدمات الطباعة والتجليد ورفع الملفات للطلاب';
-    $pageDescription = 'MrStudent منصة طلابية لإدارة طلبات الطباعة والتجليد ورفع الملفات ومتابعة حالة الطلب بسهولة وأمان.';
+    $isEnglish = session('ui_locale', 'ar') === 'en';
+    $pageTitle = $isEnglish
+        ? 'MrStudent | Printing, Binding, and File Upload Services for Students'
+        : 'MrStudent | خدمات الطباعة والتجليد ورفع الملفات للطلاب';
+    $pageDescription = $isEnglish
+        ? 'MrStudent is a student platform for managing printing and binding orders, file uploads, and order tracking easily and securely.'
+        : 'MrStudent منصة طلابية لإدارة طلبات الطباعة والتجليد ورفع الملفات ومتابعة حالة الطلب بسهولة وأمان.';
     $loginUrl = route('login');
     $registerUrl = route('login') . '#register';
 @endphp
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ session('ui_locale', 'ar') === 'en' ? 'en' : 'ar' }}" dir="{{ session('ui_locale', 'ar') === 'en' ? 'ltr' : 'rtl' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,7 +20,7 @@
     <meta name="description" content="{{ $pageDescription }}">
     <link rel="canonical" href="{{ $pageUrl }}">
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="ar_SA">
+    <meta property="og:locale" content="{{ $isEnglish ? 'en_US' : 'ar_SA' }}">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ $pageUrl }}">
@@ -183,6 +188,7 @@
             <div class="nav-actions">
                 <a class="btn light" href="{{ $loginUrl }}">تسجيل الدخول</a>
                 <a class="btn blue" href="{{ $registerUrl }}">إنشاء حساب</a>
+                @include('shared.language-switcher')
             </div>
         </div>
     </header>
@@ -368,5 +374,6 @@
             </div>
         </div>
     </footer>
+    @include('shared.language-tools')
 </body>
 </html>

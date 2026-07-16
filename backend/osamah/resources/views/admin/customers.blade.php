@@ -90,7 +90,8 @@
             @csrf
             <input type="hidden" name="role" value="customer">
                 <div class="form-grid">
-                    <div><label>الاسم</label><input name="name" required></div>
+                    <div><label>الاسم الأول</label><input name="first_name" required></div>
+                    <div><label>الاسم الثاني</label><input name="second_name"></div>
                     <div><label>رقم الجوال</label><input name="phone" required></div>
                     <div><label>البريد الإلكتروني</label><input name="email" type="email" inputmode="email" pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}" title="اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com"></div>
                     <div><label>كلمة المرور</label><input name="password" type="password" required></div>
@@ -101,6 +102,11 @@
     </template>
 
     @foreach ($customers as $customer)
+        @php
+            $customerNameParts = preg_split('/\s+/', trim($customer->name), 2);
+            $customerFirstName = $customerNameParts[0] ?? '';
+            $customerSecondName = $customerNameParts[1] ?? '';
+        @endphp
         <template id="edit-customer-{{ $customer->id }}">
             <form method="post" action="{{ route('admin.users.update', $customer) }}">
                 @csrf
@@ -110,7 +116,8 @@
                     <h3 class="form-section-title">بيانات العميل</h3>
                     <div class="form-grid">
                         @if (auth()->user()->hasAdminPermission('customers_update'))
-                            <div><label>الاسم</label><input name="name" value="{{ $customer->name }}" required></div>
+                            <div><label>الاسم الأول</label><input name="first_name" value="{{ $customerFirstName }}" required></div>
+                            <div><label>الاسم الثاني</label><input name="second_name" value="{{ $customerSecondName }}"></div>
                         @else
                             <input type="hidden" name="name" value="{{ $customer->name }}">
                         @endif
@@ -118,6 +125,11 @@
                             <div><label>رقم الجوال</label><input name="phone" value="{{ $customer->phone }}" required></div>
                         @else
                             <input type="hidden" name="phone" value="{{ $customer->phone }}">
+                        @endif
+                        @if (auth()->user()->hasAdminPermission('customers_email_update'))
+                            <div><label>البريد الإلكتروني</label><input name="email" type="email" inputmode="email" pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}" title="اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com" value="{{ $customer->email }}"></div>
+                        @else
+                            <input type="hidden" name="email" value="{{ $customer->email }}">
                         @endif
                     </div>
                 </div>

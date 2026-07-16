@@ -16,6 +16,8 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $this->normalizeAuthInput($request);
+
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:120'],
             'second_name' => ['required', 'string', 'max:120'],
@@ -23,7 +25,7 @@ class AuthController extends Controller
             'email' => ['nullable', 'email:rfc', 'max:255', 'regex:/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/', 'unique:users,email'],
             'institution_name' => ['nullable', 'string', 'max:255', 'required_unless:institution_not_interested,1'],
             'institution_not_interested' => ['nullable', 'boolean'],
-            'password' => ['required', 'confirmed', Password::min(6), 'regex:/^[A-Za-z0-9]+$/'],
+            'password' => ['required', 'confirmed', Password::min(6), 'regex:/^[\x21-\x7E]+$/'],
         ]);
 
         $user = User::query()->create([
@@ -42,9 +44,11 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $this->normalizeAuthInput($request);
+
         $data = $request->validate([
-            'login_identifier' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'login_identifier' => ['required', 'string', 'regex:/^[\x21-\x7E]+$/'],
+            'password' => ['required', 'string', 'regex:/^[\x21-\x7E]+$/'],
         ]);
 
         $field = filter_var($data['login_identifier'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
@@ -81,5 +85,60 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    private function normalizeAuthInput(Request $request): void
+    {
+        $fields = ['login_identifier', 'phone', 'email', 'password', 'password_confirmation'];
+        $normalized = [];
+
+        foreach ($fields as $field) {
+            if (! $request->has($field)) {
+                continue;
+            }
+
+            $value = (string) $request->input($field);
+            $value = $this->convertArabicDigits($value);
+
+            if ($field === 'phone') {
+                $value = preg_replace('/[^0-9]/', '', $value) ?? '';
+            } elseif ($field === 'email') {
+                $value = preg_replace('/[^A-Za-z0-9._%+\-@]/', '', $value) ?? '';
+            } else {
+                $value = preg_replace('/[^\x21-\x7E]/', '', $value) ?? '';
+            }
+
+            $normalized[$field] = $value;
+        }
+
+        if ($normalized !== []) {
+            $request->merge($normalized);
+        }
+    }
+
+    private function convertArabicDigits(string $value): string
+    {
+        return strtr($value, [
+            '٠' => '0',
+            '١' => '1',
+            '٢' => '2',
+            '٣' => '3',
+            '٤' => '4',
+            '٥' => '5',
+            '٦' => '6',
+            '٧' => '7',
+            '٨' => '8',
+            '٩' => '9',
+            '۰' => '0',
+            '۱' => '1',
+            '۲' => '2',
+            '۳' => '3',
+            '۴' => '4',
+            '۵' => '5',
+            '۶' => '6',
+            '۷' => '7',
+            '۸' => '8',
+            '۹' => '9',
+        ]);
     }
 }

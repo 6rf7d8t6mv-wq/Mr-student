@@ -9,6 +9,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\EducationalInstitutionController;
 use App\Http\Controllers\FileUploadController;
+use Illuminate\Http\Request;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -18,6 +19,16 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/educational-institutions', [EducationalInstitutionController::class, 'index'])
     ->name('educational-institutions.index');
+
+Route::post('/language', function (Request $request) {
+    $data = $request->validate([
+        'locale' => ['required', 'in:ar,en'],
+    ]);
+
+    session(['ui_locale' => $data['locale']]);
+
+    return back();
+})->name('language.switch');
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 

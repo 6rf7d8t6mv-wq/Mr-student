@@ -60,7 +60,7 @@ class _MrStudentWebAppState extends State<MrStudentWebApp> {
             setState(() {
               _isLoading = false;
               _errorMessage =
-                  'تعذر فتح موقع Laravel. تأكد أن السيرفر يعمل على 127.0.0.1:8000';
+                  'Could not open the Laravel website. Make sure the server is running on 127.0.0.1:8000.';
             });
           },
         ),
@@ -159,7 +159,7 @@ class _ConnectionError extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text('إعادة المحاولة'),
+                  child: const Text('Retry'),
                 ),
               ],
             ),

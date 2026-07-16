@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ session('ui_locale', 'ar') === 'en' ? 'en' : 'ar' }}" dir="{{ session('ui_locale', 'ar') === 'en' ? 'ltr' : 'rtl' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +21,7 @@
         .secondary-action { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; }
         .switch-button { width: auto; margin-top: 10px; padding: 9px 13px; background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
         .error { margin: 0 0 16px; padding: 12px; background: #fef2f2; color: #b91c1c; border-radius: 8px; }
+        .input-note { margin: 7px 0 0; color: #64748b; font-size: 11px; font-weight: 800; line-height: 1.6; }
         .english-number-warning { display: none; margin-top: 5px; color: #b91c1c; font-size: 12px; font-weight: 800; }
         .english-number-warning.active { display: block; }
         .auth-panel { display: none; }
@@ -72,6 +73,7 @@
     <main class="page">
         <section class="auth-card">
             <a class="web-back" href="{{ route('public.home') }}"><span aria-hidden="true">←</span><span>الصفحة الرئيسية</span></a>
+            @include('shared.language-switcher')
             <div class="brand">
                 <h1>Mr-Student</h1>
                 <p>خدمات الطباعة والتجليد</p>
@@ -88,10 +90,12 @@
                 <form method="post" action="{{ route('login.store') }}">
                     @csrf
                     <label for="loginIdentifier">رقم الجوال أو البريد الإلكتروني</label>
-                    <input id="loginIdentifier" name="login_identifier" value="{{ old('login_identifier') }}" required>
+                    <input id="loginIdentifier" name="login_identifier" value="{{ old('login_identifier') }}" autocomplete="username" required>
+                    <p class="input-note">يقبل رقم الجوال أو البريد بحروف وأرقام إنجليزية ورموز البريد فقط، والأرقام العربية تتحول تلقائيًا إلى إنجليزية.</p>
 
                     <label for="loginPassword">كلمة المرور</label>
-                    <input id="loginPassword" name="password" type="password" required>
+                    <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+                    <p class="input-note">كلمة المرور تقبل الحروف الإنجليزية والأرقام والرموز فقط.</p>
 
                     <button type="submit">دخول</button>
                 </form>
@@ -119,10 +123,12 @@
                     </div>
 
                     <label for="phone">رقم الجوال</label>
-                    <input id="phone" name="phone" inputmode="numeric" required>
+                    <input id="phone" name="phone" inputmode="numeric" autocomplete="tel" required>
+                    <p class="input-note">اكتب الرقم بأي صيغة أرقام عربية أو إنجليزية، وسيتم تحويله تلقائيًا إلى أرقام إنجليزية.</p>
 
                     <label for="email">البريد الإلكتروني (اختياري)</label>
                     <input id="email" name="email" type="email" inputmode="email" pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}" title="اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com">
+                    <p class="input-note">البريد يقبل الحروف الإنجليزية والأرقام والرموز الخاصة بالبريد فقط.</p>
 
                     <div class="optional-note">اختياري: اختر جامعتك أو معهدك أو مدرستك من القائمة، وإذا لم تجدها اكتب اسمها كاملًا يدويًا وسيتم حفظه. إذا ما تبغى تضيفها اختر غير مهتم.</div>
                     <label class="check-row" for="institutionNotInterested">
@@ -149,10 +155,11 @@
                     </div>
 
                     <label for="password">كلمة المرور</label>
-                    <input id="password" name="password" type="password" required>
+                    <input id="password" name="password" type="password" autocomplete="new-password" required>
+                    <p class="input-note">كلمة المرور تقبل الحروف الإنجليزية والأرقام والرموز فقط.</p>
 
                     <label for="password_confirmation">تأكيد كلمة المرور</label>
-                    <input id="password_confirmation" name="password_confirmation" type="password" required>
+                    <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
 
                     <button type="submit">إنشاء الحساب</button>
                 </form>
@@ -175,13 +182,39 @@
             showPanel('register');
         }
 
-        function bindInputRule(input, pattern, message) {
+        function convertArabicDigits(value) {
+            return value
+                .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+                .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)));
+        }
+
+        function bindInputRule(input, pattern, message, sanitizer = null) {
             const showWarning = () => {
+                if (sanitizer) {
+                    const cursor = input.selectionStart;
+                    const oldLength = input.value.length;
+                    input.value = sanitizer(input.value);
+                    const diff = oldLength - input.value.length;
+                    if (document.activeElement === input && cursor !== null) {
+                        input.setSelectionRange(Math.max(0, cursor - diff), Math.max(0, cursor - diff));
+                    }
+                }
+
                 let warning = input.nextElementSibling;
+                while (warning && warning.classList.contains('input-note')) {
+                    warning = warning.nextElementSibling;
+                }
                 if (!warning || !warning.classList.contains('english-number-warning')) {
                     warning = document.createElement('div');
                     warning.className = 'english-number-warning';
-                    input.insertAdjacentElement('afterend', warning);
+                    let insertAfter = input.nextElementSibling;
+                    while (insertAfter && insertAfter.classList.contains('input-note')) {
+                        input.parentNode.insertBefore(warning, insertAfter.nextElementSibling);
+                        insertAfter = null;
+                    }
+                    if (insertAfter !== null) {
+                        input.insertAdjacentElement('afterend', warning);
+                    }
                 }
 
                 const invalid = input.value !== '' && !pattern.test(input.value);
@@ -194,16 +227,24 @@
             showWarning();
         }
 
+        const asciiPrintable = (value) => convertArabicDigits(value).replace(/[^\x21-\x7E]/g, '');
+        const phoneOnly = (value) => convertArabicDigits(value).replace(/[^0-9]/g, '').slice(0, 10);
+        const emailOnly = (value) => convertArabicDigits(value).replace(/[^A-Za-z0-9._%+\-@]/g, '');
+
+        document.querySelectorAll('input[name="login_identifier"]').forEach((input) => {
+            bindInputRule(input, /^[\x21-\x7E]+$/, 'تنبيه: تسجيل الدخول يقبل الحروف الإنجليزية والأرقام والرموز فقط.', asciiPrintable);
+        });
+
         document.querySelectorAll('#registerPanel input[name="phone"]').forEach((input) => {
-            bindInputRule(input, /^05[0-9]{8}$/, 'تنبيه: رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام إنجليزية فقط.');
+            bindInputRule(input, /^05[0-9]{8}$/, 'تنبيه: رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام إنجليزية فقط.', phoneOnly);
         });
 
         document.querySelectorAll('#registerPanel input[name="email"]').forEach((input) => {
-            bindInputRule(input, /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/, 'تنبيه: اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com.');
+            bindInputRule(input, /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/, 'تنبيه: اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com.', emailOnly);
         });
 
-        document.querySelectorAll('#registerPanel input[name="password"], #registerPanel input[name="password_confirmation"]').forEach((input) => {
-            bindInputRule(input, /^[A-Za-z0-9]+$/, 'تنبيه: كلمة المرور تقبل حروف وأرقام إنجليزية فقط.');
+        document.querySelectorAll('input[name="password"], input[name="password_confirmation"]').forEach((input) => {
+            bindInputRule(input, /^[\x21-\x7E]+$/, 'تنبيه: كلمة المرور تقبل الحروف الإنجليزية والأرقام والرموز فقط.', asciiPrintable);
         });
 
         const institutionCheckbox = document.getElementById('institutionNotInterested');
@@ -373,5 +414,6 @@
         syncInstitutionInterest();
         syncManualInstitutionSave();
     </script>
+    @include('shared.language-tools')
 </body>
 </html>

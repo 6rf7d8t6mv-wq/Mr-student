@@ -95,10 +95,11 @@
             @csrf
             <input type="hidden" name="role" value="admin">
             <div class="form-grid">
-                <div><label>الاسم</label><input name="name" required></div>
-                        <div><label>رقم الجوال</label><input name="phone" required></div>
-                        <div><label>البريد الإلكتروني</label><input name="email" type="email" inputmode="email" pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}" title="اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com"></div>
-                        <div><label>كلمة المرور</label><input name="password" type="password" required></div>
+                <div><label>الاسم الأول</label><input name="first_name" required></div>
+                <div><label>الاسم الثاني</label><input name="second_name"></div>
+                <div><label>رقم الجوال</label><input name="phone" required></div>
+                <div><label>البريد الإلكتروني</label><input name="email" type="email" inputmode="email" pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}" title="اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com"></div>
+                <div><label>كلمة المرور</label><input name="password" type="password" required></div>
                 <div><label>تأكيد كلمة المرور</label><input name="password_confirmation" type="password" required></div>
             </div>
             <div class="form-section">
@@ -119,6 +120,9 @@
     @foreach ($users as $user)
         @php
             $selectedPermissions = $user->admin_permissions ?? array_keys($permissionOptions);
+            $userNameParts = preg_split('/\s+/', trim($user->name), 2);
+            $userFirstName = $userNameParts[0] ?? '';
+            $userSecondName = $userNameParts[1] ?? '';
         @endphp
         <template id="edit-admin-{{ $user->id }}">
             <form method="post" action="{{ route('admin.users.update', $user) }}">
@@ -129,7 +133,8 @@
                     <h3 class="form-section-title">بيانات المستخدم</h3>
                     <div class="form-grid">
                         @if (auth()->user()->hasAdminPermission('users_update'))
-                            <div><label>الاسم</label><input name="name" value="{{ $user->name }}" required></div>
+                            <div><label>الاسم الأول</label><input name="first_name" value="{{ $userFirstName }}" required></div>
+                            <div><label>الاسم الثاني</label><input name="second_name" value="{{ $userSecondName }}"></div>
                         @else
                             <input type="hidden" name="name" value="{{ $user->name }}">
                         @endif
@@ -137,6 +142,11 @@
                             <div><label>رقم الجوال</label><input name="phone" value="{{ $user->phone }}" required></div>
                         @else
                             <input type="hidden" name="phone" value="{{ $user->phone }}">
+                        @endif
+                        @if (auth()->user()->hasAdminPermission('users_email_update'))
+                            <div><label>البريد الإلكتروني</label><input name="email" type="email" inputmode="email" pattern="[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}" title="اكتب بريدًا إلكترونيًا صحيحًا مثل name@example.com" value="{{ $user->email }}"></div>
+                        @else
+                            <input type="hidden" name="email" value="{{ $user->email }}">
                         @endif
                     </div>
                 </div>
