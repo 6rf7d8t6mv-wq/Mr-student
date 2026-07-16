@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
@@ -12,6 +13,19 @@ class AuthController extends Controller
     public function showLogin()
     {
         return view('auth');
+    }
+
+    public function showAdminLogin()
+    {
+        if (Auth::check()) {
+            if (Auth::user()->role === 'admin') {
+                return app(AdminController::class)->dashboard();
+            }
+
+            return redirect()->route('home');
+        }
+
+        return view('admin.login');
     }
 
     public function register(Request $request)
@@ -59,6 +73,14 @@ class AuthController extends Controller
             ])->onlyInput('login_identifier');
         }
 
+        if (Auth::user()->role === 'admin') {
+            Auth::logout();
+
+            return back()->withErrors([
+                'login_identifier' => 'حسابات الإدارة تسجل الدخول من صفحة المدير فقط.',
+            ])->onlyInput('login_identifier');
+        }
+
         if (! Auth::user()->canLogin()) {
             Auth::logout();
 
@@ -77,6 +99,47 @@ class AuthController extends Controller
             : redirect()->route('home');
     }
 
+    public function adminLogin(Request $request)
+    {
+        $this->normalizeAuthInput($request);
+
+        $data = $request->validate([
+            'login_identifier' => ['required', 'string', 'regex:/^[\x21-\x7E]+$/'],
+            'password' => ['required', 'string', 'regex:/^[\x21-\x7E]+$/'],
+        ]);
+
+        $field = filter_var($data['login_identifier'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        if (!Auth::attempt([$field => $data['login_identifier'], 'password' => $data['password']], true)) {
+            return back()->withErrors([
+                'login_identifier' => 'بيانات مدير النظام غير صحيحة',
+            ])->onlyInput('login_identifier');
+        }
+
+        if (Auth::user()->role !== 'admin') {
+            Auth::logout();
+
+            return back()->withErrors([
+                'login_identifier' => 'هذه الصفحة مخصصة لدخول الإدارة فقط.',
+            ])->onlyInput('login_identifier');
+        }
+
+        if (! Auth::user()->canLogin()) {
+            Auth::logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'login_identifier' => 'هذا الحساب موقوف أو ممنوع من تسجيل الدخول.',
+            ])->onlyInput('login_identifier');
+        }
+
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.dashboard');
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();
@@ -84,7 +147,9 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return $request->is('admin/*') || str_starts_with((string) url()->previous(), url('/admin'))
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('login');
     }
 
     private function normalizeAuthInput(Request $request): void

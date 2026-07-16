@@ -15,6 +15,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.store');
     Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+    Route::post('/admin', [AuthController::class, 'adminLogin'])->name('admin.login.store');
 });
 
 Route::get('/educational-institutions', [EducationalInstitutionController::class, 'index'])
@@ -87,8 +88,9 @@ Route::middleware('auth')->prefix('account')->name('account.')->group(function (
     Route::delete('/profile', [AccountController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/admin', [AuthController::class, 'showAdminLogin'])->name('admin.dashboard');
+
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::get('/users', [AdminController::class, 'users'])->name('users');
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
