@@ -161,7 +161,7 @@
                                     @elseif (in_array($order->delivery_method, ['madinah_delivery', 'redbox_delivery'], true))
                                         <br><span class="muted">{{ $order->delivery_city }} / حي {{ $order->delivery_district }} / شارع {{ $order->delivery_street }}</span>
                                         @if ($order->delivery_map_url)
-                                            <br><a class="muted" href="{{ $order->delivery_map_url }}" target="_blank" rel="noopener">رابط الموقع</a>
+                                            <br><a class="muted" href="{{ $order->delivery_map_url }}">رابط الموقع</a>
                                         @endif
                                     @endif
                                 </div>
@@ -197,6 +197,7 @@
 
                         <div class="order-detail-section order-files-cards {{ $order->service_type === 'research' ? 'research' : '' }}">
                             @foreach ($order->files as $file)
+                                @php($isAcademicWord = in_array($order->service_type, ['thesis', 'phd'], true) && $file->file_type === 'word')
                                 <div class="order-file-card">
                                     <div class="order-file-field file-name">
                                         <span>الملف</span>
@@ -208,6 +209,12 @@
                                             <strong>{{ strtoupper($file->file_type) }}</strong>
                                         </div>
                                     @endif
+                                    @if ($isAcademicWord)
+                                        <div class="order-file-field">
+                                            <span>الاستخدام</span>
+                                            <strong>ملف Word للعرض فقط، وغير محتسب ضمن الطباعة أو التجليد أو التسعير.</strong>
+                                        </div>
+                                    @else
                                     @if (in_array($order->service_type, ['thesis', 'phd'], true))
                                         <div class="order-file-field">
                                             <span>الجامعة/المعهد</span>
@@ -270,12 +277,13 @@
                                         <span>الإجمالي</span>
                                         <strong>{{ $file->total_price }} ريال</strong>
                                     </div>
+                                    @endif
                                     @if ($order->service_type !== 'research')
                                         <div class="order-file-field actions-field">
                                             <span>الملف</span>
                                             @if (auth()->user()->hasAdminPermission('files_download'))
                                                 <div class="file-action-buttons">
-                                                    <a class="file-action-button view" href="{{ route('admin.files.view', $file) }}" target="_blank" rel="noopener">عرض الملف</a>
+                                                    <a class="file-action-button view" href="{{ route('admin.files.view', $file) }}">عرض الملف</a>
                                                     <a class="file-action-button download" href="{{ route('admin.files.download', $file) }}" data-complete-order-download>تحميل الملف</a>
                                                 </div>
                                             @else
@@ -300,7 +308,7 @@
                                                 </div>
                                                 <div class="delivered-file-actions">
                                                     @if (auth()->user()->hasAdminPermission('delivered_files_download'))
-                                                        <a class="ghost" href="{{ route('admin.delivered-files.download', ['deliveredFile' => $deliveredFile, 'view' => 1]) }}" target="_blank" rel="noopener">عرض</a>
+                                                        <a class="ghost" href="{{ route('admin.delivered-files.download', ['deliveredFile' => $deliveredFile, 'view' => 1]) }}">عرض</a>
                                                         <a class="save small-button" href="{{ route('admin.delivered-files.download', $deliveredFile) }}">تحميل</a>
                                                     @endif
                                                     @if (auth()->user()->hasAdminPermission('delivered_files_delete'))

@@ -172,14 +172,6 @@
             .binding-required { color: #b91c1c; font-weight: 600; font-size: 12px; }
             .pricing-summary { margin-top: 16px; padding: 14px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; color: #111827; font-weight: 700; line-height: 1.7; }
             .pricing-summary.empty { color: #6b7280; font-weight: 600; }
-            .discount-box { margin: 14px 0; padding: 13px; border-radius: 12px; border: 1px solid #fbcfe8; background: #fdf2f8; }
-            .discount-title { margin: 0 0 9px; color: #831843; font-weight: 900; }
-            .discount-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
-            .discount-input { width: 100%; padding: 11px 12px; border: 1px solid #f9a8d4; border-radius: 9px; background: #ffffff; color: #0f172a; font-weight: 800; }
-            .discount-apply { padding: 11px 14px; border: 0; border-radius: 9px; background: #db2777; color: #ffffff; font-weight: 900; cursor: pointer; }
-            .discount-apply:hover { background: #be185d; }
-            .discount-status { margin-top: 8px; color: #047857; font-weight: 900; }
-            .discount-status.error { color: #b91c1c; }
             .delivery-notice { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: #eff6ff; color: #1e3a8a; border: 1px solid #bfdbfe; font-size: 13px; font-weight: 800; line-height: 1.7; }
             .word-usage-notice { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; font-size: 13px; font-weight: 800; line-height: 1.7; }
             .service-notice { margin: 14px 0 24px; padding: 14px 16px; border-radius: 14px; background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%); color: #0f172a; border: 1px solid #c7ddf5; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08); display: flex; gap: 12px; align-items: flex-start; line-height: 1.8; }
@@ -198,35 +190,9 @@
             .checkout-button { display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; background: #047857; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 800; border: 0; cursor: pointer; }
             .checkout-button:hover { background: #065f46; }
             .checkout-button.disabled { background: #cbd5e1; color: #64748b; pointer-events: none; }
-            .delivery-box { margin: 14px 0; padding: 14px; border: 1px solid #dbe4ef; border-radius: 12px; background: #f8fafc; text-align: right; }
-            .delivery-title { margin: 0 0 10px; color: #0f172a; font-weight: 900; }
-            .delivery-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
-            .delivery-option { display: flex; align-items: flex-start; gap: 8px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; background: #ffffff; cursor: pointer; color: #1f2937; font-weight: 800; line-height: 1.5; }
-            .delivery-option small { display: block; color: #64748b; font-weight: 700; margin-top: 3px; }
-            .delivery-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
-            .delivery-fields.address-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .delivery-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #111827; font-weight: 700; }
-            .delivery-note { margin: 8px 0 10px; padding: 10px 12px; border-radius: 10px; background: #ecfdf5; color: #047857; font-weight: 900; line-height: 1.6; }
-            .delivery-save { padding: 10px 14px; border: 0; border-radius: 8px; background: #0f172a; color: #ffffff; font-weight: 900; cursor: pointer; }
-            .delivery-save:disabled { background: #94a3b8; cursor: not-allowed; }
-            .delivery-status { margin-top: 8px; color: #047857; font-weight: 800; line-height: 1.6; }
-            .delivery-status.error { color: #b91c1c; }
-            @media (max-width: 700px) {
-                .delivery-options,
-                .delivery-fields,
-                .delivery-fields.address-fields,
-                .discount-row { grid-template-columns: 1fr; }
-            }
-            .cart-modal-backdrop { position: fixed; inset: 0; display: none; align-items: flex-start; justify-content: center; padding: clamp(10px, 3vw, 24px) clamp(8px, 3vw, 20px); background: rgba(15, 23, 42, 0.62); z-index: 100; overflow-y: auto; }
-            .cart-modal-backdrop.active { display: flex; }
-            .cart-modal { width: min(1180px, 100%); height: min(760px, calc(100vh - 20px)); margin: auto 0; background: #ffffff; border-radius: 14px; box-shadow: 0 24px 80px rgba(15, 23, 42, 0.32); overflow: hidden; border: 1px solid rgba(226, 232, 240, 0.9); display: flex; flex-direction: column; }
-            .cart-modal-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: clamp(12px, 3vw, 16px) clamp(14px, 3vw, 18px); background: #0f172a; color: #ffffff; }
-            .cart-modal-title { font-size: clamp(16px, 4vw, 18px); font-weight: 900; }
-            .cart-modal-close { border: 1px solid #64748b; background: transparent; color: #ffffff; border-radius: 8px; padding: 7px 11px; cursor: pointer; font-weight: 900; }
-            .cart-modal-frame { display: block; width: 100%; flex: 1; min-height: 0; border: 0; background: #f3f4f6; }
-            
-            .page-footer { background: #0f172a; color: #cbd5e1; padding: 22px 24px; }
-            .footer-content { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+
+            .page-footer { background: #0f172a; color: #cbd5e1; padding: 14px 18px; }
+            .footer-content { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 4px; font-size: 12px; line-height: 1.45; }
             @media (max-width: 1180px) {
                 .services-screen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
                 .service-card { min-height: 230px; }
@@ -242,9 +208,16 @@
             @media (max-width: 768px) {
                 :root { --sidebar-width: 0px; --page-gap: 10px; }
                 body { padding: 0; }
-                .page-header { position: sticky; top: 0; width: 100%; min-height: 0; max-height: none; padding: 12px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); }
-                .header-inner { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
-                .mobile-menu-toggle { display: inline-flex; }
+                .services-title-block { padding: 10px 12px; border-radius: 12px; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06); }
+                .services-title { font-size: 19px; line-height: 1.35; }
+                .page-header { position: sticky; top: 0; width: 100%; min-height: 0; max-height: none; padding: 8px 10px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); }
+                .header-inner { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+                .header-inner > div:first-child { display: flex; align-items: center; gap: 8px; min-width: 0; }
+                .brand-logo { width: 34px; height: 34px; border-radius: 10px; margin: 0; flex: 0 0 auto; }
+                .brand { margin: 0; font-size: 17px; line-height: 1.2; white-space: nowrap; }
+                .brand-subtitle { display: none; }
+                .mobile-menu-toggle { display: inline-flex; min-width: 96px; padding: 7px 14px; border-radius: 8px; font-size: 12px; line-height: 1.2; white-space: nowrap; background: #22c55e; border-color: #86efac; color: #052e16; }
+                .mobile-menu-toggle:hover { background: #4ade80; }
                 .header-actions { grid-column: 1 / -1; margin-top: 0; display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
                 .page-header.menu-open .header-actions { display: grid; }
                 .header-user { grid-column: 1 / -1; margin: 0; padding: 0; }
@@ -252,10 +225,79 @@
                 .header-user, .header-link { padding: 9px 8px; gap: 5px; }
                 .logout-button { padding: 9px 8px; }
                 .container { width: calc(100% - 20px); margin: 14px auto 22px; padding: 16px; }
-                .footer-content { padding: 16px; }
-                .upload-section { flex-direction: column; }
-                .upload-box { min-width: 100%; }
-                .files-list { border: 0; background: transparent; overflow: visible; }
+                .page-footer { padding: 8px 10px; }
+                .footer-content { padding: 0; gap: 2px; font-size: 10.5px; line-height: 1.35; text-align: center; }
+                .upload-content.active { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 8px; row-gap: 10px; }
+                .upload-content.active > .back-button { grid-column: 1; grid-row: 1; margin: 0; padding: 9px 12px; font-size: 12px; border-radius: 8px; white-space: nowrap; }
+                .upload-content.active > h2 { grid-column: 2; grid-row: 1; margin: 0; text-align: left; font-size: 16px; line-height: 1.35; color: #0f172a; }
+                .upload-content.active > :not(.back-button):not(h2) { grid-column: 1 / -1; }
+                .upload-content.active > .service-notice { margin: 0 0 4px; padding: 8px 10px; border-radius: 10px; gap: 8px; align-items: center; box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06); }
+                .upload-content.active .service-notice-icon { width: 24px; height: 24px; min-width: 24px; border-radius: 7px; font-size: 12px; box-shadow: none; }
+                .upload-content.active .service-notice-title { margin: 0; font-size: 12px; line-height: 1.3; }
+                .upload-content.active .service-notice-text { font-size: 11px; line-height: 1.55; }
+                .upload-section { flex-direction: column; margin-top: 10px; gap: 10px; }
+                .upload-box {
+                    min-width: 0;
+                    width: 100%;
+                    padding: 10px;
+                    display: grid;
+                    grid-template-columns: 78px minmax(0, 1fr) auto;
+                    align-items: center;
+                    gap: 5px 8px;
+                    text-align: start;
+                    border-radius: 10px;
+                }
+                .upload-box .file-icon {
+                    grid-column: 1;
+                    grid-row: 1;
+                    margin: 0;
+                    font-size: 24px;
+                    line-height: 1;
+                    text-align: center;
+                }
+                .upload-box h3 {
+                    grid-column: 1;
+                    grid-row: 2;
+                    margin: 0;
+                    font-size: 10px;
+                    line-height: 1.35;
+                    text-align: center;
+                }
+                .upload-box .file-info,
+                .upload-box .word-usage-notice,
+                .upload-box .binding-required {
+                    grid-column: 2;
+                    margin: 0;
+                    padding: 0;
+                    border: 0;
+                    background: transparent;
+                    font-size: 10.5px;
+                    line-height: 1.45;
+                }
+                .upload-box .upload-button {
+                    grid-column: 3;
+                    grid-row: 1 / span 2;
+                    align-self: center;
+                    margin: 0;
+                    padding: 8px 10px;
+                    border-radius: 8px;
+                    font-size: 11px;
+                    white-space: nowrap;
+                }
+                .upload-box .progress-bar,
+                .upload-box .error-msg {
+                    grid-column: 1 / -1;
+                }
+                .upload-content.active > div[style*="margin-top: 40px"] {
+                    margin-top: -7px !important;
+                    margin-bottom: 4px !important;
+                }
+                .upload-content.active > div[style*="margin-top: 40px"] > h3 {
+                    margin-bottom: 0 !important;
+                    font-size: 13px;
+                    line-height: 1.35;
+                }
+                .files-list { margin-top: 0; border: 0; background: transparent; overflow: visible; }
                 .files-list-header { display: none; }
                 .files-list-item,
                 .files-list-item.has-price,
@@ -265,46 +307,54 @@
                 .files-list-item.has-formatting-price,
                 .files-list-item.has-thesis-project {
                     min-width: 0;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                    padding: 14px;
-                    margin-bottom: 12px;
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 6px;
+                    padding: 8px;
+                    margin-bottom: 8px;
                     border: 1px solid #e2e8f0;
-                    border-radius: 14px;
+                    border-radius: 10px;
                     background: #ffffff;
-                    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+                    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
                 }
                 .files-list-item > div {
                     width: 100%;
                     display: flex;
-                    align-items: flex-start;
+                    align-items: center;
                     justify-content: space-between;
-                    gap: 12px;
-                    padding: 8px 0;
-                    border-bottom: 1px solid #f1f5f9;
-                    line-height: 1.6;
+                    gap: 5px;
+                    min-width: 0;
+                    padding: 6px 7px;
+                    border: 1px solid #edf2f7;
+                    border-radius: 8px;
+                    background: #f8fafc;
+                    line-height: 1.35;
+                    font-size: 11px;
                 }
-                .files-list-item > div:last-child { border-bottom: 0; }
+                .files-list-item > div:last-child { border-bottom: 1px solid #edf2f7; }
                 .files-list-item > div::before {
                     content: attr(data-label);
                     flex: 0 0 auto;
                     color: #64748b;
-                    font-size: 12px;
+                    font-size: 10.5px;
                     font-weight: 900;
                     white-space: nowrap;
                 }
                 .files-list-item > div:empty { display: none; }
                 .file-name-cell {
-                    display: block !important;
-                    padding: 0 0 10px !important;
-                    border-bottom: 1px solid #e2e8f0 !important;
-                    font-size: 14px;
+                    grid-column: 1 / -1;
+                    display: flex !important;
+                    padding: 7px 8px !important;
+                    border: 1px solid #dbeafe !important;
+                    border-radius: 9px;
+                    background: #eff6ff !important;
+                    font-size: 12px;
                     text-align: right;
+                    line-height: 1.45;
                 }
                 .file-name-cell::before {
-                    display: block;
-                    margin-bottom: 6px;
+                    display: inline-flex;
+                    margin-bottom: 0;
                 }
                 .binding-select,
                 .copies-input,
@@ -312,8 +362,89 @@
                 .university-input,
                 .university-custom-input,
                 .university-picker-button {
-                    width: min(100%, 220px);
+                    width: 100%;
                     min-width: 0;
+                }
+                .binding-select,
+                .university-input,
+                .university-custom-input,
+                .university-picker-button {
+                    padding: 7px 8px;
+                    border-radius: 7px;
+                    font-size: 10.5px;
+                }
+                .academic-choice-cell {
+                    flex-direction: column;
+                    align-items: stretch !important;
+                    justify-content: flex-start !important;
+                    gap: 3px !important;
+                }
+                .academic-choice-cell::before { font-size: 9.5px !important; }
+                .academic-choice-select {
+                    padding: 5px 4px;
+                    font-size: 9px;
+                    line-height: 1.2;
+                }
+                .copies-stepper { grid-template-columns: 28px minmax(34px, 1fr) 28px; gap: 4px; }
+                .copies-stepper-button { width: 28px; height: 28px; border-radius: 7px; font-size: 15px; }
+                .copies-input { width: 100%; height: 28px; padding: 4px 5px; border-radius: 7px; font-size: 11px; }
+                .file-pages,
+                .file-size,
+                .file-price,
+                .file-remove {
+                    font-size: 11px;
+                    line-height: 1.35;
+                }
+                .file-price-note { font-size: 9.5px; line-height: 1.35; }
+                .binding-section {
+                    margin-top: 4px;
+                    padding: 8px;
+                    border-radius: 10px;
+                }
+                .binding-section h3 {
+                    margin-bottom: 4px;
+                    font-size: 13px;
+                    line-height: 1.3;
+                }
+                .pricing-summary {
+                    margin-top: 0;
+                    padding: 7px;
+                    border-radius: 8px;
+                    line-height: 1.35;
+                }
+                .checkout-summary-line {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 5px;
+                    align-items: stretch;
+                }
+                .checkout-summary-metric,
+                .checkout-row {
+                    min-width: 0;
+                    margin: 0;
+                    padding: 6px 7px;
+                    border: 1px solid #edf2f7;
+                    border-radius: 8px;
+                    background: #f8fafc;
+                    font-size: 10.5px;
+                    font-weight: 900;
+                    line-height: 1.25;
+                    text-align: center;
+                }
+                .checkout-row {
+                    display: flex;
+                    justify-content: stretch;
+                    padding: 0;
+                    background: transparent;
+                    border: 0;
+                }
+                .checkout-button {
+                    width: 100%;
+                    min-height: 100%;
+                    padding: 7px 6px;
+                    border-radius: 8px;
+                    font-size: 10.5px;
+                    line-height: 1.2;
                 }
                 .research-form-grid { grid-template-columns: 1fr; }
             }
@@ -329,6 +460,16 @@
                 .service-title { font-size: 17px; }
                 .service-description { font-size: 14px; }
                 .service-entry { font-size: 14px; }
+                .academic-choice-select { padding-inline: 2px; font-size: 8.5px; }
+                .files-list-item,
+                .files-list-item.has-price,
+                .files-list-item.has-copies-price,
+                .files-list-item.has-color-printing-price,
+                .files-list-item.has-academic-university,
+                .files-list-item.has-formatting-price,
+                .files-list-item.has-thesis-project {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
             }
         </style>
     </head>
@@ -356,6 +497,7 @@
                             <span class="customer-notice-dot" data-customer-orders-dot aria-label="تحديث جديد في طلباتك"></span>
                         @endif
                     </a>
+                    <a class="header-link" href="{{ route('cart.index') }}">🛒 السلة</a>
                     <a class="header-link settings-link" href="{{ route('account.settings') }}">⚙️ إعداداتي</a>
                     @if (auth()->user()->role === 'admin')
                         <a class="header-link" href="{{ route('admin.orders') }}">لوحة المدير</a>
@@ -374,7 +516,6 @@
             <div id="servicesScreen" class="services-screen">
                 <div class="services-title-block">
                     <h2 class="services-title">اختر الخدمة المطلوبة</h2>
-                    <p class="services-subtitle">حدد الخدمة المناسبة، ثم ارفع ملفاتك وشاهد السعر مباشرة قبل إتمام الطلب.</p>
                 </div>
 
                 <article class="service-card">
@@ -408,7 +549,7 @@
                 <article class="service-card">
                     <div class="service-icon">🎓</div>
                     <h3 class="service-title">طباعة وتجليد رسالة دكتوراه</h3>
-                    <p class="service-description">تجهيز ملفات الدكتوراه للطباعة والتجليد مع عرض كامل للتكاليف قبل الدفع.</p>
+                    <p class="service-description">تجهيز ملفات الدكتوراه للطباعة والتجليد مع عرض كامل للتكاليف قبل الإضافة للسلة.</p>
                     <button class="service-entry" type="button" onclick="selectService('phd')">الدخول للخدمة</button>
                 </article>
 
@@ -608,7 +749,7 @@
                         <h3>تحميل ملفات PDF</h3>
                         <input type="file" id="thesisPdfFile" accept=".pdf" multiple />
                         <p class="file-info">صيغ مدعومة: .pdf</p>
-                        <p class="binding-required">ملف PDF إجباري لإتمام الطلب.</p>
+                        <p class="binding-required">ملف PDF إجباري للإضافة إلى السلة.</p>
                         <p class="file-info">حجم الملف: بدون حد أقصى</p>
                         <button class="upload-button" id="thesisPdfUploadBtn" onclick="document.getElementById('thesisPdfFile').click()">اختر ملفات</button>
                         <div class="progress-bar" id="thesisPdfProgress"><div class="progress-bar-fill"></div></div>
@@ -691,7 +832,7 @@
                         <h3>تحميل ملفات PDF</h3>
                         <input type="file" id="phdPdfFile" accept=".pdf" multiple />
                         <p class="file-info">صيغ مدعومة: .pdf</p>
-                        <p class="binding-required">ملف PDF إجباري لإتمام الطلب.</p>
+                        <p class="binding-required">ملف PDF إجباري للإضافة إلى السلة.</p>
                         <p class="file-info">حجم الملف: بدون حد أقصى</p>
                         <button class="upload-button" id="phdPdfUploadBtn" onclick="document.getElementById('phdPdfFile').click()">اختر ملفات</button>
                         <div class="progress-bar" id="phdPdfProgress"><div class="progress-bar-fill"></div></div>
@@ -854,23 +995,6 @@
                 phd: null,
                 formatting: null,
                 research: null
-            };
-            const orderDiscounts = {
-                notes: { code: '', amount: 0, applied: false },
-                books: { code: '', amount: 0, applied: false },
-                color_printing: { code: '', amount: 0, applied: false },
-                thesis: { code: '', amount: 0, applied: false },
-                phd: { code: '', amount: 0, applied: false },
-                formatting: { code: '', amount: 0, applied: false },
-                research: { code: '', amount: 0, applied: false }
-            };
-            const deliveryServices = ['notes', 'books', 'color_printing', 'thesis', 'phd'];
-            const deliverySelections = {
-                notes: { method: '', fee: 0, saved: false, unit: '', floor: '', room: '', city: '', district: '', street: '', mapUrl: '' },
-                books: { method: '', fee: 0, saved: false, unit: '', floor: '', room: '', city: '', district: '', street: '', mapUrl: '' },
-                color_printing: { method: '', fee: 0, saved: false, unit: '', floor: '', room: '', city: '', district: '', street: '', mapUrl: '' },
-                thesis: { method: '', fee: 0, saved: false, unit: '', floor: '', room: '', city: '', district: '', street: '', mapUrl: '' },
-                phd: { method: '', fee: 0, saved: false, unit: '', floor: '', room: '', city: '', district: '', street: '', mapUrl: '' }
             };
             const savedResearchRequest = {
                 title: '',
@@ -1044,12 +1168,19 @@
                 const uploadIds = {
                     color_printing: 'uploadColorPrinting'
                 };
+                const serviceUrl = new URL(window.location.href);
+                serviceUrl.searchParams.set('service', service);
+                window.history.replaceState({}, '', serviceUrl);
                 document.getElementById('servicesScreen').style.display = 'none';
                 document.getElementById(uploadIds[service] || ('upload' + service.charAt(0).toUpperCase() + service.slice(1))).classList.add('active');
                 initializeService(service);
             }
 
             function backToServices() {
+                const homeUrl = new URL(window.location.href);
+                homeUrl.searchParams.delete('service');
+                homeUrl.searchParams.delete('order');
+                window.history.replaceState({}, '', homeUrl);
                 document.getElementById('servicesScreen').style.display = '';
                 document.getElementById('uploadNotes').classList.remove('active');
                 document.getElementById('uploadBooks').classList.remove('active');
@@ -1313,7 +1444,7 @@
                     summary.innerHTML = `
                         <div>${message}</div>
                         <div class="checkout-row">
-                            <span class="checkout-button disabled">إتمام الطلب</span>
+                            <span class="checkout-button disabled">أكمل بيانات الطلب</span>
                         </div>
                     `;
                     return;
@@ -1327,22 +1458,16 @@
                     ? 'سعر التجليد'
                     : (['notes', 'color_printing'].includes(service) ? 'سعر التغليف' : (noPrintServiceLabels[service] || 'سعر التجليد'));
 
-                const totalsText = noPrintServiceLabels[service]
-                    ? `${noPrintServiceLabels[service]}: ${formatMoney(totals.binding)} ريال | الإجمالي: ${formatMoney(totals.total)} ريال`
-                    : `سعر الطباعة: ${formatMoney(totals.print)} ريال | ${productBindingLabel}: ${formatMoney(totals.binding)} ريال | الإجمالي: ${formatMoney(totals.total)} ريال`;
-                const discount = orderDiscounts[service] || { code: '', amount: 0, applied: false };
-                const discountAmount = discount.applied ? Math.min(discount.amount, totals.total) : 0;
-                const discountedTotal = Math.max(0, totals.total - discountAmount);
-                const discountHtml = renderDiscountBox(service, discount, discountAmount);
-                const deliveryHtml = deliveryServices.includes(service)
-                    ? renderDeliveryBox(service, totals.total)
-                    : '';
-                const delivery = deliverySelections[service];
-                const deliveryFee = deliveryServices.includes(service) && delivery?.saved ? estimateDeliveryFee(delivery.method, totals.total) : 0;
-                const grandTotalText = deliveryServices.includes(service) && delivery?.saved
-                    ? `<div>رسوم التوصيل: ${formatMoney(deliveryFee)} ريال | الإجمالي بعد الخصم والتوصيل: ${formatMoney(discountedTotal + deliveryFee)} ريال</div>`
-                    : (discountAmount > 0 ? `<div>الإجمالي بعد الخصم: ${formatMoney(discountedTotal)} ريال</div>` : '');
-                const canProceed = !deliveryServices.includes(service) || delivery?.saved;
+                const totalsHtml = noPrintServiceLabels[service]
+                    ? `
+                        <span class="checkout-summary-metric">${noPrintServiceLabels[service]}: ${formatMoney(totals.binding)} ريال</span>
+                        <span class="checkout-summary-metric">الإجمالي: ${formatMoney(totals.total)} ريال</span>
+                    `
+                    : `
+                        <span class="checkout-summary-metric">سعر الطباعة: ${formatMoney(totals.print)} ريال</span>
+                        <span class="checkout-summary-metric">${productBindingLabel}: ${formatMoney(totals.binding)} ريال</span>
+                        <span class="checkout-summary-metric">الإجمالي: ${formatMoney(totals.total)} ريال</span>
+                    `;
                 const deliveryNoticeMessages = {
                     formatting: 'سيتم إرسال الملف بعد الانتهاء داخل التطبيق في صفحة طلباتي فور الانتهاء من التنسيق إن شاء الله.',
                     research: 'سيتم إرسال الملف بعد الانتهاء داخل التطبيق في صفحة طلباتي خلال ٢٤ ساعة إلى ٤٨ ساعة إن شاء الله.'
@@ -1352,271 +1477,14 @@
                     : '';
 
                 summary.innerHTML = `
-                    <div>${totalsText}</div>
-                    ${deliveryHtml}
-                    ${discountHtml}
-                    ${grandTotalText}
+                    <div class="checkout-summary-line">
+                        ${totalsHtml}
+                        <div class="checkout-row">
+                            <a class="checkout-button" href="/cart">الانتقال للسلة</a>
+                        </div>
+                    </div>
                     ${deliveryNotice}
-                    <div class="checkout-row">
-                        ${canProceed
-                            ? '<a class="checkout-button" href="/my-orders">إتمام الطلب</a>'
-                            : '<span class="checkout-button disabled">احفظ طريقة الاستلام أو التوصيل</span>'}
-                    </div>
                 `;
-            }
-
-            function renderDiscountBox(service, discount, discountAmount) {
-                const status = discount.applied
-                    ? `تم تطبيق الكود ${discount.code}. قيمة الخصم: ${formatMoney(discountAmount)} ريال.`
-                    : 'أدخل كود الخصم قبل إتمام الطلب إذا كان لديك كود.';
-
-                return `
-                    <div class="discount-box">
-                        <div class="discount-title">كود الخصم</div>
-                        <div class="discount-row">
-                            <input class="discount-input" id="${service}DiscountCode" value="${escapeHtml(discount.code || '')}" placeholder="اكتب كود الخصم" oninput="setDiscountCode('${service}', this.value)">
-                            <button class="discount-apply" type="button" onclick="applyDiscountCode('${service}')">تطبيق الخصم</button>
-                        </div>
-                        <div id="${service}DiscountStatus" class="discount-status">${status}</div>
-                    </div>
-                `;
-            }
-
-            function setDiscountCode(service, value) {
-                orderDiscounts[service].code = value.trim().toUpperCase();
-                orderDiscounts[service].applied = false;
-                orderDiscounts[service].amount = 0;
-            }
-
-            async function applyDiscountCode(service) {
-                const orderId = currentOrders[service];
-                const discount = orderDiscounts[service];
-                const status = document.getElementById(`${service}DiscountStatus`);
-
-                if (!orderId) return;
-                if (!discount.code) {
-                    if (status) {
-                        status.textContent = 'اكتب كود الخصم أولًا.';
-                        status.classList.add('error');
-                    }
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/cart/${orderId}/discount`, {
-                        method: 'PATCH',
-                        headers: {
-                            'X-CSRF-TOKEN': getCsrfToken(),
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            discount_code: discount.code
-                        })
-                    });
-                    const result = await response.json();
-
-                    if (!response.ok || !result.success) {
-                        throw new Error(result.message || 'تعذر تطبيق كود الخصم');
-                    }
-
-                    discount.code = result.discount_code;
-                    discount.amount = Number(result.discount_amount || 0);
-                    discount.applied = true;
-
-                    if (service === 'notes' || service === 'books' || service === 'color_printing') {
-                        updatePrintProductPricingSummary(service);
-                    } else if (service === 'thesis' || service === 'phd') {
-                        updateAcademicPricingSummary(service);
-                    } else if (service === 'formatting') {
-                        updateFormattingPricingSummary();
-                    } else if (service === 'research') {
-                        updateResearchPricingSummary();
-                    }
-                } catch (error) {
-                    if (status) {
-                        status.textContent = error.message || 'تعذر تطبيق كود الخصم';
-                        status.classList.add('error');
-                    }
-                }
-            }
-
-            function renderDeliveryBox(service, subtotal) {
-                const delivery = deliverySelections[service] || {};
-                const method = delivery.method || '';
-                const campusFee = subtotal >= 35 ? 0 : 5;
-                const displayedFee = estimateDeliveryFee(method, subtotal);
-                const status = delivery.saved
-                    ? `تم حفظ طريقة التوصيل. الرسوم: ${displayedFee} ريال.`
-                    : 'اختر طريقة الاستلام أو التوصيل ثم اضغط حفظ.';
-
-                return `
-                    <div class="delivery-box">
-                        <div class="delivery-title">الاستلام والتوصيل</div>
-                        <div class="delivery-options">
-                            <label class="delivery-option">
-                                <input type="radio" name="${service}Delivery" value="branch_pickup" ${method === 'branch_pickup' ? 'checked' : ''} onchange="setDeliveryMethod('${service}', this.value)">
-                                <span>استلام من الفرع <small>مجانًا</small></span>
-                            </label>
-                            <label class="delivery-option">
-                                <input type="radio" name="${service}Delivery" value="islamic_university_delivery" ${method === 'islamic_university_delivery' ? 'checked' : ''} onchange="setDeliveryMethod('${service}', this.value)">
-                                <span>توصيل داخل الجامعة الإسلامية <small>${campusFee === 0 ? 'مجانًا للطلبات 35 ريال فأكثر' : '5 ريال'}</small></span>
-                            </label>
-                            <label class="delivery-option">
-                                <input type="radio" name="${service}Delivery" value="madinah_delivery" ${method === 'madinah_delivery' ? 'checked' : ''} onchange="setDeliveryMethod('${service}', this.value)">
-                                <span>توصيل داخل المدينة المنورة <small>20 ريال</small></span>
-                            </label>
-                            <label class="delivery-option">
-                                <input type="radio" name="${service}Delivery" value="redbox_delivery" ${method === 'redbox_delivery' ? 'checked' : ''} onchange="setDeliveryMethod('${service}', this.value)">
-                                <span>خارج المدينة المنورة عبر RedBox <small>30 ريال إلى أقرب نقطة شحن</small></span>
-                            </label>
-                        </div>
-                        <div class="delivery-fields" style="${method === 'islamic_university_delivery' ? '' : 'display:none;'}">
-                            <input class="delivery-input" id="${service}DeliveryUnit" value="${escapeHtml(delivery.unit || '')}" placeholder="رقم الوحدة" oninput="setDeliveryField('${service}', 'unit', this.value)">
-                            <input class="delivery-input" id="${service}DeliveryFloor" value="${escapeHtml(delivery.floor || '')}" placeholder="رقم الدور" oninput="setDeliveryField('${service}', 'floor', this.value)">
-                            <input class="delivery-input" id="${service}DeliveryRoom" value="${escapeHtml(delivery.room || '')}" placeholder="رقم الغرفة" oninput="setDeliveryField('${service}', 'room', this.value)">
-                        </div>
-                        <div class="delivery-note" style="${method === 'islamic_university_delivery' ? '' : 'display:none;'}">تنبيه: إذا طلبك فوق 35 ريال يكون التوصيل داخل الجامعة الإسلامية مجانًا.</div>
-                        <div class="delivery-fields address-fields" style="${['madinah_delivery', 'redbox_delivery'].includes(method) ? '' : 'display:none;'}">
-                            <input class="delivery-input" value="${escapeHtml(delivery.city || '')}" placeholder="اسم المدينة" ${method === 'madinah_delivery' ? 'readonly' : ''} oninput="setDeliveryField('${service}', 'city', this.value)">
-                            <input class="delivery-input" value="${escapeHtml(delivery.district || '')}" placeholder="اسم الحي" oninput="setDeliveryField('${service}', 'district', this.value)">
-                            <input class="delivery-input" value="${escapeHtml(delivery.street || '')}" placeholder="اسم الشارع" oninput="setDeliveryField('${service}', 'street', this.value)">
-                            <input class="delivery-input" value="${escapeHtml(delivery.mapUrl || '')}" placeholder="انسخ رابط موقعك من Google Maps" oninput="setDeliveryField('${service}', 'mapUrl', this.value)">
-                        </div>
-                        <button class="delivery-save" type="button" onclick="saveDelivery('${service}')">حفظ طريقة التوصيل</button>
-                        <div id="${service}DeliveryStatus" class="delivery-status">${status}</div>
-                    </div>
-                `;
-            }
-
-            function estimateDeliveryFee(method, subtotal) {
-                if (method === 'islamic_university_delivery') {
-                    return subtotal >= 35 ? 0 : 5;
-                }
-                if (method === 'madinah_delivery') {
-                    return 20;
-                }
-                if (method === 'redbox_delivery') {
-                    return 30;
-                }
-
-                return 0;
-            }
-
-            function setDeliveryMethod(service, method) {
-                deliverySelections[service].method = method;
-                if (method === 'madinah_delivery') {
-                    deliverySelections[service].city = 'المدينة المنورة';
-                } else if (method === 'redbox_delivery' && isMadinahCity(deliverySelections[service].city)) {
-                    deliverySelections[service].city = '';
-                } else if (!['madinah_delivery', 'redbox_delivery'].includes(method)) {
-                    deliverySelections[service].city = '';
-                    deliverySelections[service].district = '';
-                    deliverySelections[service].street = '';
-                    deliverySelections[service].mapUrl = '';
-                }
-                deliverySelections[service].saved = false;
-                updatePrintProductPricingSummary(service);
-                if (service === 'thesis' || service === 'phd') {
-                    updateAcademicPricingSummary(service);
-                }
-            }
-
-            function setDeliveryField(service, field, value) {
-                deliverySelections[service][field] = value.trim();
-                deliverySelections[service].saved = false;
-            }
-
-            async function saveDelivery(service) {
-                const orderId = currentOrders[service];
-                const delivery = deliverySelections[service];
-                const status = document.getElementById(`${service}DeliveryStatus`);
-
-                if (!orderId) return;
-                if (!delivery.method) {
-                    if (status) {
-                        status.textContent = 'اختر طريقة الاستلام أو التوصيل أولًا.';
-                        status.classList.add('error');
-                    }
-                    return;
-                }
-                if (delivery.method === 'islamic_university_delivery' && (!delivery.unit || !delivery.floor || !delivery.room)) {
-                    if (status) {
-                        status.textContent = 'اكتب رقم الوحدة ورقم الدور ورقم الغرفة.';
-                        status.classList.add('error');
-                    }
-                    return;
-                }
-                if (delivery.method === 'madinah_delivery' && (!delivery.district || !delivery.street || !delivery.mapUrl)) {
-                    if (status) {
-                        status.textContent = 'اكتب اسم الحي والشارع وأضف رابط موقعك من Google Maps.';
-                        status.classList.add('error');
-                    }
-                    return;
-                }
-                if (delivery.method === 'redbox_delivery' && (!delivery.city || !delivery.district || !delivery.street || !delivery.mapUrl)) {
-                    if (status) {
-                        status.textContent = 'اكتب اسم المدينة والحي والشارع وأضف رابط موقعك من Google Maps.';
-                        status.classList.add('error');
-                    }
-                    return;
-                }
-                if (delivery.method === 'redbox_delivery' && isMadinahCity(delivery.city)) {
-                    if (status) {
-                        status.textContent = 'خيار خارج المدينة لا يقبل المدينة المنورة. اكتب اسم المدينة خارج المدينة المنورة.';
-                        status.classList.add('error');
-                    }
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/cart/${orderId}/delivery`, {
-                        method: 'PATCH',
-                        headers: {
-                            'X-CSRF-TOKEN': getCsrfToken(),
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            delivery_method: delivery.method,
-                            delivery_unit: delivery.unit,
-                            delivery_floor: delivery.floor,
-                            delivery_room: delivery.room,
-                            delivery_city: delivery.city,
-                            delivery_district: delivery.district,
-                            delivery_street: delivery.street,
-                            delivery_map_url: delivery.mapUrl
-                        })
-                    });
-                    const result = await response.json();
-
-                    if (!response.ok || !result.success) {
-                        throw new Error(result.message || 'تعذر حفظ طريقة التوصيل');
-                    }
-
-                    delivery.fee = Number(result.delivery_fee || 0);
-                    delivery.saved = true;
-                    if (service === 'notes' || service === 'books' || service === 'color_printing') {
-                        updatePrintProductPricingSummary(service);
-                    } else {
-                        updateAcademicPricingSummary(service);
-                    }
-                } catch (error) {
-                    if (status) {
-                        status.textContent = error.message || 'تعذر حفظ طريقة التوصيل';
-                        status.classList.add('error');
-                    }
-                }
-            }
-
-            function isMadinahCity(city) {
-                const normalized = String(city || '')
-                    .trim()
-                    .replace(/\s+/g, '')
-                    .replace(/[ة]/g, 'ه')
-                    .replace(/[أإآ]/g, 'ا');
-
-                return ['المدينهالمنوره', 'مدينهالمنوره', 'المدينه', 'طيبه'].includes(normalized);
             }
 
             function updateNotesPricingSummary() {
@@ -1641,7 +1509,7 @@
                 }
 
                 if (service !== 'books' && files.some(fileData => !fileData.binding)) {
-                    renderCheckoutSummary(summary, service, 'اختر نوع التغليف لكل ملف قبل إتمام الطلب.');
+                    renderCheckoutSummary(summary, service, 'اختر نوع التغليف لكل ملف قبل الانتقال للسلة.');
                     return;
                 }
 
@@ -1670,17 +1538,17 @@
                 const files = getAcademicPrintableFiles(service);
 
                 if (files.length === 0) {
-                    renderCheckoutSummary(summary, service, 'ارفع ملف PDF لإتمام الطلب وعرض الإجمالي.');
+                    renderCheckoutSummary(summary, service, 'ارفع ملف PDF للإضافة إلى السلة وعرض الإجمالي.');
                     return;
                 }
 
                 if (service === 'thesis' && uploadedFiles.thesis.pdf.some(fileData => !fileData.thesisProjectType)) {
-                    renderCheckoutSummary(summary, service, 'اختر نوع مشروع الرسالة لكل ملف PDF قبل إتمام الطلب.');
+                    renderCheckoutSummary(summary, service, 'اختر نوع مشروع الرسالة لكل ملف PDF قبل الانتقال للسلة.');
                     return;
                 }
 
                 if (files.some(fileData => !fileData.coverColor || !fileData.writingColor)) {
-                    renderCheckoutSummary(summary, service, 'اختر لون الرسالة ولون الكتابة لكل ملف قبل إتمام الطلب.');
+                    renderCheckoutSummary(summary, service, 'اختر لون الرسالة ولون الكتابة لكل ملف قبل الانتقال للسلة.');
                     return;
                 }
 
@@ -1993,8 +1861,8 @@
                         : '';
                     const thesisProjectHtml = showThesisProject
                         ? `
-                            <div data-label="مشروع الرسالة">
-                                <select class="binding-select" onchange="setThesisProjectType(${index}, this.value)">
+                            <div class="academic-choice-cell" data-label="مشروع الرسالة">
+                                <select class="binding-select academic-choice-select" onchange="setThesisProjectType(${index}, this.value)">
                                     <option value="" ${!fileData.thesisProjectType ? 'selected' : ''} disabled>اختر المشروع</option>
                                     <option value="thesis" ${fileData.thesisProjectType === 'thesis' ? 'selected' : ''}>رسالة ماجستير</option>
                                     <option value="supplementary" ${fileData.thesisProjectType === 'supplementary' ? 'selected' : ''}>بحث تكميلي</option>
@@ -2008,8 +1876,8 @@
                         : '';
                     const coverColorHtml = showAcademicPrice
                         ? `
-                            <div data-label="لون الرسالة">
-                                <select class="binding-select" onchange="setAcademicCoverColor('${config.service}', '${config.type}', ${index}, this.value)">
+                            <div class="academic-choice-cell" data-label="لون الرسالة">
+                                <select class="binding-select academic-choice-select" onchange="setAcademicCoverColor('${config.service}', '${config.type}', ${index}, this.value)">
                                     <option value="" ${!fileData.coverColor ? 'selected' : ''} disabled>اختر لون الرسالة</option>
                                     ${Object.entries(academicCoverColors).map(([value, label]) => `<option value="${value}" ${fileData.coverColor === value ? 'selected' : ''}>${label}</option>`).join('')}
                                 </select>
@@ -2018,8 +1886,8 @@
                         : '';
                     const writingColorHtml = showAcademicPrice
                         ? `
-                            <div data-label="لون الكتابة">
-                                <select class="binding-select" onchange="setAcademicWritingColor('${config.service}', '${config.type}', ${index}, this.value)">
+                            <div class="academic-choice-cell" data-label="لون الكتابة">
+                                <select class="binding-select academic-choice-select" onchange="setAcademicWritingColor('${config.service}', '${config.type}', ${index}, this.value)">
                                     <option value="" ${!fileData.writingColor ? 'selected' : ''} disabled>اختر لون الكتابة</option>
                                     ${Object.entries(academicWritingColors).map(([value, label]) => {
                                         const disabled = value === 'black' && fileData.coverColor && !blackWritingAllowedCovers.includes(fileData.coverColor);
@@ -2626,47 +2494,75 @@
                 });
             }
 
-            function openCartModal(orderId) {
-                const modal = document.getElementById('cartModal');
-                const frame = document.getElementById('cartModalFrame');
-
-                frame.src = `/cart/${orderId}`;
-                modal.classList.add('active');
-                modal.focus();
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeCartModal() {
-                const modal = document.getElementById('cartModal');
-                const frame = document.getElementById('cartModalFrame');
-
-                modal.classList.remove('active');
-                frame.src = 'about:blank';
-                document.body.style.overflow = '';
-            }
-
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') {
-                    closeCartModal();
+            function hydrateEditOrder(payload) {
+                if (!payload || !payload.service_type || !uploadedFiles[payload.service_type]) {
+                    return;
                 }
-            });
+
+                const service = payload.service_type;
+                currentOrders[service] = payload.id;
+
+                if (service === 'research') {
+                    const researchFile = (payload.files || [])[0] || {};
+                    savedResearchRequest.title = researchFile.research_title || researchFile.filename || '';
+                    savedResearchRequest.pages = Number(researchFile.pages || 0);
+                    document.getElementById('researchTitle').value = savedResearchRequest.title;
+                    document.getElementById('researchPages').value = savedResearchRequest.pages || '';
+                    updateResearchPricingSummary();
+                    return;
+                }
+
+                uploadedFiles[service].word = [];
+                uploadedFiles[service].pdf = [];
+
+                (payload.files || []).forEach((file) => {
+                    const type = file.file_type;
+                    if (!uploadedFiles[service][type]) {
+                        return;
+                    }
+
+                    uploadedFiles[service][type].push({
+                        id: file.id,
+                        filename: file.filename,
+                        pages: Number(file.pages || 1),
+                        size: file.size || '0 Bytes',
+                        binding: file.binding_type || (service === 'books' ? 'normal' : ''),
+                        copies: Number(file.copies || 1),
+                        printSides: file.print_sides || (service === 'color_printing' ? 'one_side' : 'two_sides'),
+                        pageSize: file.page_size || 'A4',
+                        paperColor: file.paper_color || (service === 'color_printing' ? '' : 'white'),
+                        thesisProjectType: file.thesis_project_type || '',
+                        universityChoice: '',
+                        universityName: file.university_name || '',
+                        customUniversity: '',
+                        coverColor: file.cover_color || '',
+                        writingColor: file.writing_color || '',
+                    });
+                });
+
+                Object.keys(uploadedFiles[service]).forEach((type) => {
+                    const configKey = getConfigKey(service, type);
+                    if (configKey) {
+                        updateFilesList(configKey);
+                    }
+                });
+            }
+
             bindEnglishNumberWarnings();
+
+            const editOrderPayload = @json($editOrderPayload ?? null);
+            const requestedService = new URLSearchParams(window.location.search).get('service') || editOrderPayload?.service_type;
+            const editableServices = ['notes', 'books', 'color_printing', 'thesis', 'phd', 'formatting', 'research'];
+            if (requestedService && editableServices.includes(requestedService)) {
+                selectService(requestedService);
+            }
+            hydrateEditOrder(editOrderPayload);
 
             // Load JSZip library
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
             document.head.appendChild(script);
         </script>
-
-        <div class="cart-modal-backdrop" id="cartModal" tabindex="-1" onclick="if (event.target.id === 'cartModal') closeCartModal()">
-            <div class="cart-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
-                <div class="cart-modal-head">
-                    <div class="cart-modal-title">السلة والدفع</div>
-                    <button class="cart-modal-close" type="button" onclick="closeCartModal()">إغلاق</button>
-                </div>
-                <iframe class="cart-modal-frame" id="cartModalFrame" title="السلة والدفع" src="about:blank"></iframe>
-            </div>
-        </div>
 
         @include('shared.chat-widget')
         @include('shared.language-tools')

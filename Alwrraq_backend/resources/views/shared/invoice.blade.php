@@ -171,8 +171,12 @@
             </thead>
             <tbody>
                 @foreach ($order->files as $file)
+                    @php($isAcademicWord = in_array($order->service_type, ['thesis', 'phd'], true) && $file->file_type === 'word')
                     <tr>
                         <td data-label="البند">{{ $file->original_name }}</td>
+                        @if ($isAcademicWord)
+                            <td colspan="20" data-label="الاستخدام">ملف Word للعرض فقط، وغير محتسب ضمن الطباعة أو التجليد أو الإجمالي.</td>
+                        @else
                         <td data-label="الصفحات">{{ $file->pages }}</td>
                         @if ($order->service_type !== 'research')
                             <td data-label="النسخ">{{ in_array($order->service_type, ['thesis', 'phd'], true) && $file->file_type === 'word' ? 'للعرض فقط' : $file->copies }}</td>
@@ -198,6 +202,7 @@
                         @endif
                         <td data-label="{{ $bindingPriceLabel }}">{{ $file->binding_price }} ريال</td>
                         <td data-label="الإجمالي">{{ $file->total_price }} ريال</td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>

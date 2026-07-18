@@ -10,24 +10,33 @@
         .page { min-height: 100vh; padding: clamp(12px, 3vw, 24px); }
         .viewer { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 14px; align-items: start; }
         .panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08); overflow: hidden; }
-        .side { padding: 16px; }
-        .brand { padding: 16px; margin-bottom: 14px; border-radius: 12px; background: #0f172a; color: #ffffff; }
-        .brand h1 { margin: 0; font-size: 22px; }
-        .brand-logo { width: 54px; height: 54px; border-radius: 14px; object-fit: cover; display: block; margin-bottom: 10px; background: #ffffff; border: 1px solid rgba(255,255,255,0.18); }
-        .brand p { margin: 6px 0 0; color: #cbd5e1; font-weight: 700; line-height: 1.7; }
-        .file-name { margin: 0 0 14px; color: #0f172a; font-size: 16px; font-weight: 900; line-height: 1.8; word-break: break-word; }
-        .meta { display: grid; gap: 8px; }
-        .meta div { padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
-        .meta span { display: block; margin-bottom: 4px; color: #64748b; font-size: 12px; font-weight: 900; }
-        .meta strong { color: #0f172a; font-size: 14px; font-weight: 900; }
-        .actions { display: grid; gap: 9px; margin-top: 14px; }
-        .action { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 11px 14px; border-radius: 10px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 900; }
+        .side { padding: 12px; }
+        .brand { min-height: 54px; padding: 9px 10px; margin-bottom: 10px; border-radius: 10px; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .brand-identity { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+        .brand h1 { margin: 0; font-size: 18px; line-height: 1.2; white-space: nowrap; }
+        .brand-logo { width: 36px; height: 36px; flex: 0 0 auto; border-radius: 10px; object-fit: cover; display: block; background: #ffffff; border: 1px solid rgba(255,255,255,0.18); }
+        .brand-page-title { color: #bfdbfe; font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .file-name { margin: 0 0 9px; padding: 8px 9px; border: 1px solid #dbeafe; border-radius: 9px; background: #eff6ff; color: #0f172a; font-size: 12px; font-weight: 900; line-height: 1.55; word-break: break-word; }
+        .meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+        .meta div { min-width: 0; padding: 7px 6px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; text-align: center; }
+        .meta span { display: block; margin-bottom: 2px; color: #64748b; font-size: 9.5px; font-weight: 900; line-height: 1.35; }
+        .meta strong { display: block; color: #0f172a; font-size: 11px; font-weight: 900; line-height: 1.35; overflow-wrap: anywhere; }
+        .actions { display: flex; align-items: center; justify-content: flex-start; gap: 7px; margin-top: 8px; }
+        .action { width: auto; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 7px 11px; border-radius: 8px; color: #ffffff; text-decoration: none; font-size: 11px; font-weight: 900; }
         .action.dark { background: #0f172a; }
         .action.blue { background: #2563eb; }
+        .action.green { background: #16a34a; }
+        .action.green:hover { background: #15803d; }
         .preview { min-height: calc(100vh - 48px); display: flex; flex-direction: column; }
         .preview-head { padding: 13px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
         .preview-head h2 { margin: 0; font-size: 17px; }
         .preview-frame { width: 100%; flex: 1; min-height: 720px; border: 0; background: #ffffff; }
+        .word-preview { flex: 1; min-height: 720px; padding: clamp(22px, 5vw, 54px); overflow: auto; background: #ffffff; color: #111827; font-family: Arial, Tahoma, sans-serif; font-size: 16px; line-height: 1.9; }
+        .word-preview p { margin: 0 0 12px; white-space: pre-wrap; }
+        .word-table-wrap { width: 100%; margin: 16px 0; overflow-x: auto; }
+        .word-table { width: 100%; border-collapse: collapse; }
+        .word-table td { min-width: 100px; padding: 9px 10px; border: 1px solid #cbd5e1; vertical-align: top; }
+        .word-table td p { margin-bottom: 5px; }
         .unsupported { min-height: 460px; padding: 28px; display: grid; place-items: center; text-align: center; }
         .unsupported-box { max-width: 520px; padding: 24px; border: 1px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; }
         .unsupported-box h2 { margin: 0 0 8px; }
@@ -39,41 +48,52 @@
     </style>
 </head>
 <body>
+    @php
+        $displayFileType = strtoupper(pathinfo($file->original_name, PATHINFO_EXTENSION) ?: $file->file_type);
+    @endphp
     <div class="page">
         <div class="viewer">
             <aside class="panel side">
                 <div class="brand">
-                    <img class="brand-logo" src="{{ asset('images/alwrraq-logo.jpeg') }}" alt="شعار الورّاق">
-                    <h1>الورّاق</h1>
-                    <p>عرض الملف المرفوع داخل طلبك.</p>
+                    <div class="brand-identity">
+                        <img class="brand-logo" src="{{ asset('images/alwrraq-logo.jpeg') }}" alt="شعار الورّاق">
+                        <h1>الورّاق</h1>
+                    </div>
+                    <span class="brand-page-title">عرض الملف</span>
                 </div>
 
                 <p class="file-name">{{ $file->original_name }}</p>
 
                 <div class="meta">
                     <div><span>رقم الطلب</span><strong>#{{ $order->id }}</strong></div>
-                    <div><span>نوع الملف</span><strong>{{ strtoupper($file->file_type) }}</strong></div>
+                    <div><span>نوع الملف</span><strong>{{ $displayFileType }}</strong></div>
                     <div><span>عدد الصفحات</span><strong>{{ $file->pages }}</strong></div>
                 </div>
 
                 <div class="actions">
-                    <a class="action dark" href="{{ route('orders.index', ['open_order' => $order->id]) }}">العودة لعرض الطلب</a>
+                    @if (request('from') === 'cart')
+                        <a class="action green" href="{{ route('cart.index') }}">العودة للسلة</a>
+                    @else
+                        <a class="action green" href="{{ route('orders.index', ['open_order' => $order->id]) }}">العودة لعرض الطلب</a>
+                    @endif
                 </div>
             </aside>
 
             <main class="panel preview">
                 <div class="preview-head">
                     <h2>معاينة الملف</h2>
-                    <span>{{ strtoupper($file->file_type) }}</span>
+                    <span>{{ $displayFileType }}</span>
                 </div>
 
-                @if ($isPreviewable)
+                @if ($isPdf)
                     <iframe class="preview-frame" src="{{ route('orders.file.view', ['order' => $order, 'file' => $file, 'raw' => 1]) }}"></iframe>
+                @elseif ($wordPreviewHtml)
+                    <article class="word-preview" dir="auto">{!! $wordPreviewHtml !!}</article>
                 @else
                     <div class="unsupported">
                         <div class="unsupported-box">
                             <h2>المعاينة غير مدعومة لهذا النوع</h2>
-                            <p>إذا كان الملف Word فقد لا يعرضه المتصفح مباشرة. استخدم زر فتح الملف فقط.</p>
+                            <p>تعذر قراءة محتوى ملف Word. تأكد أن الملف بصيغة DOCX سليمة.</p>
                         </div>
                     </div>
                 @endif

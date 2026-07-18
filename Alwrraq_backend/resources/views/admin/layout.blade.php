@@ -174,9 +174,12 @@
         @media (max-width: 980px) {
             :root { --sidebar-width: 0px; --page-gap: 10px; }
             .layout { grid-template-columns: minmax(0, 1fr); }
-            aside { position: sticky; top: 0; height: auto; max-height: none; padding: 12px; z-index: 30; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+            aside { position: sticky; top: 0; height: auto; max-height: none; padding: 8px 10px; z-index: 30; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+            .brand-logo { width: 34px; height: 34px; border-radius: 10px; margin: 0; }
+            .brand { margin: 0; font-size: 17px; line-height: 1.2; white-space: nowrap; }
             .admin-name { grid-column: 1 / -1; display: none; margin: 0 0 2px; }
-            .mobile-menu-toggle { display: inline-flex; }
+            .mobile-menu-toggle { display: inline-flex; min-width: 96px; padding: 7px 14px; border-radius: 8px; font-size: 12px; line-height: 1.2; white-space: nowrap; background: #22c55e; border-color: #86efac; color: #052e16; }
+            .mobile-menu-toggle:hover { background: #4ade80; }
             nav { grid-column: 1 / -1; display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
             aside.menu-open .admin-name { display: block; }
             aside.menu-open nav { display: grid; }
@@ -385,10 +388,12 @@
             const invoice = document.getElementById(invoiceId);
             if (!invoice) return;
 
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) return;
+            const printFrame = document.createElement('iframe');
+            printFrame.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;';
+            document.body.appendChild(printFrame);
+            const printDocument = printFrame.contentWindow.document;
 
-            printWindow.document.write(`
+            printDocument.write(`
                 <!DOCTYPE html>
                 <html lang="ar" dir="rtl">
                 <head>
@@ -417,9 +422,12 @@
                 <body>${invoice.outerHTML}</body>
                 </html>
             `);
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
+            printDocument.close();
+            setTimeout(() => {
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+                setTimeout(() => printFrame.remove(), 1000);
+            }, 300);
         }
 
         function toggleInlinePasswordPanel(button) {

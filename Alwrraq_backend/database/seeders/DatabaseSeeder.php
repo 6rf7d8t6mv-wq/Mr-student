@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::query()->firstOrCreate([
+        User::query()->updateOrCreate([
             'phone' => '0500000000',
         ], [
             'name' => 'مدير النظام',

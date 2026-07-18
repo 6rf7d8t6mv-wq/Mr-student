@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Services\CartPricingService;
 use App\Services\Payments\PaymentGatewayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,10 +68,21 @@ class ApiController extends Controller
         ]);
     }
 
-    public function orders()
+    public function orders(CartPricingService $cartPricing)
     {
+        $cartOrders = Order::query()
+            ->where('user_id', Auth::id())
+            ->where('payment_status', '!=', 'paid')
+            ->withCount('files')
+            ->with('files')
+            ->latest()
+            ->get();
+
+        $cartSummary = $cartPricing->refreshCartTotals($cartOrders);
+
         $orders = Order::query()
             ->where('user_id', Auth::id())
+            ->where('payment_status', 'paid')
             ->withCount('files')
             ->latest()
             ->get();
@@ -78,6 +90,8 @@ class ApiController extends Controller
         return response()->json([
             'success' => true,
             'orders' => $orders,
+            'cart_orders' => $cartOrders,
+            'cart_summary' => $cartSummary,
         ]);
     }
 

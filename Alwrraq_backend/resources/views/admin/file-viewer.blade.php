@@ -66,6 +66,7 @@
                 <p class="file-name">{{ $file->original_name }}</p>
 
                 <div class="meta-grid">
+                    @php($isAcademicWord = in_array($order->service_type, ['thesis', 'phd'], true) && $file->file_type === 'word')
                     <div class="meta-item">
                         <span>العميل</span>
                         <strong>{{ $order->user->name ?? '-' }} - {{ $order->user->phone ?? '-' }}</strong>
@@ -74,6 +75,12 @@
                         <span>الخدمة</span>
                         <strong>{{ $serviceNames[$order->service_type] ?? $order->service_type }}</strong>
                     </div>
+                    @if ($isAcademicWord)
+                    <div class="meta-item">
+                        <span>الاستخدام</span>
+                        <strong>ملف Word للعرض فقط، وغير محتسب ضمن الطباعة أو التجليد أو التسعير.</strong>
+                    </div>
+                    @else
                     <div class="meta-item">
                         <span>عدد النسخ</span>
                         <strong>{{ in_array($order->service_type, ['thesis', 'phd'], true) && $file->file_type === 'word' ? 'للعرض فقط' : $file->copies }}</strong>
@@ -98,6 +105,7 @@
                         <span>عدد الصفحات</span>
                         <strong>{{ $file->pages }}</strong>
                     </div>
+                    @endif
                 </div>
 
                 <div class="notice">
@@ -135,35 +143,22 @@
 
     <script>
         function printPreview(rawUrl) {
-            const printWindow = window.open(rawUrl, 'mrStudentPrintWindow', 'width=980,height=720');
-
-            if (!printWindow) {
-                alert('المتصفح منع فتح نافذة الطباعة. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.');
-                return;
-            }
-
-            const closePrintWindow = () => {
-                try {
-                    if (!printWindow.closed) {
-                        printWindow.close();
-                    }
-                } catch (error) {}
-
-                window.focus();
-            };
+            const printFrame = document.createElement('iframe');
+            printFrame.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;';
+            document.body.appendChild(printFrame);
 
             const triggerPrint = () => {
                 try {
-                    printWindow.focus();
-                    printWindow.print();
-                    setTimeout(closePrintWindow, 700);
+                    printFrame.contentWindow.focus();
+                    printFrame.contentWindow.print();
+                    setTimeout(() => printFrame.remove(), 1000);
                 } catch (error) {
-                    closePrintWindow();
+                    printFrame.remove();
                 }
             };
 
-            printWindow.addEventListener?.('afterprint', closePrintWindow);
-            setTimeout(triggerPrint, 900);
+            printFrame.addEventListener('load', () => setTimeout(triggerPrint, 300), { once: true });
+            printFrame.src = rawUrl;
         }
     </script>
     @include('shared.language-tools')

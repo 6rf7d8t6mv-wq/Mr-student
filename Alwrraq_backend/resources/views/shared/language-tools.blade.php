@@ -903,3 +903,20 @@
         observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     })();
 </script>
+
+<script>
+    (() => {
+        document.addEventListener('click', (event) => {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+            const link = event.target.closest('a[href]');
+            if (!link || link.hasAttribute('download') || link.matches('[data-delivered-file-download], [data-complete-order-download]')) return;
+
+            const href = link.getAttribute('href')?.trim() || '';
+            if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+            event.preventDefault();
+            window.location.assign(link.href);
+        }, true);
+    })();
+</script>

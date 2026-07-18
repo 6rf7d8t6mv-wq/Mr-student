@@ -14,7 +14,7 @@
         .support-chat-title { margin: 0; font-size: 15px; font-weight: 900; }
         .support-chat-subtitle { margin: 2px 0 0; color: #cbd5e1; font-size: 12px; }
         .support-chat-close { border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.08); color: #ffffff; border-radius: 9px; padding: 6px 10px; cursor: pointer; font-family: inherit; font-weight: 900; }
-        .support-chat-layout { min-height: 0; flex: 1; display: grid; grid-template-columns: {{ $chatIsAdmin ? '150px minmax(0, 1fr)' : '1fr' }}; }
+        .support-chat-layout { min-height: 0; flex: 1; display: grid; grid-template-columns: {{ $chatIsAdmin ? '150px minmax(0, 1fr)' : '1fr' }}; overscroll-behavior: contain; }
         .support-chat-threads { display: {{ $chatIsAdmin ? 'block' : 'none' }}; overflow-y: auto; border-left: 1px solid #e5e7eb; background: #f8fafc; }
         .support-chat-thread { width: 100%; display: block; padding: 11px 10px; border: 0; border-bottom: 1px solid #e5e7eb; background: transparent; text-align: right; cursor: pointer; font-family: inherit; }
         .support-chat-thread.active { background: #e0f2fe; }
@@ -22,7 +22,7 @@
         .support-chat-thread span { display: block; margin-top: 2px; color: #64748b; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .support-chat-thread .thread-unread { display: inline-flex; margin-top: 5px; min-width: 18px; height: 18px; padding: 0 6px; align-items: center; justify-content: center; border-radius: 999px; background: #dc2626; color: #ffffff; font-size: 11px; font-weight: 900; }
         .support-chat-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
-        .support-chat-messages { min-height: 0; flex: 1; overflow-y: auto; padding: 14px; background: #f8fafc; }
+        .support-chat-messages { min-height: 0; flex: 1; overflow-y: auto; padding: 14px; background: #f8fafc; overscroll-behavior: contain; }
         .support-chat-empty { height: 100%; display: grid; place-items: center; color: #64748b; text-align: center; font-size: 13px; font-weight: 800; padding: 18px; }
         .support-message { display: flex; margin-bottom: 10px; }
         .support-message.mine { justify-content: flex-start; }
@@ -209,6 +209,25 @@
                 previousUnreadTotal = total;
             };
 
+            const openChatPanel = () => {
+                panel.classList.add('active');
+                document.body.dataset.chatScrollLocked = '1';
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeChatPanel = () => {
+                panel.classList.remove('active');
+                delete document.body.dataset.chatScrollLocked;
+                document.body.style.overflow = '';
+            };
+
+            const focusChatInput = () => {
+                requestAnimationFrame(() => {
+                    input.focus();
+                    input.setSelectionRange(input.value.length, input.value.length);
+                });
+            };
+
             const renderThreads = () => {
                 if (!isAdmin) return;
 
@@ -306,17 +325,26 @@
 
             launcher.addEventListener('click', async () => {
                 await requestBrowserNotificationPermission();
-                panel.classList.add('active');
+                openChatPanel();
                 await refresh();
                 scanOrderAlerts();
+                focusChatInput();
             });
 
-            closeButton.addEventListener('click', () => panel.classList.remove('active'));
+            closeButton.addEventListener('click', closeChatPanel);
+
+            document.addEventListener('pointerdown', (event) => {
+                if (!panel.classList.contains('active')) return;
+                if (panel.contains(event.target) || launcher.contains(event.target)) return;
+
+                closeChatPanel();
+            });
 
             threadsEl.addEventListener('click', async (event) => {
                 const button = event.target.closest('[data-chat-thread]');
                 if (!button) return;
                 await loadMessages(Number(button.dataset.chatThread));
+                focusChatInput();
             });
 
             form.addEventListener('submit', async (event) => {
@@ -338,13 +366,26 @@
                 if (response.ok) {
                     await loadConversations();
                     await loadMessages(currentConversationId);
+                    focusChatInput();
                 }
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+
+                event.preventDefault();
+                form.requestSubmit();
             });
 
             refresh();
             requestAnimationFrame(scanOrderAlerts);
             pollTimer = setInterval(refresh, 12000);
-            window.addEventListener('beforeunload', () => clearInterval(pollTimer));
+            window.addEventListener('beforeunload', () => {
+                clearInterval(pollTimer);
+                if (document.body.dataset.chatScrollLocked === '1') {
+                    document.body.style.overflow = '';
+                }
+            });
         })();
     </script>
 @endauth

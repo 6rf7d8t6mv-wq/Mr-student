@@ -391,14 +391,26 @@ class FileUploadController extends Controller
             unlink($absolutePath);
         }
 
-        $this->refreshOrderTotals($order);
+        $orderDeleted = $order->payment_status !== 'paid' && $order->files()->doesntExist();
+
+        if ($orderDeleted) {
+            $order->delete();
+        } else {
+            $this->refreshOrderTotals($order);
+        }
 
         if (!request()->expectsJson()) {
-            return back()->with('status', 'تم حذف الملف من الطلب بنجاح.');
+            return back()->with(
+                'status',
+                $orderDeleted
+                    ? 'تم حذف الملف والخدمة الفارغة من السلة بنجاح.'
+                    : 'تم حذف الملف من الطلب بنجاح.'
+            );
         }
 
         return response()->json([
             'success' => true,
+            'order_deleted' => $orderDeleted,
         ]);
     }
 

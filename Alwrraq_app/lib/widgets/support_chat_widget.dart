@@ -14,6 +14,7 @@ class SupportChatWidget extends StatefulWidget {
 class _SupportChatWidgetState extends State<SupportChatWidget> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+  final _focusNode = FocusNode();
   Timer? _timer;
   bool _isOpen = false;
   bool _isLoading = false;
@@ -33,6 +34,7 @@ class _SupportChatWidgetState extends State<SupportChatWidget> {
     _timer?.cancel();
     _messageController.dispose();
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -98,6 +100,7 @@ class _SupportChatWidgetState extends State<SupportChatWidget> {
 
     if (response['message'] is Map) {
       await _loadMessages(id);
+      _focusMessageInput();
       return;
     }
 
@@ -112,6 +115,20 @@ class _SupportChatWidgetState extends State<SupportChatWidget> {
     setState(() => _isOpen = !_isOpen);
     if (!_isOpen) return;
     _refresh();
+    _focusMessageInput();
+  }
+
+  void _closeChat() {
+    if (!_isOpen) return;
+    setState(() => _isOpen = false);
+    _focusNode.unfocus();
+  }
+
+  void _focusMessageInput() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_isOpen) return;
+      _focusNode.requestFocus();
+    });
   }
 
   @override
@@ -121,6 +138,14 @@ class _SupportChatWidgetState extends State<SupportChatWidget> {
       child: Stack(
         children: [
           if (_isOpen)
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: _closeChat,
+                child: const SizedBox.expand(),
+              ),
+            ),
+          if (_isOpen)
             Positioned(
               left: 14,
               bottom: 78,
@@ -128,8 +153,9 @@ class _SupportChatWidgetState extends State<SupportChatWidget> {
                 isLoading: _isLoading,
                 messages: _messages,
                 controller: _messageController,
+                focusNode: _focusNode,
                 scrollController: _scrollController,
-                onClose: _toggleChat,
+                onClose: _closeChat,
                 onSend: _sendMessage,
               ),
             ),
@@ -214,6 +240,7 @@ class _ChatPanel extends StatelessWidget {
     required this.isLoading,
     required this.messages,
     required this.controller,
+    required this.focusNode,
     required this.scrollController,
     required this.onClose,
     required this.onSend,
@@ -222,6 +249,7 @@ class _ChatPanel extends StatelessWidget {
   final bool isLoading;
   final List<Map<String, dynamic>> messages;
   final TextEditingController controller;
+  final FocusNode focusNode;
   final ScrollController scrollController;
   final VoidCallback onClose;
   final VoidCallback onSend;
@@ -329,8 +357,11 @@ class _ChatPanel extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: controller,
+                      focusNode: focusNode,
                       minLines: 1,
                       maxLines: 3,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => onSend(),
                       decoration: InputDecoration(
                         hintText: 'اكتب رسالتك هنا...',
                         filled: true,

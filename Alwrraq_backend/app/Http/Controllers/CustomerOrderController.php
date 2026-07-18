@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderDeliveredFile;
 use App\Models\OrderFile;
+use App\Services\WordPreviewService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
@@ -15,6 +16,7 @@ class CustomerOrderController extends Controller
     {
         $orders = Order::query()
             ->where('user_id', Auth::id())
+            ->where('payment_status', 'paid')
             ->with(['files', 'deliveredFiles'])
             ->withCount('files')
             ->latest()
@@ -57,14 +59,26 @@ class CustomerOrderController extends Controller
             ->with('status', 'تم حذف الطلب وجميع ملفاته بنجاح.');
     }
 
-    public function viewUploadedFile(Order $order, OrderFile $file)
+    public function viewUploadedFile(Order $order, OrderFile $file, WordPreviewService $wordPreview)
     {
         abort_unless($order->user_id === Auth::id(), 403);
         abort_unless($file->order_id === $order->id, 404);
 
         $absolutePath = storage_path('app/' . $file->path);
 
-        abort_unless(File::isFile($absolutePath), 404);
+        if (! File::isFile($absolutePath)) {
+            $message = $order->service_type === 'research'
+                ? 'طلب إنشاء البحث لا يحتوي على ملف مرفوع للعرض.'
+                : 'الملف غير موجود في التخزين، لذلك تعذر عرضه.';
+
+            if (request('from') === 'cart') {
+                return redirect()->route('cart.index')->withErrors(['file' => $message]);
+            }
+
+            return redirect()
+                ->route('orders.index', ['open_order' => $order->id])
+                ->withErrors(['file' => $message]);
+        }
 
         if (request()->boolean('raw')) {
             return response()->file($absolutePath, [
@@ -73,9 +87,17 @@ class CustomerOrderController extends Controller
             ]);
         }
 
-        $isPreviewable = strtolower($file->file_type) === 'pdf';
+        $isPdf = strtolower($file->file_type) === 'pdf';
+        $wordPreviewHtml = strtolower($file->file_type) === 'word'
+            ? $wordPreview->toHtml($absolutePath)
+            : null;
+        $isPreviewable = $isPdf || filled($wordPreviewHtml);
 
-        return view('orders.file-viewer', compact('order', 'file', 'isPreviewable'));
+        return response()
+            ->view('orders.file-viewer', compact('order', 'file', 'isPreviewable', 'isPdf', 'wordPreviewHtml'))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function downloadDeliveredFile(Order $order, OrderDeliveredFile $deliveredFile)

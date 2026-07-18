@@ -43,7 +43,7 @@ Route::get('/', function () {
     return view('public.home');
 })->name('public.home');
 
-Route::get('/home', function () {
+Route::get('/home', function (Request $request) {
     $students = [
         ['name' => 'أحمد', 'subject' => 'رياضيات', 'grade' => 95],
         ['name' => 'سارة', 'subject' => 'علوم', 'grade' => 88],
@@ -52,7 +52,54 @@ Route::get('/home', function () {
         ['name' => 'يوسف', 'subject' => 'فيزياء', 'grade' => 84],
     ];
 
-    return view('grades', compact('students'));
+    $editOrderPayload = null;
+    if ($request->filled('order')) {
+        $formatSize = function (int $bytes): string {
+            if ($bytes <= 0) {
+                return '0 Bytes';
+            }
+
+            $units = ['Bytes', 'KB', 'MB', 'GB'];
+            $index = min((int) floor(log($bytes, 1024)), count($units) - 1);
+
+            return round($bytes / (1024 ** $index), 2) . ' ' . $units[$index];
+        };
+
+        $editOrder = \App\Models\Order::query()
+            ->where('user_id', auth()->id())
+            ->where('payment_status', '!=', 'paid')
+            ->with('files')
+            ->find($request->integer('order'));
+
+        if ($editOrder) {
+            $editOrderPayload = [
+                'id' => $editOrder->id,
+                'service_type' => $editOrder->service_type,
+                'files' => $editOrder->files->map(fn ($file) => [
+                    'id' => $file->id,
+                    'file_type' => $file->file_type,
+                    'filename' => $file->original_name,
+                    'pages' => $file->pages,
+                    'size' => $formatSize((int) $file->size),
+                    'binding_type' => $file->binding_type,
+                    'copies' => $file->copies,
+                    'print_sides' => $file->print_sides,
+                    'page_size' => $file->page_size,
+                    'paper_color' => $file->paper_color,
+                    'thesis_project_type' => $file->thesis_project_type,
+                    'university_name' => $file->university_name,
+                    'cover_color' => $file->cover_color,
+                    'writing_color' => $file->writing_color,
+                    'research_title' => $file->research_title,
+                    'print_price' => $file->print_price,
+                    'binding_price' => $file->binding_price,
+                    'total_price' => $file->total_price,
+                ])->values(),
+            ];
+        }
+    }
+
+    return view('grades', compact('students', 'editOrderPayload'));
 })->middleware('auth')->name('home');
 
 Route::post('/upload-file', [FileUploadController::class, 'upload'])->middleware('auth');
@@ -61,6 +108,9 @@ Route::patch('/order-files/{file}', [FileUploadController::class, 'updateFile'])
 Route::delete('/order-files/{file}', [FileUploadController::class, 'destroyFile'])->middleware('auth');
 
 Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'showAll'])->name('index');
+    Route::get('/payment', [CartController::class, 'payment'])->name('payment');
+    Route::post('/pay', [CartController::class, 'payAll'])->name('pay-all');
     Route::get('/{order}', [CartController::class, 'show'])->name('show');
     Route::patch('/{order}/delivery', [CartController::class, 'updateDelivery'])->name('delivery.update');
     Route::patch('/{order}/discount', [CartController::class, 'applyDiscount'])->name('discount.apply');

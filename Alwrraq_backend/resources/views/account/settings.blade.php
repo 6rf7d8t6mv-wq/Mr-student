@@ -58,9 +58,12 @@
         @media (max-width: 720px) {
             :root { --sidebar-width: 0px; --page-gap: 10px; }
             body { padding: 0; }
-            .header { position: sticky; top: 0; width: 100%; min-height: 0; max-height: none; padding: 12px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); }
-            .header-inner { height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
-            .mobile-menu-toggle { display: inline-flex; }
+            .header { position: sticky; top: 0; width: 100%; min-height: 0; max-height: none; padding: 8px 10px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); }
+            .header-inner { height: auto; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+            .brand-logo { width: 34px; height: 34px; border-radius: 10px; margin: 0; }
+            .brand { margin: 0; font-size: 17px; line-height: 1.2; }
+            .mobile-menu-toggle { display: inline-flex; min-width: 96px; padding: 7px 14px; border-radius: 8px; font-size: 12px; line-height: 1.2; white-space: nowrap; background: #22c55e; border-color: #86efac; color: #052e16; }
+            .mobile-menu-toggle:hover { background: #4ade80; }
             .header-actions { grid-column: 1 / -1; margin-top: 0; display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
             .header.menu-open .header-actions { display: grid; }
             .header-user { grid-column: 1 / -1; margin: 0; }
@@ -81,6 +84,7 @@
                 <span class="header-user">👤 {{ auth()->user()->name }}</span>
                 <a class="home-button" href="{{ route('home') }}">🏠 الصفحة الرئيسية</a>
                 <a class="home-button" href="{{ route('orders.index') }}">🧾 طلباتي</a>
+                <a class="home-button" href="{{ route('cart.index') }}">🛒 السلة</a>
                 <form class="header-form" method="post" action="{{ route('logout') }}">
                     @csrf
                     <button class="logout-button" type="submit">🚪 خروج</button>
