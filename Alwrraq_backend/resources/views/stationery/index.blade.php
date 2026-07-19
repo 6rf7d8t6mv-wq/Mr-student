@@ -26,7 +26,8 @@
         .store-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
         .store-title h1 { margin: 0 0 3px; font-size: 25px; }
         .store-title p { margin: 0; color: #64748b; font-size: 12px; }
-        .cart-link { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 9px; background: #047857; color: #fff; text-decoration: none; font-size: 12px; font-weight: 900; white-space: nowrap; }
+        .cart-link { position: fixed; top: 18px; left: 18px; z-index: 89; display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid rgba(255,255,255,.75); border-radius: 11px; background: #047857; color: #fff; box-shadow: 0 10px 26px rgba(4,120,87,.3); text-decoration: none; font-size: 12px; font-weight: 900; white-space: nowrap; transition: transform .2s ease, box-shadow .2s ease; }
+        .cart-link:hover { transform: translateY(-2px); box-shadow: 0 13px 30px rgba(4,120,87,.36); }
         .cart-count { min-width: 20px; padding: 2px 5px; border-radius: 999px; background: #fff; color: #047857; text-align: center; }
         .search-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; margin-bottom: 14px; padding: 7px; border: 1px solid #dbe3ef; border-radius: 11px; background: #f8fafc; }
         .search-form input { min-width: 0; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; font-size: 16px; }
@@ -61,7 +62,7 @@
             .store-head { margin-bottom: 8px; }
             .store-title h1 { font-size: 18px; }
             .store-title p { font-size: 9px; }
-            .cart-link { padding: 7px 9px; font-size: 10px; }
+            .cart-link { top: 96px; left: 12px; padding: 7px 9px; font-size: 10px; }
             .search-form { margin-bottom: 9px; padding: 5px; }
             .search-form input { padding: 7px 8px; }
             .search-form button { padding: 6px 10px; font-size: 10px; }
@@ -73,6 +74,18 @@
             .product-price { font-size: 10px; }
             .product-actions { gap: 3px; }
             .product-actions button { min-height: 26px; padding: 4px 2px; font-size: 8px; }
+        }
+        @media (min-width: 1100px) {
+            .store-title h1 { font-size: 29px; }
+            .store-title p { font-size: 14px; }
+            .cart-link,
+            .search-form button,
+            .search-clear { font-size: 14px; }
+            .product-company { font-size: 12px; }
+            .product-name { min-height: 41px; font-size: 14px; line-height: 1.45; }
+            .product-type { font-size: 12px; }
+            .product-price { font-size: 15px; }
+            .product-actions button { min-height: 34px; font-size: 12px; }
         }
     </style>
 </head>

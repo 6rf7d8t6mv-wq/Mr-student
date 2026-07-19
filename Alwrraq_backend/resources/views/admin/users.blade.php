@@ -12,7 +12,7 @@
         @endif
     </div>
 
-    <div class="panel compact-management-panel">
+    <div class="panel compact-management-panel blue-records-panel">
         <form class="search-form auto-search-form" method="get" action="{{ route('admin.users') }}" style="margin-bottom: 14px;">
             <div style="flex: 1;">
                 <label>بحث باسم المستخدم أو رقم الجوال</label>

@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="panel compact-settings-panel">
+    <div class="panel compact-settings-panel blue-settings-panel">
         <form method="post" action="{{ route('admin.settings.update') }}">
             @csrf
             @method('patch')
@@ -37,7 +37,7 @@
     </div>
 
     @if (auth()->user()->admin_permissions !== null)
-        <div class="panel compact-settings-panel">
+        <div class="panel compact-settings-panel blue-settings-panel">
             <div class="form-section">
                 <h3 class="form-section-title">حذف الحساب</h3>
                 <p class="form-note">يمكن حذف حساب المستخدم الحالي نهائيًا عند الحاجة.</p>

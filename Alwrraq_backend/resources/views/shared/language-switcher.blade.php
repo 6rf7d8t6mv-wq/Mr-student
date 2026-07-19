@@ -135,6 +135,15 @@
             overflow: hidden !important;
         }
     }
+    @media (min-width: 1100px) {
+        .customer-app-page .header-identity strong { font-size: 15px !important; }
+        .customer-app-page .header-identity small { font-size: 12px !important; }
+        .customer-app-page .header-actions .header-link,
+        .customer-app-page .header-actions .home-button,
+        .customer-app-page .header-actions .settings-button,
+        .customer-app-page .header-actions .logout-button,
+        .customer-app-page .header-actions .language-switcher-button { font-size: 14px !important; }
+    }
 </style>
 
 <form class="language-switcher-form" method="post" action="{{ route('language.switch') }}">

@@ -74,6 +74,21 @@
             .preview-head span { font-size: 8px; }
             .preview-frame { min-height: 560px; }
         }
+        @media (min-width: 1100px) {
+            .viewer-shell { grid-template-columns: minmax(300px, 350px) minmax(0, 1fr); }
+            .brand h1 { font-size: 20px; }
+            .brand-logo { width: 40px; height: 40px; }
+            .brand-page-title { font-size: 13px; }
+            .file-name { font-size: 13px; line-height: 1.5; }
+            .meta-item { min-height: 45px; }
+            .meta-item span { font-size: 9.5px; }
+            .meta-item strong { font-size: 11px; line-height: 1.4; }
+            .notice { font-size: 10.5px; }
+            .action { min-height: 32px; font-size: 10.5px; }
+            .preview-head h2 { font-size: 16px; }
+            .preview-head span { font-size: 11px; }
+            .unsupported-box p { font-size: 13px; }
+        }
         @media print {
             body { background: #ffffff; }
             .info-panel, .preview-head { display: none; }

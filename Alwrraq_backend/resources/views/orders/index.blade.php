@@ -84,7 +84,7 @@
         .orders-table { display: block; border-radius: 0; overflow: visible; }
         .orders-table thead { display: none; }
         .orders-table tbody { display: grid; gap: 14px; }
-        .orders-table tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px; overflow: hidden; border: 1px solid #dbe3ef; border-radius: 14px; background: #ffffff; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07); }
+        .orders-table tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px; overflow: hidden; border: 1px solid #dbe3ef; border-inline-start: 4px solid #2563eb; border-radius: 14px; background: #ffffff; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07); }
         .orders-table td { display: flex; min-width: 0; flex-direction: row; justify-content: space-between; align-items: center; gap: 6px; min-height: 48px; padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; white-space: normal; overflow-wrap: anywhere; font-size: 12px; }
         .orders-table td::before { content: attr(data-label); color: #64748b; font-size: 11px; font-weight: 900; line-height: 1.4; }
         .orders-table .order-main-cell { grid-column: 1 / -1; display: block; min-height: 0; padding: 2px 3px 8px; border: 0; border-radius: 0; background: transparent; }
@@ -248,6 +248,28 @@
             .detail-table-wrap tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 7px; }
             .detail-table-wrap td { min-height: 38px; padding: 5px 6px; gap: 3px; font-size: 9px; }
             .detail-table-wrap td::before { font-size: 8px; }
+        }
+        @media (min-width: 1100px) {
+            .orders-table td { font-size: 14px; line-height: 1.5; }
+            .orders-table td::before { font-size: 12px; }
+            .order-main-item span { font-size: 13px; }
+            .order-main-item strong { font-size: 16px; }
+            .order-section-label { font-size: 13px; }
+            .orders-table .action { font-size: 14px; }
+            .detail-card span { font-size: 13px; }
+            .detail-card strong { font-size: 14px; }
+            .detail-table-wrap td { font-size: 13px; line-height: 1.45; }
+            .detail-table-wrap td::before { font-size: 11px; }
+            .total-card span { font-size: 12px; }
+            .total-card strong { font-size: 14px; }
+            .invoice-number span,
+            .invoice-grid span,
+            .invoice-totals span { font-size: 11px; }
+            .invoice-grid strong { font-size: 13px; }
+            .invoice-table-wrap th,
+            .invoice-table-wrap td { font-size: 12px; }
+            .invoice-totals strong,
+            .invoice-totals .grand strong { font-size: 13px; }
         }
     </style>
 </head>

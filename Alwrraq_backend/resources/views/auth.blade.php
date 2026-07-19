@@ -71,9 +71,12 @@
     </style>
 </head>
 <body>
+    @php($appMode = $appMode ?? false)
     <main class="page">
         <section class="auth-card">
-            <a class="web-back" href="{{ route('public.home') }}"><span aria-hidden="true">←</span><span>الصفحة الرئيسية</span></a>
+            @unless ($appMode)
+                <a class="web-back" href="{{ route('public.home') }}"><span aria-hidden="true">←</span><span>الصفحة الرئيسية</span></a>
+            @endunless
             @include('shared.language-switcher')
             <div class="brand">
                 <img class="brand-logo" src="{{ asset('images/alwrraq-logo.jpeg') }}" alt="شعار الورّاق">
@@ -87,13 +90,13 @@
 
             <div id="loginPanel" class="auth-panel active">
                 <h2>تسجيل الدخول</h2>
-                <p>ادخل رقم جوالك أو بريدك الإلكتروني وكلمة المرور للمتابعة.</p>
+                <p>{{ $appMode ? 'ادخل رقم جوالك وكلمة المرور، وسيتم فتح واجهتك تلقائيًا.' : 'ادخل رقم جوالك أو بريدك الإلكتروني وكلمة المرور للمتابعة.' }}</p>
 
-                <form method="post" action="{{ route('login.store') }}">
+                <form method="post" action="{{ $appMode ? route('app.login.store') : route('login.store') }}">
                     @csrf
-                    <label for="loginIdentifier">رقم الجوال أو البريد الإلكتروني</label>
-                    <input id="loginIdentifier" name="login_identifier" value="{{ old('login_identifier') }}" autocomplete="username" required>
-                    <p class="input-note">يقبل رقم الجوال أو البريد بحروف وأرقام إنجليزية ورموز البريد فقط، والأرقام العربية تتحول تلقائيًا إلى إنجليزية.</p>
+                    <label for="loginIdentifier">{{ $appMode ? 'رقم الجوال' : 'رقم الجوال أو البريد الإلكتروني' }}</label>
+                    <input id="loginIdentifier" name="login_identifier" value="{{ old('login_identifier') }}" autocomplete="username" @if($appMode) inputmode="numeric" @endif required>
+                    <p class="input-note">{{ $appMode ? 'اكتب رقم الجوال المسجل، والأرقام العربية تتحول تلقائيًا إلى إنجليزية.' : 'يقبل رقم الجوال أو البريد بحروف وأرقام إنجليزية ورموز البريد فقط، والأرقام العربية تتحول تلقائيًا إلى إنجليزية.' }}</p>
 
                     <label for="loginPassword">كلمة المرور</label>
                     <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
@@ -111,7 +114,7 @@
             <div id="registerPanel" class="auth-panel">
                 <h2>إنشاء حساب</h2>
 
-                <form method="post" action="{{ route('register.store') }}">
+                <form method="post" action="{{ $appMode ? route('app.register.store') : route('register.store') }}">
                     @csrf
                     <div class="form-grid">
                         <div>
@@ -233,8 +236,15 @@
         const phoneOnly = (value) => convertArabicDigits(value).replace(/[^0-9]/g, '').slice(0, 10);
         const emailOnly = (value) => convertArabicDigits(value).replace(/[^A-Za-z0-9._%+\-@]/g, '');
 
+        const isAppMode = @json($appMode);
+
         document.querySelectorAll('input[name="login_identifier"]').forEach((input) => {
-            bindInputRule(input, /^[\x21-\x7E]+$/, 'تنبيه: تسجيل الدخول يقبل الحروف الإنجليزية والأرقام والرموز فقط.', asciiPrintable);
+            bindInputRule(
+                input,
+                isAppMode ? /^05[0-9]{8}$/ : /^[\x21-\x7E]+$/,
+                isAppMode ? 'تنبيه: رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام.' : 'تنبيه: تسجيل الدخول يقبل الحروف الإنجليزية والأرقام والرموز فقط.',
+                isAppMode ? phoneOnly : asciiPrintable
+            );
         });
 
         document.querySelectorAll('#registerPanel input[name="phone"]').forEach((input) => {

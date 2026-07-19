@@ -178,6 +178,8 @@
         .compact-page-title h1 { font-size: 22px; }
         .compact-page-title > .save { width: auto; min-height: 31px; margin: 0; padding: 6px 9px; font-size: 10px; }
         .compact-management-panel, .compact-settings-panel { padding: 11px; margin-bottom: 9px; }
+        .blue-settings-panel { border-inline-start: 4px solid #2563eb; }
+        .blue-records-panel .management-table tbody tr > td:first-child { border-inline-start: 4px solid #2563eb; }
         .compact-management-panel .search-form { margin-bottom: 8px !important; gap: 6px; }
         .compact-management-panel .search-form label { margin-bottom: 3px; font-size: 9px; }
         .compact-management-panel .search-form input { padding: 7px 8px; }
@@ -223,6 +225,8 @@
             .management-table thead { display: none; }
             .management-table tbody { display: grid; gap: 12px; }
             .management-table tr { display: grid; gap: 8px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06); }
+            .blue-records-panel .management-table tbody tr { border-inline-start: 4px solid #2563eb; }
+            .blue-records-panel .management-table tbody tr > td:first-child { border-inline-start: 0; }
             .management-table td { display: grid; grid-template-columns: minmax(86px, 35%) minmax(0, 1fr); align-items: center; gap: 8px; padding: 0; border-bottom: 0; white-space: normal; }
             .management-table td::before { content: attr(data-label); color: #64748b; font-size: 12px; font-weight: 900; }
             .management-table td:last-child { width: auto; }
@@ -339,6 +343,44 @@
             #adminModalBody .permission-option input { flex: 0 0 auto; width: auto; }
             #adminModalBody .save,
             #adminModalBody .ghost { width: auto; min-height: 27px; margin-top: 5px; padding: 5px 7px; font-size: 8px; }
+        }
+        @media (min-width: 1100px) {
+            .admin-name { font-size: 15px; }
+            .admin-name small { font-size: 12px; }
+            nav a,
+            .logout { font-size: 15px; }
+            h1 { font-size: 32px; }
+            .subtitle { font-size: 16px; }
+            .stat span { font-size: 14px; }
+            .stat strong { font-size: 27px; }
+            table { font-size: 14px; }
+            .label,
+            label { font-size: 13px; }
+            .small-button,
+            .ghost,
+            .badge,
+            .invoice-admin-button,
+            .file-action-button { font-size: 13px; }
+            .compact-page-title h1 { font-size: 27px; }
+            .compact-page-title > .save { font-size: 12px; }
+            .compact-management-panel .search-form label { font-size: 11.5px; }
+            .compact-management-panel .search-form .save,
+            .compact-management-panel .search-form .ghost { font-size: 11px; }
+            .compact-management-panel .management-table th,
+            .compact-management-panel .management-table td { font-size: 12.5px; line-height: 1.45; }
+            .management-product-image { width: 50px; height: 50px; }
+            .compact-settings-panel .form-section-title { font-size: 16px; }
+            .compact-settings-panel .form-note { font-size: 11.5px; }
+            .compact-settings-panel label { font-size: 11.5px; }
+            .compact-settings-panel .save,
+            .compact-settings-panel .danger,
+            .compact-settings-panel .ghost { font-size: 11px; }
+            #adminModalBody .form-section-title { font-size: 16px; }
+            #adminModalBody .form-note,
+            #adminModalBody label,
+            #adminModalBody .permission-option { font-size: 11.5px; }
+            #adminModalBody .save,
+            #adminModalBody .ghost { font-size: 11px; }
         }
     </style>
 </head>

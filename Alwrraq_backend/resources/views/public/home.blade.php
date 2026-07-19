@@ -3,11 +3,11 @@
     $pageUrl = $siteUrl . '/';
     $isEnglish = session('ui_locale', 'ar') === 'en';
     $pageTitle = $isEnglish
-        ? 'Alwrraq | Printing, Binding, and File Upload Services for Students'
-        : 'الورّاق | خدمات الطباعة والتجليد ورفع الملفات للطلاب';
+        ? 'Alwrraq | Printing, Binding, Stationery, and File Services for Everyone'
+        : 'الورّاق | خدمات الطباعة والتجليد والقرطاسية لجميع الفئات';
     $pageDescription = $isEnglish
-        ? 'Alwrraq is a student platform for managing printing and binding orders, file uploads, and order tracking easily and securely.'
-        : 'الورّاق منصة طلابية لإدارة طلبات الطباعة والتجليد ورفع الملفات ومتابعة حالة الطلب بسهولة وأمان.';
+        ? 'Alwrraq serves students, teachers, professors, lecturers, teaching assistants, researchers, and everyone through printing, binding, stationery, file upload, and order tracking services.'
+        : 'الورّاق يخدم الدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات بخدمات الطباعة والتجليد والقرطاسية ورفع الملفات ومتابعة الطلبات.';
     $loginUrl = route('login');
     $registerUrl = route('login') . '#register';
 @endphp
@@ -29,10 +29,16 @@
     <meta property="og:site_name" content="Alwrraq">
     <style>
         * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; scroll-padding-top: 92px; }
         body { margin: 0; font-family: Arial, Tahoma, sans-serif; background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 44%, #f7fafc 100%); color: #0f172a; line-height: 1.8; }
         a { color: inherit; }
         .container { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+        .stationery-announcement { position: relative; z-index: 21; background: linear-gradient(135deg, #0f4c81, #10233f); color: #ffffff; border-bottom: 1px solid rgba(147, 197, 253, 0.28); }
+        .stationery-announcement-inner { min-height: 72px; display: flex; align-items: center; justify-content: center; gap: 11px; padding: 9px 0; text-align: center; line-height: 1.4; }
+        .stationery-announcement-icon { width: 35px; height: 35px; flex: 0 0 auto; display: inline-grid; place-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.14); font-size: 19px; }
+        .stationery-announcement-copy { display: grid; gap: 1px; }
+        .stationery-announcement strong { display: block; color: #fef08a; font-size: 26px; font-weight: 1000; line-height: 1.25; }
+        .stationery-announcement-text { display: block; color: #ffffff; font-size: 19px; font-weight: 900; }
         .site-header { position: sticky; top: 0; z-index: 20; background: rgba(255, 255, 255, 0.90); border-bottom: 1px solid rgba(203, 213, 225, 0.74); backdrop-filter: blur(16px); box-shadow: 0 10px 35px rgba(15, 23, 42, 0.05); }
         .nav { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
         .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 900; font-size: 22px; }
@@ -79,10 +85,10 @@
         .showcase-copy h2 { margin: 0 0 12px; font-size: clamp(28px, 4vw, 42px); line-height: 1.35; }
         .showcase-copy p { margin: 0; color: #dbeafe; font-size: 16px; }
         .devices { position: relative; width: 100%; height: clamp(500px, 45vw, 575px); z-index: 1; }
-        .device { position: absolute; background: #0b1120; border: 8px solid #070b14; box-shadow: 0 28px 70px rgba(2, 6, 23, 0.34); overflow: hidden; }
-        .device-desktop { width: min(76%, 480px); height: 324px; left: 0; top: 116px; border-radius: 24px; transform: rotate(-5deg); }
-        .device-phone { width: min(38%, 236px); height: 506px; right: 0; top: 18px; border-radius: 36px; transform: rotate(4deg); }
-        .device-phone::before { content: ""; position: absolute; top: 9px; left: 50%; width: 74px; height: 20px; border-radius: 999px; background: #05070d; transform: translateX(-50%); z-index: 3; }
+        .device { position: absolute; margin: 0; overflow: hidden; background: transparent; filter: drop-shadow(0 28px 34px rgba(2, 6, 23, 0.3)); }
+        .device-desktop { width: min(88%, 550px); aspect-ratio: 2879 / 1625; left: 0; top: 172px; border: 4px solid rgba(255,255,255,.76); border-radius: 18px; transform: rotate(-3deg); }
+        .device-phone { width: min(35%, 220px); aspect-ratio: 702 / 1462; right: 0; top: 8px; border-radius: 30px; transform: rotate(3deg); }
+        .showcase-preview { display: block; width: 100%; height: 100%; object-fit: contain; }
         .screen { width: 100%; height: 100%; background: #f8fafc; overflow: hidden; color: #0f172a; }
         .mini-header { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: linear-gradient(135deg, #0f172a, #0f4c81); color: #ffffff; }
         .mini-brand-wrap { display: inline-flex; align-items: center; gap: 8px; }
@@ -131,7 +137,7 @@
         .card { background: rgba(255, 255, 255, 0.94); border: 1px solid #e2e8f0; border-radius: 18px; padding: 20px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
         .card:hover { transform: translateY(-3px); border-color: #bfdbfe; box-shadow: 0 22px 48px rgba(15, 76, 129, 0.12); }
         .card-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: #eff6ff; color: #0f4c81; font-size: 18px; margin-bottom: 12px; font-weight: 900; }
-        .card h3 { margin: 0 0 8px; font-size: 18px; }
+        .card h3 { margin: 0; font-size: 18px; }
         .card p { margin: 0; color: #64748b; font-size: 14px; }
         .steps { counter-reset: step; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
         .step { position: relative; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px 14px; min-height: 150px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05); }
@@ -140,11 +146,18 @@
         .step p { margin: 0; color: #64748b; font-size: 13px; }
         .features { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
         .feature { padding: 18px; border-radius: 18px; background: linear-gradient(145deg, #10233f, #0f4c81); color: #ffffff; box-shadow: 0 18px 42px rgba(15, 76, 129, 0.16); }
-        .feature h3 { margin: 0 0 6px; font-size: 16px; color: #ffffff; }
+        .feature h3 { margin: 0; font-size: 16px; color: #ffffff; }
         .feature p { margin: 0; color: #dbeafe; font-size: 13px; }
         .contact { background: linear-gradient(135deg, #ffffff, #f0f7ff); border: 1px solid #dbe3ef; border-radius: 22px; padding: clamp(22px, 4vw, 34px); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08); }
         .contact h2 { margin: 0 0 8px; }
         .contact p { margin: 0; color: #64748b; }
+        .contact-phone { display: inline-flex; align-items: center; gap: 7px; margin-top: 9px; padding: 6px 10px; border-radius: 9px; background: #ffffff; border: 1px solid #dbe3ef; color: #0f172a; font-size: 15px; font-weight: 900; text-decoration: none; direction: ltr; }
+        .contact-actions { display: grid; grid-template-columns: repeat(3, minmax(100px, 1fr)); gap: 7px; }
+        .contact-channel { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 12px; border-radius: 9px; color: #ffffff; font-size: 13px; font-weight: 900; text-decoration: none; white-space: nowrap; }
+        .contact-channel-icon { width: 18px; height: 18px; flex: 0 0 auto; display: block; fill: currentColor; }
+        .contact-channel.call { background: #0f4c81; }
+        .contact-channel.whatsapp { background: #16a34a; }
+        .contact-channel.telegram { background: #0284c7; }
         .site-footer { padding: 26px 0; border-top: 1px solid #e2e8f0; background: #ffffff; color: #64748b; }
         .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
         .footer-links { display: flex; gap: 14px; flex-wrap: wrap; }
@@ -155,28 +168,181 @@
             .hero-grid, .about-box, .contact { grid-template-columns: 1fr; }
             .showcase-stage { grid-template-columns: 1fr; }
             .devices { height: 575px; max-width: 680px; margin: 0 auto; }
-            .device-desktop { left: 0; top: 166px; width: min(76%, 480px); }
-            .device-phone { right: 0; top: 0; width: min(40%, 236px); }
+            .device-desktop { left: 0; top: 190px; width: min(86%, 520px); }
+            .device-phone { right: 0; top: 0; width: min(36%, 220px); }
             .section-head { display: block; }
             .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .steps, .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 560px) {
+            html { scroll-padding-top: 78px; }
             .container { width: min(100% - 22px, 1120px); }
-            .nav-links { gap: 10px; font-size: 13px; }
-            .nav-actions .btn, .contact .btn { width: 100%; }
-            .hero-stats { grid-template-columns: 1fr; }
-            .showcase-stage { padding: 22px 14px; border-radius: 24px; }
-            .devices { display: grid; gap: 18px; justify-items: center; height: auto; }
-            .device { position: relative; inset: auto; transform: none; border-width: 7px; }
-            .device-phone { order: 1; width: min(86%, 236px); height: 506px; border-radius: 34px; }
-            .device-desktop { order: 2; width: 100%; height: 322px; border-radius: 22px; }
+            .stationery-announcement-inner { min-height: 59px; gap: 7px; padding: 6px 0; }
+            .stationery-announcement-icon { width: 27px; height: 27px; border-radius: 8px; font-size: 14px; }
+            .stationery-announcement strong { font-size: 19px; font-weight: 1000; }
+            .stationery-announcement-text { font-size: 14px; line-height: 1.35; }
+            .site-header { box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07); }
+            .nav { min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 5px 8px; padding: 6px 0; }
+            .brand { gap: 5px; font-size: 15px; white-space: nowrap; }
+            .logo { width: 30px; height: 30px; border-radius: 8px; box-shadow: none; }
+            .nav-actions { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+            .nav-actions .btn,
+            .nav-actions .language-switcher-button { width: 100%; min-width: 0; min-height: 26px !important; margin: 0; padding: 3px 2px !important; border-radius: 6px; font-size: 8px; line-height: 1.15; text-align: center; white-space: nowrap; }
+            .nav-actions .language-switcher-form { width: 100% !important; min-width: 0; margin: 0; }
+            .nav-links { grid-column: 1 / -1; width: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; font-size: 8.5px; line-height: 1.2; }
+            .nav-links a { min-width: 0; padding: 3px 1px; border: 1px solid #e2e8f0; border-radius: 5px; background: #f8fafc; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .hero { padding: 18px 0 12px; }
+            .hero-grid { gap: 8px; }
+            .eyebrow { margin-bottom: 6px; padding: 4px 8px; font-size: 10px; }
+            h1 { font-size: 22px; line-height: 1.35; }
+            .hero p { margin-top: 7px; font-size: 11.5px; line-height: 1.65; }
+            .hero-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
+            .stat { min-width: 0; padding: 6px; border-radius: 8px; box-shadow: none; }
+            .stat strong { font-size: 10px; line-height: 1.3; }
+            .stat span { margin-top: 2px; font-size: 7.5px; line-height: 1.35; }
+            .hero-card { padding: 9px; border-radius: 11px; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07); }
+            .hero-card::before { height: 3px; }
+            .hero-card h2 { margin-bottom: 6px; font-size: 14px; }
+            .hero-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+            .hero-list li { align-items: flex-start; gap: 4px; min-width: 0; padding: 6px; border-radius: 7px; font-size: 8.5px; line-height: 1.45; }
+            .check { width: 17px; height: 17px; font-size: 10px; }
+            section { padding: 13px 0; }
+            .about-box { gap: 8px; padding: 9px; border-radius: 12px; box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06); }
+            .about-badge { margin-bottom: 5px; padding: 3px 7px; font-size: 9px; }
+            .about-box h2 { margin-bottom: 5px; font-size: 16px; }
+            .about-box p { font-size: 10px; line-height: 1.6; }
+            .about-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+            .about-point { min-width: 0; padding: 6px; border-radius: 7px; }
+            .about-point strong { margin-bottom: 2px; font-size: 8.5px; line-height: 1.35; }
+            .about-point span { display: block; font-size: 7.5px; line-height: 1.4; }
+            .showcase { padding-top: 5px; }
+            .showcase-stage { gap: 8px; padding: 11px; border-radius: 14px; }
+            .showcase-copy { text-align: center; }
+            .showcase-copy h2 { margin-bottom: 5px; font-size: 17px; }
+            .showcase-copy p { font-size: 10px; line-height: 1.55; }
+            .devices { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-items: center; gap: 6px; height: 225px; margin: 0; overflow: hidden; }
+            .device { position: relative; inset: auto; transform: none; }
+            .device-phone { order: 2; width: 90px; height: auto; border-radius: 15px; }
+            .device-desktop { order: 1; display: block; width: 100%; height: auto; border-width: 2px; border-radius: 10px; }
+            .phone-screen { padding-top: 13px; }
+            .phone-screen .mini-header { height: 47px; padding: 6px; }
+            .mini-logo { width: 24px; height: 24px; border-radius: 6px; }
+            .mini-brand { font-size: 10px; }
+            .mini-brand small { font-size: 6px; }
+            .phone-screen .mini-body { padding: 6px; }
+            .phone-home-title { margin-bottom: 4px; font-size: 10px; }
+            .phone-home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
+            .phone-home-service { min-width: 0; padding: 4px; border-radius: 6px; }
+            .phone-home-service strong { font-size: 5.8px; }
+            .phone-home-service span { font-size: 5px; }
+            .phone-home-service .enter { margin-top: 2px; padding: 2px; border-radius: 4px; font-size: 5px; }
+            .section-head { margin-bottom: 7px; }
+            .section-head h2 { margin-bottom: 3px; font-size: 17px; }
+            .section-head p { font-size: 10px; line-height: 1.55; }
+            .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+            .card { min-width: 0; padding: 7px; border-radius: 8px; box-shadow: 0 7px 16px rgba(15, 23, 42, 0.05); }
+            .card-icon { width: 23px; height: 23px; margin-bottom: 4px; border-radius: 6px; font-size: 8px; }
+            .card h3 { margin: 0; font-size: 9px; line-height: 1.4; }
+            .card p { font-size: 7.5px; line-height: 1.45; }
+            .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+            .step { min-width: 0; min-height: 0; padding: 7px; border-radius: 8px; box-shadow: none; }
+            .step::before { width: 22px; height: 22px; margin-bottom: 4px; border-radius: 6px; font-size: 9px; }
+            .step h3 { margin-bottom: 3px; font-size: 8.5px; line-height: 1.4; }
+            .step p { font-size: 7.5px; line-height: 1.4; }
+            .features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+            .feature { min-width: 0; padding: 8px; border-radius: 8px; box-shadow: none; }
+            .feature h3 { margin: 0; font-size: 10px; }
+            .feature p { font-size: 8px; line-height: 1.45; }
+            .contact { grid-template-columns: minmax(0, 1fr) auto; gap: 7px; padding: 9px; border-radius: 10px; box-shadow: none; }
+            .contact h2 { margin-bottom: 3px; font-size: 15px; }
+            .contact p { font-size: 9px; line-height: 1.45; }
+            .contact .btn { width: auto; min-height: 30px; padding: 5px 8px; border-radius: 7px; font-size: 9px; }
+            .contact-phone { margin-top: 5px; padding: 4px 6px; border-radius: 6px; font-size: 10px; }
+            .contact-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+            .contact-channel { min-width: 0; min-height: 29px; padding: 5px 4px; border-radius: 6px; font-size: 8.5px; }
+            .contact-channel-icon { width: 13px; height: 13px; }
+            .site-footer { padding: 10px 0; font-size: 9px; }
+            .footer-inner { gap: 5px; }
+            .footer-links { gap: 7px; }
             .upload-meta, .upload-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .cards, .steps, .features { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 1100px) {
+            .container { width: min(1240px, calc(100% - 56px)); }
+            .nav { min-height: 70px; }
+            .brand { font-size: 24px; }
+            .nav-links { gap: 7px; font-size: 14px; }
+            .nav-links a { min-height: 39px; display: inline-flex; align-items: center; justify-content: center; padding: 7px 12px; border: 1px solid #dbe3ef; border-radius: 9px; background: #ffffff; color: #334155; box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05); }
+            .nav-links a:hover { border-color: #60a5fa; background: #eff6ff; color: #0f4c81; }
+            .btn { min-height: 43px; font-size: 15px; }
+            .nav-actions .language-switcher-button { min-height: 43px !important; font-size: 15px !important; }
+            .hero { padding: 42px 0 24px; }
+            .hero-grid { grid-template-columns: minmax(0, 1.12fr) minmax(380px, 0.88fr); gap: 22px; }
+            .eyebrow { margin-bottom: 11px; padding: 7px 12px; font-size: 15px; }
+            h1 { font-size: 46px; line-height: 1.25; }
+            .hero p { margin-top: 12px; font-size: 18px; line-height: 1.75; }
+            .hero-stats { gap: 9px; margin-top: 18px; }
+            .stat { padding: 11px 12px; border-radius: 12px; }
+            .stat strong { font-size: 18px; }
+            .stat span { font-size: 13px; }
+            .hero-card { padding: 19px; border-radius: 16px; }
+            .hero-card h2 { margin-bottom: 10px; font-size: 22px; }
+            .hero-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .hero-list li { min-width: 0; padding: 10px; border-radius: 10px; font-size: 14px; line-height: 1.55; }
+            section { padding: 28px 0; }
+            .about-box { grid-template-columns: 1fr; gap: 16px; padding: 22px; border-radius: 18px; }
+            .about-badge { margin-bottom: 8px; font-size: 14px; }
+            .about-box h2 { margin-bottom: 8px; font-size: 31px; }
+            .about-box p { max-width: 1100px; font-size: 17px; line-height: 1.75; }
+            .about-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+            .about-point { min-width: 0; padding: 13px 15px; border-radius: 12px; }
+            .about-point strong { font-size: 16px; }
+            .about-point span { font-size: 14px; }
+            .showcase { padding-top: 10px; }
+            .showcase-stage { gap: 30px; padding: 30px; border-radius: 22px; }
+            .showcase-copy h2 { font-size: 37px; }
+            .showcase-copy p { font-size: 17px; }
+            .devices { height: 490px; }
+            .device-desktop { height: auto; top: 155px; }
+            .device-phone { height: auto; width: min(35%, 210px); }
+            .section-head { margin-bottom: 13px; }
+            .section-head h2 { margin-bottom: 4px; font-size: 31px; }
+            .section-head p { font-size: 16px; }
+            .cards { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+            .card { min-width: 0; min-height: 118px; padding: 15px; border-radius: 13px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06); }
+            .card-icon { width: 36px; height: 36px; margin-bottom: 9px; border-radius: 10px; font-size: 13px; }
+            .card h3 { font-size: 17px; line-height: 1.5; }
+            .steps { gap: 9px; }
+            .step { min-width: 0; min-height: 124px; padding: 14px; border-radius: 13px; }
+            .step::before { width: 31px; height: 31px; margin-bottom: 8px; border-radius: 9px; }
+            .step h3 { font-size: 16px; }
+            .step p { font-size: 13px; line-height: 1.55; }
+            .features { gap: 9px; }
+            .feature { padding: 15px; border-radius: 13px; text-align: center; }
+            .feature h3 { font-size: 18px; }
+            .contact { padding: 20px 24px; border-radius: 16px; }
+            .contact h2 { font-size: 27px; }
+            .contact p { font-size: 15px; }
+            .contact-phone { font-size: 17px; }
+            .contact-channel { min-height: 43px; font-size: 14px; }
+            .site-footer { padding: 18px 0; font-size: 14px; }
+        }
+        @media (min-width: 561px) {
+            .nav-links { gap: 7px; font-size: 14px; }
+            .nav-links a { min-height: 39px; display: inline-flex; align-items: center; justify-content: center; padding: 7px 12px; border: 1px solid #dbe3ef; border-radius: 9px; background: #ffffff; color: #334155; box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05); }
+            .nav-links a:hover { border-color: #60a5fa; background: #eff6ff; color: #0f4c81; }
         }
     </style>
 </head>
 <body>
+    <div class="stationery-announcement" role="note" aria-label="خدمة القرطاسية">
+        <div class="container stationery-announcement-inner">
+            <span class="stationery-announcement-icon" aria-hidden="true">✦</span>
+            <span class="stationery-announcement-copy">
+                <strong>قرطاسيتك في بيتك</strong>
+                <span class="stationery-announcement-text">اختر منتجاتك، ضيفها بسلتك، والورّاق يوصلها لك.</span>
+            </span>
+        </div>
+    </div>
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="{{ route('public.home') }}" aria-label="الورّاق">
@@ -185,9 +351,9 @@
             </a>
             <nav class="nav-links" aria-label="روابط الصفحة">
                 <a href="#top">الرئيسية</a>
-                <a href="#about">من نحن</a>
-                <a href="#services">خدماتنا</a>
                 <a href="#how-it-works">كيف يعمل</a>
+                <a href="#services">خدماتنا</a>
+                <a href="#about">من نحن</a>
                 <a href="#contact">تواصل معنا</a>
             </nav>
             <div class="nav-actions">
@@ -202,9 +368,9 @@
         <section class="hero">
             <div class="container hero-grid">
                 <div>
-                    <span class="eyebrow">خدمات طباعة وتجليد للطلاب</span>
+                    <span class="eyebrow">طباعة الرسائل العلمية والكتب والمذكرات وتجليدها وخدمات القرطاسية</span>
                     <h1>الورّاق لإدارة طلبات الطباعة ورفع الملفات بسهولة</h1>
-                    <p>منصة تساعد الطلاب على رفع ملفاتهم، اختيار إعدادات الطباعة والتجليد، مراجعة الطلب، إكمال الدفع، ومتابعة حالة الطلب من مكان واحد.</p>
+                    <p>منصة تخدم الدكتور والأستاذ والمعيد والمعلم والباحث والطالب وجميع الفئات في رفع الملفات، اختيار الطباعة والتجليد، شراء القرطاسية، ومتابعة الطلب من مكان واحد.</p>
                     <div class="hero-stats" aria-label="مميزات مختصرة">
                         <div class="stat"><strong>رفع إلكتروني</strong><span>ملفاتك داخل حسابك</span></div>
                         <div class="stat"><strong>متابعة مباشرة</strong><span>حالة الطلب والفاتورة</span></div>
@@ -216,6 +382,7 @@
                     <ul class="hero-list">
                         <li><span class="check">✓</span><span>رفع ملفات PDF و Word حسب نوع الخدمة.</span></li>
                         <li><span class="check">✓</span><span>اختيار النسخ، حجم الصفحة، الطباعة، والتجليد.</span></li>
+                        <li><span class="check">✓</span><span>تصفح منتجات القرطاسية وإضافتها للسلة بسهولة.</span></li>
                         <li><span class="check">✓</span><span>متابعة الطلب والفواتير والملفات المستلمة.</span></li>
                     </ul>
                 </div>
@@ -227,13 +394,13 @@
                 <div class="about-box">
                     <div>
                         <span class="about-badge">من نحن</span>
-                        <h2>الورّاق تجربة طلابية متكاملة بخدمة موثوقة وتنفيذ منظم</h2>
+                        <h2>الورّاق تجربة متكاملة لجميع الفئات بخدمة موثوقة وتنفيذ منظم</h2>
                         <p>
-                            الورّاق منصة متخصصة في تسهيل خدمات الطباعة والتجليد ورفع الملفات ومتابعة الطلبات للطلاب، صممت لتجمع بين وضوح الإجراءات وسرعة التنفيذ وحفظ تفاصيل الطلب في مكان واحد. نحن إحدى مؤسسات شركة مسير المدينة المحدودة، ونعمل على تقديم تجربة رقمية مرتبة تساعد الطالب على إنجاز طلبه بثقة وراحة من لحظة رفع الملف حتى استلامه.
+                            الورّاق منصة متخصصة في تسهيل خدمات الطباعة والتجليد والقرطاسية ورفع الملفات ومتابعة الطلبات للدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات. صممت لتجمع بين وضوح الإجراءات وسرعة التنفيذ وحفظ تفاصيل الطلب في مكان واحد. نحن إحدى مؤسسات شركة مسير المدينة المحدودة، ونعمل على تقديم تجربة رقمية مرتبة تساعد كل عميل على إنجاز طلبه بثقة وراحة حتى الاستلام.
                         </p>
                     </div>
                     <div class="about-panel" aria-label="قيم الورّاق">
-                        <div class="about-point"><strong>خدمة مبنية على احتياج الطالب</strong><span>نركز على جعل خطوات الطلب واضحة، مختصرة، وسهلة المتابعة.</span></div>
+                        <div class="about-point"><strong>خدمة مبنية على احتياج العميل</strong><span>نركز على جعل خطوات الطلب واضحة، مختصرة، وسهلة المتابعة لجميع الفئات.</span></div>
                         <div class="about-point"><strong>تنظيم يحفظ التفاصيل</strong><span>كل ملف وخيار وسعر وحالة طلب تظهر للعميل بطريقة مباشرة.</span></div>
                         <div class="about-point"><strong>هوية مهنية موثوقة</strong><span>نعمل تحت مظلة شركة مسير المدينة المحدودة لتقديم خدمة أكثر استقرارًا وجودة.</span></div>
                     </div>
@@ -247,60 +414,15 @@
                     <div class="showcase-copy">
                         <span class="eyebrow">واجهة تعمل على الجوال والكمبيوتر</span>
                         <h2>تجربة واحدة مرتبة من تسجيل الدخول حتى متابعة الطلب</h2>
-                        <p>صممنا واجهات الورّاق لتظهر تفاصيل الخدمة والملفات والأسعار والطلبات بوضوح، سواء استخدمها الطالب من الجوال أو من شاشة الكمبيوتر.</p>
+                        <p>صممنا واجهات الورّاق لتظهر تفاصيل الخدمات والمنتجات والملفات والأسعار بوضوح لكل مستخدم، سواء من الجوال أو شاشة الكمبيوتر.</p>
                     </div>
-                    <div class="devices" aria-hidden="true">
-                        <div class="device device-desktop">
-                            <div class="screen">
-                                <div class="mini-header">
-                                    <div class="mini-brand-wrap"><img class="mini-logo" src="{{ asset('images/alwrraq-logo.jpeg') }}" alt=""><div class="mini-brand">الورّاق<small>خدمات الطباعة والتجليد</small></div></div>
-                                    <div class="mini-user">semi</div>
-                                </div>
-                                <div class="mini-body">
-                                    <h3 class="mini-title">طباعة وتجليد رسالة دكتوراه</h3>
-                                    <div class="upload-panel">
-                                        <div class="upload-drop">تحميل ملف PDF إجباري + ملف Word للكعب والكليشة</div>
-                                        <div class="upload-file">
-                                            <strong>doctoral-research.pdf</strong>
-                                            <div class="upload-meta">
-                                                <span>126 صفحة</span>
-                                                <span>نسختان</span>
-                                                <span>A4</span>
-                                                <span>وجهين</span>
-                                            </div>
-                                        </div>
-                                        <div class="upload-options">
-                                            <div class="upload-option">لون الرسالة: كحلي</div>
-                                            <div class="upload-option">لون الكتابة: ذهبي</div>
-                                            <div class="upload-option">التجليد: جلد طبيعي</div>
-                                        </div>
-                                        <div class="upload-total">
-                                            <span>الإجمالي قبل التوصيل</span>
-                                            <span>240 ريال</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="device device-phone">
-                            <div class="screen phone-screen">
-                                <div class="mini-header">
-                                    <div class="mini-brand-wrap"><img class="mini-logo" src="{{ asset('images/alwrraq-logo.jpeg') }}" alt=""><div class="mini-brand">الورّاق<small>خدمات الطباعة والتجليد</small></div></div>
-                                </div>
-                                <div class="mini-body">
-                                    <h3 class="phone-home-title">اختر الخدمة المطلوبة</h3>
-                                    <div class="phone-home-grid">
-                                        <div class="phone-home-service"><strong>طباعة المذكرات وملفات PDF</strong><span>أبيض وأسود، أحجام، تغليف</span><span class="enter">الدخول للخدمة</span></div>
-                                        <div class="phone-home-service"><strong>طباعة الملفات بالألوان</strong><span>A4 / A3 وتغليف حراري</span><span class="enter">الدخول للخدمة</span></div>
-                                        <div class="phone-home-service"><strong>طباعة وتجليد كتب كعب جلد طبيعي</strong><span>كتب وملازم وتجليد احترافي</span><span class="enter">الدخول للخدمة</span></div>
-                                        <div class="phone-home-service"><strong>طباعة وتجليد رسالة ماجستير</strong><span>ألوان رسالة وكتابة وتجليد</span><span class="enter">الدخول للخدمة</span></div>
-                                        <div class="phone-home-service"><strong>طباعة وتجليد رسالة دكتوراه</strong><span>PDF للطباعة و Word للكعب</span><span class="enter">الدخول للخدمة</span></div>
-                                        <div class="phone-home-service"><strong>تنسيق الرسائل الجامعية</strong><span>Word وخدمة تسليم داخل الطلبات</span><span class="enter">الدخول للخدمة</span></div>
-                                        <div class="phone-home-service"><strong>إنشاء بحث</strong><span>اكتب عنوان البحث وعدد الصفحات</span><span class="enter">الدخول للخدمة</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="devices">
+                        <figure class="device device-desktop">
+                            <img class="showcase-preview" src="{{ asset('images/alwrraq-desktop-preview.png') }}" alt="واجهة الورّاق على شاشة الكمبيوتر" loading="lazy">
+                        </figure>
+                        <figure class="device device-phone">
+                            <img class="showcase-preview" src="{{ asset('images/alwrraq-mobile-preview.png') }}" alt="واجهة الورّاق على شاشة الجوال" loading="lazy">
+                        </figure>
                     </div>
                 </div>
             </div>
@@ -310,18 +432,19 @@
             <div class="container">
                 <div class="section-head">
                     <h2>خدماتنا</h2>
-                    <p>مجموعة خدمات أكاديمية وطباعية متكاملة تخدم طلاب المدارس والجامعات والباحثين.</p>
+                    <p>خدمات أكاديمية وطباعية ومنتجات قرطاسية تخدم الدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات.</p>
                 </div>
                 <div class="cards">
-                    <article class="card"><div class="card-icon">01</div><h3>تنسيق رسائل الدكتوراه والماجستير</h3><p>خدمة تنسيق أكاديمي للرسائل الجامعية مع متابعة تسليم الملف بعد الانتهاء.</p></article>
-                    <article class="card"><div class="card-icon">02</div><h3>تدقيق لغوي للرسائل العلمية</h3><p>مراجعة لغوية احترافية لرسائل الدكتوراه والماجستير والبحوث الأكاديمية.</p></article>
-                    <article class="card"><div class="card-icon">03</div><h3>طباعة وتجليد رسائل الماجستير</h3><p>خيارات مخصصة للطباعة والتجليد وألوان الرسالة والكتابة حسب متطلباتك.</p></article>
-                    <article class="card"><div class="card-icon">04</div><h3>طباعة وتجليد رسائل الدكتوراه</h3><p>تجهيز رسائل الدكتوراه بملفات PDF للطباعة وملفات Word للكعب والكليشة.</p></article>
-                    <article class="card"><div class="card-icon">05</div><h3>إنشاء البحوث</h3><p>إرسال عنوان البحث وعدد الصفحات المطلوبة ومتابعة تسليم الملف داخل حسابك.</p></article>
-                    <article class="card"><div class="card-icon">06</div><h3>طباعة المذكرات والكتب</h3><p>طباعة ملفات PDF والمذكرات والكتب بخيارات حجم الورق والنسخ والتغليف.</p></article>
-                    <article class="card"><div class="card-icon">07</div><h3>تجليد الكتب كعب جلد طبيعي</h3><p>تجليد كتب وملازم بكعب جلد طبيعي وبمقاسات مناسبة للكتب الدراسية والأكاديمية.</p></article>
-                    <article class="card"><div class="card-icon">08</div><h3>طباعة الملفات بالألوان</h3><p>طباعة ملونة بمقاسات متعددة وخيارات تغليف حراري حسب نوع الملف والاستخدام.</p></article>
-                    <article class="card"><div class="card-icon">09</div><h3>رفع الملفات ومتابعة الطلب</h3><p>رفع الملفات إلكترونيًا، مراجعة تفاصيل الطلب، الفاتورة، وحالة التنفيذ من حسابك.</p></article>
+                    <article class="card"><div class="card-icon">01</div><h3>تنسيق رسائل الدكتوراه والماجستير</h3></article>
+                    <article class="card"><div class="card-icon">02</div><h3>تدقيق لغوي للرسائل العلمية</h3></article>
+                    <article class="card"><div class="card-icon">03</div><h3>طباعة وتجليد رسائل الماجستير</h3></article>
+                    <article class="card"><div class="card-icon">04</div><h3>طباعة وتجليد رسائل الدكتوراه</h3></article>
+                    <article class="card"><div class="card-icon">05</div><h3>إنشاء البحوث</h3></article>
+                    <article class="card"><div class="card-icon">06</div><h3>طباعة المذكرات والكتب</h3></article>
+                    <article class="card"><div class="card-icon">07</div><h3>تجليد الكتب كعب جلد طبيعي</h3></article>
+                    <article class="card"><div class="card-icon">08</div><h3>طباعة الملفات بالألوان</h3></article>
+                    <article class="card"><div class="card-icon">09</div><h3>رفع الملفات ومتابعة الطلب</h3></article>
+                    <article class="card"><div class="card-icon">10</div><h3>القرطاسية</h3></article>
                 </div>
             </div>
         </section>
@@ -346,13 +469,12 @@
             <div class="container">
                 <div class="section-head">
                     <h2>مميزات المنصة</h2>
-                    <p>تجربة مرتبة وآمنة لإدارة طلباتك.</p>
                 </div>
                 <div class="features">
-                    <div class="feature"><h3>سهولة الاستخدام</h3><p>واجهة واضحة من رفع الملف حتى الطلب.</p></div>
-                    <div class="feature"><h3>سرعة التنفيذ</h3><p>تجهيز الطلبات ببيانات واضحة ومباشرة.</p></div>
-                    <div class="feature"><h3>حماية الملفات</h3><p>ملفاتك تظهر داخل حسابك فقط.</p></div>
-                    <div class="feature"><h3>متابعة الطلب</h3><p>تعرف على حالة الطلب والفواتير بسهولة.</p></div>
+                    <div class="feature"><h3>سهولة الاستخدام</h3></div>
+                    <div class="feature"><h3>سرعة التنفيذ</h3></div>
+                    <div class="feature"><h3>حماية الملفات</h3></div>
+                    <div class="feature"><h3>متابعة الطلب</h3></div>
                 </div>
             </div>
         </section>
@@ -362,9 +484,23 @@
                 <div class="contact">
                     <div>
                         <h2>تواصل معنا</h2>
-                        <p>للاستفسارات أو المساعدة في الطلبات، يمكنك تسجيل الدخول ومتابعة طلبك من داخل حسابك.</p>
+                        <p>للاستفسارات أو المساعدة في الطلبات، تواصل معنا مباشرة عبر الاتصال أو واتساب أو تلجرام.</p>
+                        <a class="contact-phone" href="tel:+966542440582" aria-label="رقم التواصل">+966 54 244 0582</a>
                     </div>
-                    <a class="btn primary" href="{{ $loginUrl }}">الدخول لحسابك</a>
+                    <div class="contact-actions" aria-label="قنوات التواصل">
+                        <a class="contact-channel call" href="tel:+966542440582" aria-label="اتصال مباشر على رقم الورّاق">
+                            <svg class="contact-channel-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.46 15.46 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
+                            <span>اتصال</span>
+                        </a>
+                        <a class="contact-channel whatsapp" href="https://wa.me/966542440582" aria-label="فتح محادثة واتساب مع الورّاق">
+                            <svg class="contact-channel-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.84 9.84 0 0 0-8.43 14.91L2 22l5.22-1.56A9.91 9.91 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.1.93.96-3.02-.2-.31a8.12 8.12 0 1 1 6.77 3.71Zm4.45-6.07c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.54.12-.16.24-.62.79-.76.95-.14.16-.28.18-.52.06-.24-.12-1.03-.38-1.96-1.21a7.35 7.35 0 0 1-1.35-1.68c-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.31-.74-1.79-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.58.18 1.1.16 1.51.1.46-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28Z"/></svg>
+                            <span>واتساب</span>
+                        </a>
+                        <a class="contact-channel telegram" href="https://t.me/+966542440582" aria-label="فتح محادثة تلجرام مع الورّاق">
+                            <svg class="contact-channel-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.7 3.3a1.07 1.07 0 0 0-1.1-.18L2.9 9.95c-.76.3-.72 1.4.06 1.64l4.48 1.4 1.72 5.36c.22.7 1.12.9 1.62.37l2.5-2.66 4.67 3.42c.58.43 1.4.1 1.53-.61l2.57-14.55a1.07 1.07 0 0 0-.35-1.02ZM9.8 13.72l-.36 3.3-1.18-3.68 8.82-5.49-7.28 5.87Zm1.34 3.12.3-2.75 5.96-5.25-6.26 8Z"/></svg>
+                            <span>تلجرام</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>

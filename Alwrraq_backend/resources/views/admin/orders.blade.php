@@ -7,7 +7,7 @@
         .orders-page-title { margin-bottom: 9px; }
         .order-filter-bar { margin-bottom: 9px; }
         .orders-search-panel { margin-bottom: 9px; padding: 11px 13px; }
-        .orders-customer-card { margin-bottom: 9px; }
+        .orders-customer-card { margin-bottom: 9px; border-inline-start: 4px solid #2563eb; }
         .orders-customer-card .order-head { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; padding: 9px; }
         .orders-customer-card .order-head > div { display: flex; align-items: center; justify-content: space-between; gap: 5px; min-width: 0; min-height: 42px; padding: 7px 8px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 10px; line-height: 1.25; }
         .orders-customer-card .order-head .label { flex: 0 0 auto; min-width: 0; margin: 0; font-size: 8.5px; line-height: 1.2; white-space: nowrap; word-break: normal; }
@@ -113,6 +113,33 @@
             #adminModalBody .panel[data-order-id] .product-name-field .ordered-product-main strong { font-size: 7px; }
             #adminModalBody .panel[data-order-id] .delivered-upload-form { grid-template-columns: minmax(0, 1fr) auto; }
             #adminModalBody .panel[data-order-id] .delivered-upload-form label { grid-column: 1 / -1; }
+        }
+        @media (min-width: 1100px) {
+            .orders-page-title h1 { font-size: 27px; }
+            .order-filter-button { font-size: 13px; }
+            .orders-search-panel label { font-size: 12px; }
+            .orders-customer-card .order-head > div { font-size: 13px; line-height: 1.4; }
+            .orders-customer-card .order-head .label { font-size: 10.5px; }
+            .orders-customer-card .summary-action .small-button { font-size: 11px; }
+            #adminModalBody .panel[data-order-id] > .order-head > div { font-size: 12px; line-height: 1.45; }
+            #adminModalBody .panel[data-order-id] > .order-head .label { font-size: 10px; }
+            #adminModalBody .panel[data-order-id] .badge { font-size: 10px; }
+            #adminModalBody .panel[data-order-id] .compact-actions button { font-size: 10px; }
+            #adminModalBody .panel[data-order-id] .order-file-field span { font-size: 10px; }
+            #adminModalBody .panel[data-order-id] .order-file-field strong { font-size: 11.5px; line-height: 1.4; }
+            #adminModalBody .panel[data-order-id] .order-file-field.file-name strong { font-size: 12px; }
+            #adminModalBody .panel[data-order-id] .ordered-product-image { flex-basis: 42px; width: 42px; height: 42px; }
+            #adminModalBody .panel[data-order-id] .file-action-button { font-size: 10.5px; }
+            #adminModalBody .panel[data-order-id] .delivered-files-section h2 { font-size: 15px; }
+            #adminModalBody .panel[data-order-id] .delivered-file-name { font-size: 11.5px; }
+            #adminModalBody .panel[data-order-id] .delivered-file-item .muted { font-size: 9.5px; }
+            #adminModalBody .panel[data-order-id] .delivered-file-actions .ghost,
+            #adminModalBody .panel[data-order-id] .delivered-file-actions .save,
+            #adminModalBody .panel[data-order-id] .delivered-file-actions .danger { font-size: 10px; }
+            #adminModalBody .panel[data-order-id] .delivered-files-empty,
+            #adminModalBody .panel[data-order-id] .delivered-upload-form label { font-size: 10.5px; }
+            #adminModalBody .panel[data-order-id] .delivered-upload-form input { font-size: 12px; }
+            #adminModalBody .panel[data-order-id] .delivered-upload-form .save { font-size: 10px; }
         }
     </style>
 

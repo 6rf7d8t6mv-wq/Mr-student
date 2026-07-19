@@ -489,6 +489,31 @@
                     grid-template-columns: repeat(2, minmax(0, 1fr));
                 }
             }
+            @media (min-width: 1100px) {
+                .service-description { font-size: 16px; }
+                .service-entry { font-size: 16px; }
+                .files-list-header,
+                .files-list-item { font-size: 15px; }
+                .upload-box .file-info,
+                .upload-box.error .error-msg,
+                .binding-required { font-size: 14px; }
+                .research-field label { font-size: 13px; }
+                .research-pages-save-row .research-field label { font-size: 12px; }
+                #researchSaveButton { font-size: 13px; }
+                .research-delivery-notice { font-size: 11.5px; }
+                .footer-content { font-size: 14px; }
+            }
+            @media (min-width: 769px) {
+                .services-screen { gap: 9px; }
+                .services-title-block { padding: 12px 15px; border-radius: 13px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06); }
+                .services-title { font-size: 25px; line-height: 1.3; }
+                .services-subtitle { margin-top: 3px; font-size: 13px; line-height: 1.55; }
+                .service-card { min-height: 180px; gap: 6px; padding: 10px 11px; border-radius: 12px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06); }
+                .service-icon { width: 40px; height: 40px; border-radius: 10px; font-size: 20px; }
+                .service-title { font-size: 16px; line-height: 1.4; }
+                .service-description { font-size: 13px; line-height: 1.55; }
+                .service-entry { padding: 8px 9px; border-radius: 8px; font-size: 13px; }
+            }
         </style>
     </head>
     <body class="customer-app-page">

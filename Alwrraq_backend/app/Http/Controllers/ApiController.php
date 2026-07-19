@@ -31,6 +31,13 @@ class ApiController extends Controller
             ], 422);
         }
 
+        if (! $user->canLogin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا الحساب موقوف أو ممنوع من تسجيل الدخول.',
+            ], 403);
+        }
+
         return response()->json([
             'success' => true,
             'token' => Crypt::encryptString((string) $user->id),
@@ -238,11 +245,18 @@ class ApiController extends Controller
 
     private function userPayload(User $user): array
     {
+        $accountType = $user->role === 'customer'
+            ? 'customer'
+            : ($user->admin_permissions === null ? 'admin' : 'employee');
+
         return [
             'id' => $user->id,
             'name' => $user->name,
             'phone' => $user->phone,
             'role' => $user->role,
+            'account_type' => $accountType,
+            'permissions' => $user->role === 'admin' ? ($user->admin_permissions ?? []) : [],
+            'has_full_admin_access' => $user->role === 'admin' && $user->admin_permissions === null,
             'address' => $user->address,
             'city' => $user->city,
             'district' => $user->district,

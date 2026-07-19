@@ -40,6 +40,13 @@ class ApiTokenAuth
             ], 401);
         }
 
+        if (! $user->canLogin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا الحساب موقوف أو ممنوع من تسجيل الدخول.',
+            ], 403);
+        }
+
         Auth::setUser($user);
 
         return $next($request);

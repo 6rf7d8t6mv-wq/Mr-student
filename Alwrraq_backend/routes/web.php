@@ -19,7 +19,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login.store');
     Route::post('/register', [AuthController::class, 'register'])->name('register.store');
     Route::post('/admin', [AuthController::class, 'adminLogin'])->name('admin.login.store');
+    Route::post('/app/login', [AuthController::class, 'appLogin'])->name('app.login.store');
+    Route::post('/app/register', [AuthController::class, 'register'])->name('app.register.store');
 });
+
+Route::get('/app', [AuthController::class, 'showAppLogin'])->name('app.entry');
 
 Route::get('/educational-institutions', [EducationalInstitutionController::class, 'index'])
     ->name('educational-institutions.index');

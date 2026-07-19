@@ -3,6 +3,58 @@
 @section('title', 'منتجات القرطاسية - لوحة المدير')
 
 @section('content')
+    <style>
+        .admin-products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        .admin-product-card { min-width: 0; overflow: hidden; border: 1px solid #dbe3ef; border-radius: 12px; background: #ffffff; box-shadow: 0 9px 22px rgba(15, 23, 42, 0.07); }
+        .admin-product-image-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .admin-product-image { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .admin-product-image-empty { width: 100%; height: 100%; display: grid; place-items: center; color: #94a3b8; font-size: 12px; font-weight: 900; }
+        .admin-product-status { position: absolute; top: 7px; left: 7px; padding: 4px 7px; border-radius: 999px; background: #0f172a; color: #ffffff; font-size: 9px; font-weight: 900; }
+        .admin-product-status.hidden { background: #64748b; }
+        .admin-product-body { display: grid; gap: 6px; padding: 9px; }
+        .admin-product-company { overflow: hidden; color: #64748b; font-size: 10px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+        .admin-product-name { min-height: 38px; margin: 0; overflow: hidden; color: #0f172a; font-size: 13px; font-weight: 900; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .admin-product-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+        .admin-product-type { min-width: 0; overflow: hidden; color: #64748b; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+        .admin-product-price { flex: 0 0 auto; color: #047857; font-size: 13px; font-weight: 900; white-space: nowrap; }
+        .admin-product-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+        .admin-product-actions form { margin: 0; }
+        .admin-product-actions .ghost,
+        .admin-product-actions .danger { width: 100%; min-width: 0; min-height: 30px; margin: 0; padding: 6px 5px; font-size: 10px; text-align: center; justify-content: center; }
+        .admin-products-empty { grid-column: 1 / -1; padding: 30px 12px; border: 1px dashed #cbd5e1; border-radius: 10px; color: #64748b; text-align: center; font-weight: 800; }
+        @media (max-width: 980px) {
+            .admin-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+            .admin-product-card { border-radius: 9px; }
+            .admin-product-body { gap: 4px; padding: 6px; }
+            .admin-product-status { top: 5px; left: 5px; padding: 3px 5px; font-size: 7px; }
+            .admin-product-company,
+            .admin-product-type { font-size: 8px; }
+            .admin-product-name { min-height: 30px; font-size: 10px; line-height: 1.4; }
+            .admin-product-price { font-size: 10px; }
+            .admin-product-actions { gap: 3px; }
+            .admin-product-actions .ghost,
+            .admin-product-actions .danger { min-height: 26px; padding: 4px 2px; font-size: 8px; }
+        }
+        @media (max-width: 420px) {
+            .admin-products-grid { gap: 5px; }
+            .admin-product-name { min-height: 28px; font-size: 9px; }
+            .admin-product-meta { gap: 3px; }
+            .admin-product-company,
+            .admin-product-type { font-size: 7.5px; }
+            .admin-product-price { font-size: 9px; }
+            .admin-product-actions .ghost,
+            .admin-product-actions .danger { min-height: 24px; font-size: 7px; }
+        }
+        @media (min-width: 1100px) {
+            .admin-product-company,
+            .admin-product-type { font-size: 12px; }
+            .admin-product-name { min-height: 44px; font-size: 15px; }
+            .admin-product-price { font-size: 15px; }
+            .admin-product-actions .ghost,
+            .admin-product-actions .danger { font-size: 12px; }
+        }
+    </style>
+
     <div class="page-title compact-page-title">
         <div>
             <h1>منتجات القرطاسية</h1>
@@ -19,39 +71,36 @@
             <button class="save" type="submit">بحث</button>
         </form>
 
-        <div class="management-table-wrap">
-            <table class="management-table">
-                <thead><tr><th>الصورة</th><th>المنتج</th><th>الشركة</th><th>النوع</th><th>السعر</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
-                <tbody>
-                    @forelse ($products as $product)
-                        <tr>
-                            <td data-label="الصورة">
-                                @if ($product->image_path)
-                                    <img class="management-product-image" src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">
-                                @else
-                                    <span class="badge">بدون صورة</span>
-                                @endif
-                            </td>
-                            <td data-label="المنتج"><strong>{{ $product->name }}</strong></td>
-                            <td data-label="الشركة">{{ $product->company_name }}</td>
-                            <td data-label="النوع">{{ $product->product_type }}</td>
-                            <td data-label="السعر"><strong>{{ $product->price }} ريال</strong></td>
-                            <td data-label="الحالة"><span class="badge">{{ $product->is_active ? 'ظاهر' : 'مخفي' }}</span></td>
-                            <td data-label="الإجراءات">
-                                <div class="actions">
-                                    <button class="ghost" type="button" onclick="openAdminModal('تعديل المنتج', 'edit-stationery-product-{{ $product->id }}')">تعديل</button>
-                                    <form method="post" action="{{ route('admin.stationery-products.destroy', $product) }}" onsubmit="return confirm('حذف هذا المنتج؟')">
-                                        @csrf @method('delete')
-                                        <button class="danger small-button" type="submit">حذف</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td class="empty" colspan="7">لا توجد منتجات حاليًا.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <div class="admin-products-grid">
+            @forelse ($products as $product)
+                <article class="admin-product-card">
+                    <div class="admin-product-image-wrap">
+                        @if ($product->image_path)
+                            <img class="admin-product-image" src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">
+                        @else
+                            <div class="admin-product-image-empty">بدون صورة</div>
+                        @endif
+                        <span class="admin-product-status {{ $product->is_active ? '' : 'hidden' }}">{{ $product->is_active ? 'ظاهر' : 'مخفي' }}</span>
+                    </div>
+                    <div class="admin-product-body">
+                        <div class="admin-product-company">{{ $product->company_name }}</div>
+                        <h2 class="admin-product-name">{{ $product->name }}</h2>
+                        <div class="admin-product-meta">
+                            <span class="admin-product-type">{{ $product->product_type }}</span>
+                            <strong class="admin-product-price">{{ $product->price }} ريال</strong>
+                        </div>
+                        <div class="admin-product-actions">
+                            <button class="ghost" type="button" onclick="openAdminModal('تعديل المنتج', 'edit-stationery-product-{{ $product->id }}')">تعديل</button>
+                            <form method="post" action="{{ route('admin.stationery-products.destroy', $product) }}" onsubmit="return confirm('حذف هذا المنتج؟')">
+                                @csrf @method('delete')
+                                <button class="danger" type="submit">حذف</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div class="admin-products-empty">لا توجد منتجات حاليًا.</div>
+            @endforelse
         </div>
     </div>
 

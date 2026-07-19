@@ -23,7 +23,7 @@
         .logout-button { width: 100%; color: #ffffff; background: #b91c1c; border: 1px solid rgba(248, 113, 113, 0.5); font-weight: 800; padding: 10px 12px; border-radius: 10px; text-align: center; line-height: 1.5; cursor: pointer; margin-top: 0; }
         .logout-button:hover { background: #dc2626; border-color: #f87171; }
         main { width: min(900px, 100%); margin: clamp(16px, 4vw, 28px) auto; padding: 0 clamp(12px, 4vw, 20px); }
-        .panel { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: clamp(16px, 4vw, 24px); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08); }
+        .panel { background: #ffffff; border: 1px solid #e5e7eb; border-inline-start: 4px solid #2563eb; border-radius: 12px; padding: clamp(16px, 4vw, 24px); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08); }
         h1 { margin: 0 0 8px; font-size: clamp(24px, 6vw, 28px); }
         p { margin: 0 0 22px; color: #64748b; line-height: 1.7; }
         .notice, .errors { margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; }
@@ -96,6 +96,47 @@
             .header-actions .home-button,
             .header-actions .settings-button,
             .header-actions .logout-button { width: 100%; text-align: center; }
+            .section:last-child { margin-bottom: 72px; }
+            .section:last-child .section-actions { justify-content: flex-start; margin-top: 2px; }
+            .section:last-child .danger-button { position: relative; transform: translateY(-5px); }
+        }
+        @media (min-width: 721px) {
+            main { width: min(1180px, 100%); margin: 18px auto; padding: 0 14px; }
+            .panel { padding: 14px; border-radius: 13px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07); }
+            h1 { margin-bottom: 3px; font-size: 26px; }
+            .panel > p { margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
+            .section,
+            .section:first-of-type { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 10px; margin-top: 9px; padding: 10px; border: 1px solid #dbe3ef; border-inline-start: 4px solid #2563eb; border-radius: 11px; background: #ffffff; }
+            .section-header { grid-column: 1; grid-row: 1; margin: 0; }
+            .section-title { font-size: 17px; }
+            .section-actions { grid-column: 2; grid-row: 1; margin: 0; justify-content: flex-end; }
+            .section-actions button { min-height: 31px; margin: 0; padding: 6px 10px; border-radius: 7px; font-size: 11px; }
+            .details-grid { grid-column: 1 / -1; grid-row: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+            .detail,
+            .detail.full { grid-column: auto; display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 45px; padding: 8px 9px; border-radius: 8px; }
+            .detail.full { grid-column: span 2; }
+            .detail-label { flex: 0 1 auto; min-width: 0; margin: 0; font-size: 10.5px; line-height: 1.35; }
+            .detail-value { flex: 0 1 auto; min-width: 0; min-height: 0; font-size: 12px; line-height: 1.4; text-align: left; overflow-wrap: anywhere; }
+            .edit-panel { grid-column: 1 / -1; margin-top: 0; padding: 10px; border-radius: 9px; }
+            .edit-panel p { margin-bottom: 8px; font-size: 11px; line-height: 1.5; }
+            .form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+            .form-grid .full { grid-column: 1 / -1; }
+            .edit-panel label { margin-bottom: 4px; font-size: 11px; }
+            .edit-panel input { padding: 8px 9px; border-radius: 7px; font-size: 14px; }
+            .edit-panel button { min-height: 32px; margin-top: 9px; padding: 7px 11px; border-radius: 7px; font-size: 11px; }
+        }
+        @media (min-width: 1100px) {
+            h1 { font-size: 31px; }
+            .panel > p { font-size: 16px; }
+            .section-title { font-size: 23px; }
+            .detail-label { font-size: 14px; }
+            .detail-value { font-size: 16px; }
+            label { font-size: 15px; }
+            .section-actions button,
+            .edit-panel button { font-size: 14px; }
+            .institution-meta { font-size: 13px; }
+            .institution-empty { font-size: 14px; }
+            .details-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
     </style>
 </head>
@@ -279,12 +320,6 @@
                 <div class="section-header">
                     <h2 class="section-title">كلمة المرور</h2>
                 </div>
-                <div class="details-grid">
-                    <div class="detail full">
-                        <div class="detail-label">كلمة المرور</div>
-                        <div class="detail-value">يمكنك تغيير كلمة المرور عند الحاجة.</div>
-                    </div>
-                </div>
                 <div class="section-actions">
                     <button class="secondary" type="button" onclick="togglePanel('passwordPanel')">تغيير كلمة المرور</button>
                 </div>
@@ -318,12 +353,6 @@
             <div class="section">
                 <div class="section-header">
                     <h2 class="section-title">حذف الحساب</h2>
-                </div>
-                <div class="details-grid">
-                    <div class="detail full">
-                        <div class="detail-label">حذف حسابي</div>
-                        <div class="detail-value">يمكنك حذف حسابك نهائيًا عند الحاجة.</div>
-                    </div>
                 </div>
                 <div class="section-actions">
                     <form method="post" action="{{ route('account.profile.destroy') }}" onsubmit="return confirm('هل أنت متأكد من حذف حسابك نهائيًا؟');">

@@ -290,6 +290,28 @@
             .delivery-fields.address-fields,
             .cart-form-grid { grid-template-columns: 1fr; }
         }
+        @media (min-width: 1100px) {
+            .cart-order-label { font-size: 16px; }
+            .cart-order-title { font-size: 20px; }
+            .cart-order-meta { font-size: 15px; }
+            .cart-section-box h3 { font-size: 17px; }
+            .detail-table-wrap td { font-size: 13px; line-height: 1.45; }
+            .detail-table-wrap td::before { font-size: 11px; }
+            .summary-item span { font-size: 14px; }
+            .summary-item strong { font-size: 15px; }
+            .summary-item.total-after strong { font-size: 16px; }
+            .delivery-option { font-size: 15px; }
+            .delivery-option small { font-size: 13px; }
+            .delivery-section-box .cart-form-grid label,
+            .discount-form label { font-size: 13px; }
+            .cart-page-actions .close-to-orders,
+            .cart-page-actions .cart-pay-link,
+            .delete-file-button,
+            .edit-file-button,
+            .view-file-button { font-size: 14px; }
+            .stationery-product-name { font-size: 13px; }
+            .stationery-product-actions .delete-file-button { font-size: 11px; }
+        }
     </style>
 </head>
 <body class="customer-app-page {{ ($paymentPage ?? false) ? 'cart-payment' : 'cart-index' }}">

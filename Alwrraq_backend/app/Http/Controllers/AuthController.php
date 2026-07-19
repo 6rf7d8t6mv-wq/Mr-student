@@ -15,6 +15,17 @@ class AuthController extends Controller
         return view('auth');
     }
 
+    public function showAppLogin()
+    {
+        if (Auth::check()) {
+            session(['auth_surface' => 'app']);
+
+            return $this->redirectAfterLogin(Auth::user());
+        }
+
+        return view('auth', ['appMode' => true]);
+    }
+
     public function showAdminLogin()
     {
         if (Auth::check()) {
@@ -53,7 +64,42 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        if ($request->routeIs('app.register.store')) {
+            $request->session()->put('auth_surface', 'app');
+        }
+
         return redirect()->route('home');
+    }
+
+    public function appLogin(Request $request)
+    {
+        $this->normalizeAuthInput($request);
+
+        $data = $request->validate([
+            'login_identifier' => ['required', 'string', 'regex:/^05[0-9]{8}$/'],
+            'password' => ['required', 'string', 'regex:/^[\x21-\x7E]+$/'],
+        ]);
+
+        if (! Auth::attempt(['phone' => $data['login_identifier'], 'password' => $data['password']], true)) {
+            return back()->withErrors([
+                'login_identifier' => 'رقم الجوال أو كلمة المرور غير صحيحة',
+            ])->onlyInput('login_identifier');
+        }
+
+        if (! Auth::user()->canLogin()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'login_identifier' => 'هذا الحساب موقوف أو ممنوع من تسجيل الدخول.',
+            ])->onlyInput('login_identifier');
+        }
+
+        $request->session()->regenerate();
+        $request->session()->put('auth_surface', 'app');
+
+        return $this->redirectAfterLogin(Auth::user());
     }
 
     public function login(Request $request)
@@ -142,14 +188,27 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $isAppSession = $request->session()->get('auth_surface') === 'app';
+
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        if ($isAppSession) {
+            return redirect()->route('app.entry');
+        }
+
         return $request->is('admin/*') || str_starts_with((string) url()->previous(), url('/admin'))
             ? redirect()->route('admin.dashboard')
             : redirect()->route('login');
+    }
+
+    private function redirectAfterLogin(User $user)
+    {
+        return $user->role === 'admin'
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('home');
     }
 
     private function normalizeAuthInput(Request $request): void

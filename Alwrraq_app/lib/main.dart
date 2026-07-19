@@ -30,7 +30,7 @@ class AlwrraqWebApp extends StatefulWidget {
 }
 
 class _AlwrraqWebAppState extends State<AlwrraqWebApp> {
-  static final Uri _siteUri = Uri.parse('http://127.0.0.1:8000');
+  static final Uri _siteUri = Uri.parse('http://127.0.0.1:8000/app');
 
   late final WebViewController _controller;
   var _isLoading = true;
@@ -60,7 +60,7 @@ class _AlwrraqWebAppState extends State<AlwrraqWebApp> {
             setState(() {
               _isLoading = false;
               _errorMessage =
-                  'Could not open the Laravel website. Make sure the server is running on 127.0.0.1:8000.';
+                  'تعذر فتح تطبيق الورّاق. تأكد أن السيرفر يعمل على 127.0.0.1:8000.';
             });
           },
         ),
