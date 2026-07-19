@@ -217,6 +217,10 @@ class FileUploadController extends Controller
     {
         abort_unless($file->order->user_id === Auth::id() || Auth::user()?->role === 'admin', 403);
 
+        $coverColorRule = $file->order->service_type === 'books'
+            ? 'in:black,green,red,blue,beige,brown'
+            : 'in:black,light_blue,navy,dark_green,light_green,burgundy,beige,white';
+
         $data = $request->validate([
             'binding_type' => ['nullable', 'in:tape,wire,normal,thermal,none'],
             'copies' => ['nullable', 'integer', 'min:1', 'max:999'],
@@ -225,7 +229,7 @@ class FileUploadController extends Controller
             'paper_color' => ['nullable', 'in:white,yellow'],
             'thesis_project_type' => ['nullable', 'in:thesis,supplementary,graduation'],
             'university_name' => ['nullable', 'string', 'max:255'],
-            'cover_color' => ['nullable', 'in:black,light_blue,navy,dark_green,light_green,burgundy,beige,white'],
+            'cover_color' => ['nullable', $coverColorRule],
             'writing_color' => ['nullable', 'in:gold,black'],
             'cd_type' => ['nullable', 'in:none,plain,printed'],
             'cd_copies' => ['nullable', 'integer', 'min:0', 'max:999'],
@@ -392,7 +396,7 @@ class FileUploadController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'تم حفظ طلب إنشاء البحث بنجاح',
+            'message' => 'تم حفظ طلب إنشاء البحوث بنجاح',
             'file_id' => $orderFile->id,
             'order_id' => $order->id,
             'research_title' => $orderFile->research_title,

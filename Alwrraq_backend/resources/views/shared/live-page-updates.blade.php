@@ -89,11 +89,11 @@
 
             const pageIsBusy = () => {
                 if (dirty) return true;
-                if (document.querySelector('.modal-backdrop.active, .modal.active, dialog[open]')) return true;
+                if (document.querySelector('dialog[open]')) return true;
                 if ([...document.querySelectorAll('input[type="file"]')].some((input) => input.files?.length)) return true;
 
                 const active = document.activeElement;
-                return Boolean(active?.closest('main') && (
+                return Boolean(active?.closest('main, #adminModalBody') && (
                     active.matches('input, textarea, select') || active.isContentEditable
                 ));
             };
@@ -111,6 +111,13 @@
                 const currentMain = document.querySelector('main');
                 if (!nextMain || !currentMain) throw new Error('live-main-missing');
 
+                const activeModal = document.getElementById('adminModal');
+                const modalWasOpen = activeModal?.classList.contains('active') || false;
+                const modalTemplateId = modalWasOpen ? activeModal.dataset.templateId : '';
+                const modalTitle = modalWasOpen ? activeModal.dataset.modalTitle : '';
+                const modalBody = modalWasOpen ? document.getElementById('adminModalBody') : null;
+                const modalScrollTop = modalBody?.scrollTop || 0;
+
                 currentMain.innerHTML = nextMain.innerHTML;
                 revision = nextRevision;
                 dirty = false;
@@ -118,6 +125,18 @@
                 window.bindAutoSearchForms?.(currentMain);
                 window.bindEnglishNumberWarnings?.(currentMain);
                 document.dispatchEvent(new CustomEvent('alwrraq:content-updated', { detail: { root: currentMain } }));
+
+                if (modalWasOpen && modalTemplateId) {
+                    const reopened = window.openAdminModal?.(modalTitle, modalTemplateId);
+                    if (reopened) {
+                        requestAnimationFrame(() => {
+                            const refreshedModalBody = document.getElementById('adminModalBody');
+                            if (refreshedModalBody) refreshedModalBody.scrollTop = modalScrollTop;
+                        });
+                    } else {
+                        activeModal?.classList.remove('active');
+                    }
+                }
             };
 
             const applyUpdate = async (nextRevision, hasNewOrder) => {
@@ -168,10 +187,10 @@
             };
 
             document.addEventListener('input', (event) => {
-                if (event.target.closest('main') && event.isTrusted) dirty = true;
+                if (event.target.closest('main, #adminModalBody') && event.isTrusted) dirty = true;
             }, true);
             document.addEventListener('change', (event) => {
-                if (event.target.closest('main') && event.isTrusted) dirty = true;
+                if (event.target.closest('main, #adminModalBody') && event.isTrusted) dirty = true;
             }, true);
             document.addEventListener('submit', () => { dirty = true; }, true);
 

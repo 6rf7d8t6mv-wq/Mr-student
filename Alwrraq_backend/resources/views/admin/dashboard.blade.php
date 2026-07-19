@@ -10,9 +10,18 @@
             'color_printing' => 'طباعة الملفات بالألوان',
             'thesis' => 'ماجستير',
             'phd' => 'دكتوراه',
-            'formatting' => 'تنسيق الرسائل الجامعية',
-            'research' => 'إنشاء بحث',
+            'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+            'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
             'stationery' => 'القرطاسية',
+        ];
+        $statusNames = [
+            'new' => 'جديد',
+            'reviewing' => 'قيد المراجعة',
+            'priced' => 'تم التسعير',
+            'processing' => 'قيد التنفيذ',
+            'completed' => 'مكتمل',
+            'finished' => 'مكتمل',
+            'cancelled' => 'ملغي',
         ];
         $latestOrders = $orders->take(6);
         $paidPercent = $stats['orders'] > 0 ? round(($stats['paid_orders'] / $stats['orders']) * 100) : 0;
@@ -60,21 +69,20 @@
         .status-track { height: 9px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
         .status-fill { height: 100%; border-radius: inherit; background: #0f4c81; }
         .status-fill.green { background: #16a34a; }
-        .dashboard-table-wrap { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 10px; }
-        .dashboard-table-wrap table { min-width: 720px; }
+        .dashboard-table-wrap { overflow: visible; border: 0; background: transparent; }
+        .dashboard-table-wrap table { min-width: 0; display: block; }
+        .dashboard-table-wrap thead { display: none; }
+        .dashboard-table-wrap tbody { display: grid; gap: 10px; }
+        .dashboard-table-wrap tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px; border: 1px solid #e2e8f0; border-inline-start: 4px solid #2563eb; border-radius: 11px; background: #ffffff; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06); }
+        .dashboard-table-wrap td,
+        .dashboard-table-wrap td:last-child { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 44px; padding: 7px 8px; border: 1px solid #edf2f7; border-radius: 8px; background: #f8fafc; white-space: normal; overflow: hidden; }
+        .dashboard-table-wrap td::before { content: attr(data-label); flex: 0 1 45%; min-width: 0; color: #64748b; font-size: 11px; font-weight: 900; line-height: 1.3; white-space: nowrap; }
+        .dashboard-order-value { flex: 0 1 55%; min-width: 0; text-align: left; overflow-wrap: anywhere; }
         .order-id { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: #f1f5f9; color: #0f172a; font-weight: 900; }
         @media (max-width: 980px) {
             .dashboard-hero, .dashboard-grid { grid-template-columns: 1fr; }
             .dashboard-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .discount-form { grid-template-columns: 1fr; }
-            .dashboard-table-wrap { border: 0; overflow: visible; background: transparent; }
-            .dashboard-table-wrap table { min-width: 0; display: block; }
-            .dashboard-table-wrap thead { display: none; }
-            .dashboard-table-wrap tbody { display: grid; gap: 12px; }
-            .dashboard-table-wrap tr { display: grid; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06); }
-            .dashboard-table-wrap td { display: grid; grid-template-columns: minmax(92px, 34%) minmax(0, 1fr); align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #edf2f7; white-space: normal; overflow-wrap: anywhere; }
-            .dashboard-table-wrap td:last-child { border-bottom: 0; }
-            .dashboard-table-wrap td::before { content: attr(data-label); color: #64748b; font-size: 12px; font-weight: 900; }
         }
         @media (max-width: 980px) {
             .dashboard-hero { gap: 7px; margin-bottom: 10px; }
@@ -107,7 +115,7 @@
             .dashboard-grid .stat span { min-width: 0; margin: 0; font-size: 8.5px; line-height: 1.25; }
             .dashboard-grid .stat strong { flex: 0 0 auto; font-size: 11px; text-align: left; }
             .dashboard-table-wrap tbody { gap: 6px; }
-            .dashboard-table-wrap tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 6px; border-radius: 9px; box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05); }
+            .dashboard-table-wrap tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 6px; border-inline-start: 4px solid #2563eb; border-radius: 9px; box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05); }
             .dashboard-table-wrap td,
             .dashboard-table-wrap td:last-child { display: flex; align-items: center; justify-content: space-between; gap: 3px; min-width: 0; min-height: 36px; padding: 5px 6px; border: 1px solid #edf2f7; border-radius: 7px; background: #f8fafc; font-size: 8px; line-height: 1.2; overflow: hidden; }
             .dashboard-table-wrap td::before { flex: 0 1 43%; min-width: 0; font-size: 7.5px; line-height: 1.2; white-space: nowrap; word-break: normal; }
@@ -207,7 +215,7 @@
                                     $isEffectivelyCompleted = $isPaid && in_array($order->status, ['completed', 'finished'], true);
                                     $displayStatus = $isEffectivelyCompleted
                                         ? 'مكتمل'
-                                        : (in_array($order->status, ['completed', 'finished'], true) ? 'بانتظار الدفع' : $order->status);
+                                        : (in_array($order->status, ['completed', 'finished'], true) ? 'بانتظار الدفع' : ($statusNames[$order->status] ?? 'غير محدد'));
                                 @endphp
                                 <tr>
                                     <td data-label="رقم الطلب"><span class="dashboard-order-value"><span class="order-id">#{{ $order->id }}</span></span></td>

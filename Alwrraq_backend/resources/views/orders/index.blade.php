@@ -337,8 +337,8 @@
                                     'color_printing' => 'طباعة الملفات بالألوان',
                                     'thesis' => 'ماجستير',
                                     'phd' => 'دكتوراه',
-                                    'formatting' => 'تنسيق الرسائل الجامعية',
-                                    'research' => 'إنشاء بحث',
+                                    'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+                                    'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
                                     'stationery' => 'القرطاسية',
                                 ];
                                 $projectNames = [
@@ -379,6 +379,9 @@
                                 $missingRequirements = collect();
                                 if (in_array($order->service_type, ['notes', 'books'], true) && $order->files->contains(fn ($file) => blank($file->binding_type))) {
                                     $missingRequirements->push('اختيار نوع التغليف لكل ملف.');
+                                }
+                                if ($order->service_type === 'books' && $order->files->contains(fn ($file) => blank($file->cover_color))) {
+                                    $missingRequirements->push('اختيار لون الجلد لكل ملف.');
                                 }
                                 if ($order->service_type === 'color_printing' && $order->files->contains(fn ($file) => blank($file->binding_type))) {
                                     $missingRequirements->push('اختيار نوع التغليف لكل ملف.');
@@ -479,8 +482,8 @@
                             'color_printing' => 'طباعة الملفات بالألوان',
                             'thesis' => 'ماجستير',
                             'phd' => 'دكتوراه',
-                            'formatting' => 'تنسيق الرسائل الجامعية',
-                            'research' => 'إنشاء بحث',
+                            'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+                            'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
                             'stationery' => 'القرطاسية',
                         ];
                         $serviceFullNames = [
@@ -489,8 +492,8 @@
                             'color_printing' => 'طباعة الملفات بالألوان',
                             'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
                             'phd' => 'طباعة وتجليد رسالة دكتوراه',
-                            'formatting' => 'تنسيق الرسائل الجامعية',
-                            'research' => 'إنشاء بحث',
+                            'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+                            'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
                             'stationery' => 'القرطاسية',
                         ];
                         $noPrintServices = ['formatting', 'research', 'stationery'];
@@ -509,6 +512,14 @@
                             'burgundy' => 'العنابي',
                             'beige' => 'البيج',
                             'white' => 'الأبيض',
+                        ];
+                        $leatherColorNames = [
+                            'black' => 'جلد أسود',
+                            'green' => 'جلد أخضر',
+                            'red' => 'جلد أحمر',
+                            'blue' => 'جلد أزرق',
+                            'beige' => 'جلد بيج',
+                            'brown' => 'جلد بني',
                         ];
                         $writingColorNames = [
                             'gold' => 'كتابة باللون الذهبي',
@@ -540,7 +551,7 @@
                             'color_printing' => 'التغليف',
                             'notes' => 'التغليف',
                             'formatting' => 'التنسيق',
-                            'research' => 'إنشاء البحث',
+                            'research' => 'إنشاء البحوث',
                             default => 'التجليد',
                         };
                         $bindingPriceLabel = match ($order->service_type) {
@@ -548,7 +559,7 @@
                             'color_printing' => 'سعر التغليف',
                             'notes' => 'سعر التغليف',
                             'formatting' => 'سعر التنسيق',
-                            'research' => 'سعر إنشاء البحث',
+                            'research' => 'سعر إنشاء البحوث',
                             'stationery' => 'إجمالي المنتجات',
                             default => 'سعر التجليد',
                         };
@@ -577,6 +588,9 @@
                         $missingRequirements = collect();
                         if (in_array($order->service_type, ['notes', 'books', 'color_printing'], true) && $order->files->contains(fn ($file) => blank($file->binding_type))) {
                             $missingRequirements->push('اختيار نوع التغليف لكل ملف.');
+                        }
+                        if ($order->service_type === 'books' && $order->files->contains(fn ($file) => blank($file->cover_color))) {
+                            $missingRequirements->push('اختيار لون الجلد لكل ملف.');
                         }
                         if (in_array($order->service_type, ['thesis', 'phd'], true) && $order->files->contains(fn ($file) => $file->file_type === 'pdf' && (blank($file->cover_color) || blank($file->writing_color)))) {
                             $missingRequirements->push('اختيار لون الرسالة ولون الكتابة لكل ملف PDF.');
@@ -685,6 +699,9 @@
                                                     @if (in_array($order->service_type, ['notes', 'books'], true))
                                                         <th>لون الورق</th>
                                                     @endif
+                                                    @if ($order->service_type === 'books')
+                                                        <th>لون الجلد</th>
+                                                    @endif
                                                     @if (! in_array($order->service_type, $noPrintServices, true))
                                                         <th>{{ $bindingLabel }}</th>
                                                     @endif
@@ -753,6 +770,9 @@
                                                         @endif
                                                         @if (in_array($order->service_type, ['notes', 'books'], true))
                                                             <td data-label="لون الورق">{{ ['white' => 'أبيض', 'yellow' => 'أصفر'][$file->paper_color] ?? 'أبيض' }}</td>
+                                                        @endif
+                                                        @if ($order->service_type === 'books')
+                                                            <td data-label="لون الجلد">{{ $leatherColorNames[$file->cover_color] ?? '-' }}</td>
                                                         @endif
                                                         @if (! in_array($order->service_type, $noPrintServices, true))
                                                             <td data-label="{{ $bindingLabel }}">{{ $bindingNames[$file->binding_type] ?? '-' }}</td>
@@ -1001,7 +1021,6 @@
             openOrderModal(`orderModal${openOrderId}`);
         }
     </script>
-    @include('shared.chat-widget')
     @include('shared.language-tools')
 </body>
 </html>

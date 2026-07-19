@@ -197,6 +197,17 @@
         .compact-settings-panel .save,
         .compact-settings-panel .danger,
         .compact-settings-panel .ghost { width: auto; min-height: 30px; margin-top: 6px; padding: 6px 9px; font-size: 9px; }
+        @media (min-width: 981px) {
+            .blue-records-panel .management-table-wrap { overflow: visible; border: 0; background: transparent; }
+            .blue-records-panel .management-table { border-collapse: separate; border-spacing: 0 10px; }
+            .blue-records-panel .management-table thead th { border-bottom: 0; background: #eef2f7; }
+            .blue-records-panel .management-table thead th:first-child { border-start-start-radius: 9px; border-end-start-radius: 9px; }
+            .blue-records-panel .management-table thead th:last-child { border-start-end-radius: 9px; border-end-end-radius: 9px; }
+            .blue-records-panel .management-table tbody tr { background: #ffffff; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07); }
+            .blue-records-panel .management-table tbody td { border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+            .blue-records-panel .management-table tbody tr > td:first-child { border-start-start-radius: 10px; border-end-start-radius: 10px; }
+            .blue-records-panel .management-table tbody tr > td:last-child { border-inline-end: 1px solid #e5e7eb; border-start-end-radius: 10px; border-end-end-radius: 10px; }
+        }
         @media (max-width: 980px) {
             :root { --sidebar-width: 0px; --page-gap: 10px; }
             .layout { display: block; padding-top: 88px; }
@@ -402,7 +413,7 @@
             <nav>
                 <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><span class="nav-icon" aria-hidden="true">🏠</span><span class="nav-text">الرئيسية</span></a>
                 @if ($hasOrdersAccess)
-                    <a class="{{ request()->routeIs('admin.orders') ? 'active' : '' }}" href="{{ route('admin.orders') }}" data-admin-orders-link>
+                    <a class="{{ request()->routeIs('admin.orders', 'admin.orders.unpaid') ? 'active' : '' }}" href="{{ route('admin.orders') }}" data-admin-orders-link>
                         <span class="nav-icon" aria-hidden="true">🧾</span>
                         <span class="nav-text">الطلبات</span>
                         @if ($hasUnopenedOrdersForAdmin)
@@ -469,14 +480,18 @@
             const modal = document.getElementById('adminModal');
             const body = document.getElementById('adminModalBody');
             const template = document.getElementById(templateId);
+            if (!modal || !body || !template) return false;
 
             document.getElementById('adminModalTitle').textContent = title;
+            modal.dataset.templateId = templateId;
+            modal.dataset.modalTitle = title;
             body.innerHTML = '';
             body.appendChild(template.content.cloneNode(true));
             localizeDateTimes(body);
             bindEnglishNumberWarnings(body);
             modal.classList.add('active');
             markVisibleOrdersAsOpened(body);
+            return true;
         }
 
         function localizeDateTimes(root = document) {
@@ -528,7 +543,10 @@
 
         function closeAdminModal(event) {
             if (event && event.target.id !== 'adminModal') return;
-            document.getElementById('adminModal').classList.remove('active');
+            const modal = document.getElementById('adminModal');
+            modal.classList.remove('active');
+            delete modal.dataset.templateId;
+            delete modal.dataset.modalTitle;
         }
 
         function printInvoice(invoiceId) {
@@ -696,19 +714,6 @@
         bindAutoSearchForms();
         bindEnglishNumberWarnings();
 
-        document.addEventListener('click', (event) => {
-            const link = event.target.closest('[data-complete-order-download]');
-            if (!link) return;
-
-            const orderElement = link.closest('[data-order-id]');
-            const orderId = orderElement?.dataset.orderId;
-            if (!orderId || orderElement?.dataset.orderPaid !== '1') return;
-
-            document.querySelectorAll(`[data-order-id="${orderId}"] [data-order-status-dot]`).forEach((dot) => {
-                dot.classList.remove('red', 'yellow');
-                dot.classList.add('green');
-            });
-        });
     </script>
     @include('shared.chat-widget')
     @include('shared.language-tools')

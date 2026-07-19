@@ -8,6 +8,8 @@
         .support-chat-panel button { margin: 0; }
         .support-chat-launcher { position: fixed; left: 18px; bottom: 18px; z-index: 90; width: auto; display: inline-flex; align-items: center; gap: 9px; min-height: 46px; padding: 12px 16px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #0f4c81, #10233f); color: #ffffff; box-shadow: 0 18px 44px rgba(15, 23, 42, 0.24); cursor: pointer; font-family: inherit; font-weight: 900; }
         .support-chat-launcher:hover { transform: translateY(-1px); }
+        body.customer-service-view .support-chat-launcher,
+        body.customer-service-view .support-chat-panel { display: none !important; }
         .support-chat-launcher .chat-count { display: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #dc2626; color: #ffffff; font-size: 12px; line-height: 20px; text-align: center; }
         .support-chat-launcher.has-unread .chat-count { display: inline-block; }
         .support-chat-panel { position: fixed; left: 18px; bottom: 78px; z-index: 91; width: min(420px, calc(100vw - 28px)); height: min(620px, calc(100vh - 104px)); display: none; flex-direction: column; overflow: hidden; border: 1px solid #dbe3ef; border-radius: 18px; background: #ffffff; box-shadow: 0 28px 90px rgba(15, 23, 42, 0.28); direction: rtl; }

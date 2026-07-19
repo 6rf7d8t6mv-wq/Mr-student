@@ -26,14 +26,35 @@ class CartController extends Controller
             ->header('Expires', '0');
     }
 
-    public function payment(CartPricingService $cartPricing)
+    public function payment(Request $request, CartPricingService $cartPricing)
     {
-        $cartOrders = $this->cartOrders();
+        $allCartOrders = $this->cartOrders();
+        $selectedOrderIds = $this->selectedOrderIds($request);
+        $cartOrders = $allCartOrders
+            ->whereIn('id', $selectedOrderIds)
+            ->values();
+
+        if ($selectedOrderIds->isEmpty() || $cartOrders->count() !== $selectedOrderIds->count()) {
+            return redirect()->route('cart.index')->withErrors([
+                'order' => 'حدد طلبًا واحدًا على الأقل للانتقال إلى الدفع.',
+            ]);
+        }
+
+        $selectedDeliveryOrders = $cartOrders->filter(
+            fn (Order $order) => in_array($order->service_type, ['notes', 'books', 'color_printing', 'thesis', 'phd', 'stationery'], true)
+        );
+
+        if ($selectedDeliveryOrders->isNotEmpty() && ! $selectedDeliveryOrders->contains(fn (Order $order) => filled($order->delivery_method))) {
+            return redirect()->route('cart.index')->withErrors([
+                'delivery_method' => 'اختر طريقة الاستلام أو التوصيل قبل الانتقال إلى الدفع.',
+            ]);
+        }
+
         $cartSummary = $cartPricing->refreshCartTotals($cartOrders);
         $paymentPage = true;
 
         return response()
-            ->view('cart.show', compact('cartOrders', 'cartSummary', 'paymentPage'))
+            ->view('cart.show', compact('cartOrders', 'cartSummary', 'paymentPage', 'selectedOrderIds'))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
@@ -48,15 +69,22 @@ class CartController extends Controller
 
     public function payAll(Request $request, PaymentGatewayService $payments, CartPricingService $cartPricing)
     {
-        $cartOrders = $this->cartOrders();
-        if ($cartOrders->isEmpty()) {
-            return redirect()->route('orders.index')->withErrors([
-                'order' => 'لا توجد طلبات في السلة للدفع.',
+        $selectedOrderIds = $this->selectedOrderIds($request);
+        $allCartOrders = $this->cartOrders();
+        $cartOrders = $allCartOrders
+            ->whereIn('id', $selectedOrderIds)
+            ->values();
+
+        if ($selectedOrderIds->isEmpty() || $cartOrders->count() !== $selectedOrderIds->count()) {
+            return redirect()->route('cart.index')->withErrors([
+                'order' => 'حدد طلبًا واحدًا على الأقل للدفع.',
             ]);
         }
 
         $cartPricing->refreshCartTotals($cartOrders);
-        $cartOrders = $this->cartOrders();
+        $cartOrders = $this->cartOrders()
+            ->whereIn('id', $selectedOrderIds)
+            ->values();
 
         foreach ($cartOrders as $order) {
             if ($message = $this->orderPaymentBlockMessage($order, true)) {
@@ -84,7 +112,11 @@ class CartController extends Controller
                 ->withErrors(['payment' => 'تعذر إتمام عملية الدفع. تأكد من طريقة الدفع وحاول مرة أخرى.']);
         }
 
-        return redirect()->route('orders.index')->with('status', 'تم الدفع واعتماد الطلب بجميع خدماته بنجاح.');
+        if ($this->cartOrders()->isNotEmpty()) {
+            return redirect()->route('cart.index')->with('status', 'تم دفع الطلبات المحددة، وبقيت الطلبات الأخرى محفوظة في السلة.');
+        }
+
+        return redirect()->route('orders.index')->with('status', 'تم الدفع واعتماد جميع الطلبات المحددة بنجاح.');
     }
 
     public function pay(Request $request, Order $order, PaymentGatewayService $payments, CartPricingService $cartPricing)
@@ -107,8 +139,14 @@ class CartController extends Controller
 
         if ($payment->payment_status !== 'paid') {
             return redirect()
-                ->route('cart.show', $order)
+                ->route('cart.payment', ['order' => $order->id])
                 ->withErrors(['payment' => 'تعذر إتمام عملية الدفع. تأكد من طريقة الدفع وحاول مرة أخرى.']);
+        }
+
+        $hasRemainingCartOrders = $this->cartOrders()->isNotEmpty();
+
+        if ($hasRemainingCartOrders) {
+            return redirect()->route('cart.index')->with('status', 'تم دفع الطلب المحدد، وبقيت الطلبات الأخرى محفوظة في السلة.');
         }
 
         return redirect()->route('orders.index')->with('status', 'تم الدفع واعتماد الطلب بنجاح.');
@@ -200,6 +238,15 @@ class CartController extends Controller
             'card_expiry' => ['required_if:payment_method,mada,visa,mastercard', 'nullable', 'string', 'regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/'],
             'card_cvc' => ['required_if:payment_method,mada,visa,mastercard', 'nullable', 'string', 'regex:/^[0-9]{3,4}$/'],
         ]);
+    }
+
+    private function selectedOrderIds(Request $request)
+    {
+        return collect($request->input('order_ids', []))
+            ->map(fn ($orderId) => filter_var($orderId, FILTER_VALIDATE_INT))
+            ->filter(fn ($orderId) => is_int($orderId) && $orderId > 0)
+            ->unique()
+            ->values();
     }
 
     public function applyDiscount(Request $request, Order $order, CartPricingService $cartPricing)
@@ -319,6 +366,10 @@ class CartController extends Controller
             if ($order->files->contains(fn ($file) => blank($file->binding_type))) {
                 return 'اختر نوع التغليف لكل ملف قبل الدفع.';
             }
+        }
+
+        if ($order->service_type === 'books' && $order->files->contains(fn ($file) => blank($file->cover_color))) {
+            return 'اختر لون الجلد لكل ملف قبل الدفع.';
         }
 
         if (in_array($order->service_type, ['thesis', 'phd'], true)) {

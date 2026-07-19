@@ -1,10 +1,16 @@
 @extends('admin.layout')
 
-@section('title', 'الطلبات - لوحة المدير')
+@section('title', ($paymentView === 'paid' ? 'الطلبات المدفوعة' : 'الطلبات غير المدفوعة').' - لوحة المدير')
 
 @section('content')
     <style>
         .orders-page-title { margin-bottom: 9px; }
+        .payment-order-pages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 9px; }
+        .payment-order-page-button { display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0; min-height: 42px; padding: 8px 11px; border: 2px solid transparent; border-radius: 9px; color: #ffffff; text-decoration: none; font-size: 11px; font-weight: 900; line-height: 1.3; text-align: center; box-shadow: 0 9px 22px rgba(15,23,42,.1); }
+        .payment-order-page-button.paid { background: #047857; }
+        .payment-order-page-button.unpaid { background: #d97706; }
+        .payment-order-page-button.active { border-color: #0f172a; box-shadow: 0 11px 25px rgba(15,23,42,.16); transform: translateY(-1px); }
+        .payment-order-page-count { min-width: 23px; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,.94); color: #0f172a; font-size: 9px; line-height: 1.4; }
         .order-filter-bar { margin-bottom: 9px; }
         .orders-search-panel { margin-bottom: 9px; padding: 11px 13px; }
         .orders-customer-card { margin-bottom: 9px; border-inline-start: 4px solid #2563eb; }
@@ -12,15 +18,28 @@
         .orders-customer-card .order-head > div { display: flex; align-items: center; justify-content: space-between; gap: 5px; min-width: 0; min-height: 42px; padding: 7px 8px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 10px; line-height: 1.25; }
         .orders-customer-card .order-head .label { flex: 0 0 auto; min-width: 0; margin: 0; font-size: 8.5px; line-height: 1.2; white-space: nowrap; word-break: normal; }
         .order-summary-value { display: -webkit-box; flex: 1 1 auto; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; text-align: left; white-space: normal; word-break: normal; overflow-wrap: normal; }
+        .orders-customer-card .order-head > .summary-status-box { border-width: 1px; font-weight: 900; }
+        .summary-status-value { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 4px 7px; border-radius: 999px; font-size: 9px; font-weight: 900; line-height: 1.2; white-space: nowrap; }
+        .orders-customer-card .order-head > .summary-status-box.status-new { border-color: #fca5a5; background: #fef2f2; }
+        .summary-status-box.status-new .summary-status-value { background: #dc2626; color: #ffffff; }
+        .orders-customer-card .order-head > .summary-status-box.status-processing { border-color: #facc15; background: #fffbeb; }
+        .summary-status-box.status-processing .summary-status-value { background: #facc15; color: #422006; }
+        .orders-customer-card .order-head > .summary-status-box.status-completed { border-color: #86efac; background: #ecfdf5; }
+        .summary-status-box.status-completed .summary-status-value { background: #16a34a; color: #ffffff; }
         .orders-customer-card .summary-action { align-items: center; justify-content: center; }
         .orders-customer-card .summary-action .small-button { width: auto; min-width: 62px; min-height: 28px; margin: 0; padding: 5px 7px; font-size: 9px; }
         #adminModalBody .panel[data-order-id] { padding: 9px; border: 1px solid #dbe5f1; border-inline-start: 4px solid #2563eb; border-radius: 10px; box-shadow: 0 5px 14px rgba(37, 99, 235, 0.07); }
         #adminModalBody .panel[data-order-id] > .order-head { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 6px; border: 0; border-radius: 9px; background: #f8fafc; }
         #adminModalBody .panel[data-order-id] > .order-head > div { min-width: 0; min-height: 42px; padding: 6px 7px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 9px; line-height: 1.3; word-break: normal; overflow-wrap: normal; }
         #adminModalBody .panel[data-order-id] > .order-head .label { margin-bottom: 3px; font-size: 8px; line-height: 1.2; }
+        #adminModalBody .panel[data-order-id] > .order-head > .order-service-field { grid-column: span 2; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #e0f2fe; border-color: #7dd3fc; }
+        #adminModalBody .panel[data-order-id] .order-service-field .label { flex: 0 0 auto; margin: 0; color: #0369a1; font-weight: 900; }
+        #adminModalBody .panel[data-order-id] .order-service-name { flex: 1 1 auto; min-width: 0; color: #0c4a6e; font-size: 10.5px; font-weight: 900; line-height: 1.45; text-align: left; white-space: normal; overflow: visible; word-break: normal; overflow-wrap: anywhere; }
         #adminModalBody .panel[data-order-id] .badge { padding: 2px 5px; font-size: 8px; }
         #adminModalBody .panel[data-order-id] .compact-actions { gap: 4px; }
-        #adminModalBody .panel[data-order-id] .compact-actions button { width: auto; min-width: 50px; margin: 0; padding: 4px 6px; font-size: 8px; }
+        #adminModalBody .panel[data-order-id] .compact-actions button { width: auto; min-width: 50px; height: auto; min-height: 0; margin: 0; padding: 4px 6px; border-radius: 7px; font-size: 8px; line-height: 1; }
+        .complete-order-button { background: #facc15; color: #422006; border: 1px solid #eab308; }
+        .complete-order-button:hover { background: #eab308; color: #422006; }
         #adminModalBody .panel[data-order-id] .order-files-cards { display: grid; gap: 7px; margin-bottom: 7px; }
         #adminModalBody .panel[data-order-id] .order-file-card { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; padding: 6px; border-radius: 9px; }
         #adminModalBody .panel[data-order-id] .order-file-field,
@@ -63,17 +82,22 @@
         @media (max-width: 980px) {
             .orders-page-title { margin-bottom: 6px; }
             .orders-page-title h1 { font-size: 20px; }
+            .payment-order-pages { gap: 5px; margin-bottom: 7px; }
+            .payment-order-page-button { min-height: 36px; padding: 6px 8px; border-radius: 7px; font-size: 9px; }
+            .payment-order-page-count { min-width: 20px; padding: 1px 5px; font-size: 8px; }
             .order-filter-bar { margin-bottom: 7px; }
             .orders-search-panel { margin-bottom: 7px; padding: 8px; }
             .orders-customer-card { margin-bottom: 7px; }
             .orders-customer-card .order-head { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 6px; }
             .orders-customer-card .order-head > div { min-height: 38px; padding: 5px 6px; border-radius: 7px; font-size: 8.5px; }
             .orders-customer-card .order-head .label { font-size: 7.5px; }
+            .summary-status-value { padding: 3px 6px; font-size: 8px; }
             .orders-customer-card .summary-action .small-button { min-width: 50px; min-height: 25px; padding: 4px 6px; font-size: 8px; }
             #adminModalBody .panel[data-order-id] { padding: 6px; }
             #adminModalBody .panel[data-order-id] > .order-head { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 5px; }
             #adminModalBody .panel[data-order-id] > .order-head > div { min-height: 38px; padding: 5px; font-size: 8px; }
             #adminModalBody .panel[data-order-id] > .order-head .label { font-size: 7px; }
+            #adminModalBody .panel[data-order-id] .order-service-name { font-size: 9px; }
             #adminModalBody .panel[data-order-id] .order-file-card { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 5px; }
             #adminModalBody .panel[data-order-id] .order-file-field,
             #adminModalBody .panel[data-order-id] .order-file-field:nth-child(3n) { min-height: 35px; padding: 4px 5px; }
@@ -87,6 +111,9 @@
         @media (max-width: 560px) {
             .orders-page-title { margin-bottom: 4px; }
             .orders-page-title h1 { font-size: 17px; }
+            .payment-order-pages { gap: 3px; margin-bottom: 5px; }
+            .payment-order-page-button { min-height: 32px; gap: 4px; padding: 4px 5px; border-width: 1px; border-radius: 6px; font-size: 8px; }
+            .payment-order-page-count { min-width: 18px; padding: 1px 4px; font-size: 7px; }
             .order-filter-bar { gap: 3px; margin-bottom: 5px; }
             .order-filter-button { min-height: 36px; padding: 4px 2px; border-width: 1px; border-radius: 7px; font-size: 8px; line-height: 1.2; }
             .orders-search-panel { margin-bottom: 5px; padding: 5px; }
@@ -97,11 +124,13 @@
             .orders-customer-card .order-head { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 4px; }
             .orders-customer-card .order-head > div { min-height: 34px; gap: 3px; padding: 4px; border-radius: 6px; font-size: 7.5px; }
             .orders-customer-card .order-head .label { font-size: 6.5px; }
+            .summary-status-value { padding: 3px 5px; font-size: 7px; }
             .orders-customer-card .summary-action .small-button { min-width: 45px; min-height: 23px; padding: 3px 4px; font-size: 7px; }
             #adminModalBody .panel[data-order-id] { padding: 4px; border-inline-start-width: 3px; }
             #adminModalBody .panel[data-order-id] > .order-head { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; }
             #adminModalBody .panel[data-order-id] > .order-head > div { min-height: 34px; padding: 4px; border-radius: 6px; font-size: 7px; }
             #adminModalBody .panel[data-order-id] > .order-head .label { font-size: 6px; }
+            #adminModalBody .panel[data-order-id] .order-service-name { font-size: 8px; line-height: 1.35; }
             #adminModalBody .panel[data-order-id] .order-files-cards { gap: 4px; margin-bottom: 4px; }
             #adminModalBody .panel[data-order-id] .order-file-card,
             #adminModalBody .panel[data-order-id] .product-order-card { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 4px; }
@@ -116,13 +145,17 @@
         }
         @media (min-width: 1100px) {
             .orders-page-title h1 { font-size: 27px; }
+            .payment-order-page-button { min-height: 48px; font-size: 14px; }
+            .payment-order-page-count { min-width: 27px; font-size: 11px; }
             .order-filter-button { font-size: 13px; }
             .orders-search-panel label { font-size: 12px; }
             .orders-customer-card .order-head > div { font-size: 13px; line-height: 1.4; }
             .orders-customer-card .order-head .label { font-size: 10.5px; }
+            .summary-status-value { font-size: 11px; }
             .orders-customer-card .summary-action .small-button { font-size: 11px; }
             #adminModalBody .panel[data-order-id] > .order-head > div { font-size: 12px; line-height: 1.45; }
             #adminModalBody .panel[data-order-id] > .order-head .label { font-size: 10px; }
+            #adminModalBody .panel[data-order-id] .order-service-name { font-size: 14px; line-height: 1.5; }
             #adminModalBody .panel[data-order-id] .badge { font-size: 10px; }
             #adminModalBody .panel[data-order-id] .compact-actions button { font-size: 10px; }
             #adminModalBody .panel[data-order-id] .order-file-field span { font-size: 10px; }
@@ -145,18 +178,31 @@
 
     <div class="page-title orders-page-title">
         <div>
-            <h1>الطلبات</h1>
+            <h1>{{ $paymentView === 'paid' ? 'الطلبات المدفوعة' : 'الطلبات غير المدفوعة' }}</h1>
         </div>
     </div>
 
-    <div class="order-filter-bar">
-        <a class="order-filter-button red {{ $statusFilter === 'new' ? 'active' : '' }}" href="{{ route('admin.orders', array_filter(['status_filter' => 'new', 'search' => $search])) }}">الطلبات الجديدة</a>
-        <a class="order-filter-button yellow {{ $statusFilter === 'in_progress' ? 'active' : '' }}" href="{{ route('admin.orders', array_filter(['status_filter' => 'in_progress', 'search' => $search])) }}">الطلبات قيد العمل</a>
-        <a class="order-filter-button green {{ $statusFilter === 'completed' ? 'active' : '' }}" href="{{ route('admin.orders', array_filter(['status_filter' => 'completed', 'search' => $search])) }}">إجمالي الطلبات المكتملة</a>
+    <div class="payment-order-pages" aria-label="صفحات الطلبات حسب حالة الدفع">
+        <a class="payment-order-page-button paid {{ $paymentView === 'paid' ? 'active' : '' }}" href="{{ route('admin.orders') }}">
+            <span>الطلبات المدفوعة</span>
+            <span class="payment-order-page-count">{{ $paidOrdersCount }}</span>
+        </a>
+        <a class="payment-order-page-button unpaid {{ $paymentView === 'unpaid' ? 'active' : '' }}" href="{{ route('admin.orders.unpaid') }}">
+            <span>الطلبات غير المدفوعة</span>
+            <span class="payment-order-page-count">{{ $unpaidOrdersCount }}</span>
+        </a>
     </div>
 
+    @if ($paymentView === 'paid')
+        <div class="order-filter-bar">
+            <a class="order-filter-button red {{ $statusFilter === 'new' ? 'active' : '' }}" href="{{ route($pageRouteName, array_filter(['status_filter' => 'new', 'search' => $search])) }}" @if($statusFilter === 'new') aria-current="page" @endif>الطلبات الجديدة</a>
+            <a class="order-filter-button yellow {{ $statusFilter === 'in_progress' ? 'active' : '' }}" href="{{ route($pageRouteName, array_filter(['status_filter' => 'in_progress', 'search' => $search])) }}" @if($statusFilter === 'in_progress') aria-current="page" @endif>الطلبات قيد العمل</a>
+            <a class="order-filter-button green {{ $statusFilter === 'completed' ? 'active' : '' }}" href="{{ route($pageRouteName, array_filter(['status_filter' => 'completed', 'search' => $search])) }}" @if($statusFilter === 'completed') aria-current="page" @endif>إجمالي الطلبات المكتملة</a>
+        </div>
+    @endif
+
     <div class="panel orders-search-panel">
-        <form class="search-form auto-search-form" method="get" action="{{ route('admin.orders') }}">
+        <form class="search-form auto-search-form" method="get" action="{{ route($pageRouteName) }}">
             @if ($statusFilter !== '')
                 <input type="hidden" name="status_filter" value="{{ $statusFilter }}">
             @endif
@@ -165,7 +211,7 @@
                 <input name="search" value="{{ $search }}" placeholder="مثال: 12 أو 0500000000 أو محمد">
             </div>
             @if ($search !== '')
-                <a class="ghost" href="{{ route('admin.orders') }}">مسح</a>
+                <a class="ghost" href="{{ route($pageRouteName) }}">مسح</a>
             @endif
         </form>
     </div>
@@ -179,9 +225,28 @@
             'color_printing' => 'طباعة الملفات بالألوان',
             'thesis' => 'ماجستير',
             'phd' => 'دكتوراه',
-            'formatting' => 'تنسيق الرسائل الجامعية',
-            'research' => 'إنشاء بحث',
+            'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+            'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
             'stationery' => 'القرطاسية',
+        ];
+        $serviceFullNames = [
+            'notes' => 'طباعة المذكرات وملفات ال PDF',
+            'books' => 'طباعة وتجليد كتب كعب جلد طبيعي',
+            'color_printing' => 'طباعة الملفات بالألوان',
+            'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
+            'phd' => 'طباعة وتجليد رسالة دكتوراه',
+            'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+            'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
+            'stationery' => 'القرطاسية',
+        ];
+        $statusNames = [
+            'new' => 'جديد',
+            'reviewing' => 'قيد المراجعة',
+            'priced' => 'تم التسعير',
+            'processing' => 'قيد التنفيذ',
+            'completed' => 'مكتمل',
+            'finished' => 'مكتمل',
+            'cancelled' => 'ملغي',
         ];
         $customerGroups = $orders->groupBy('user_id');
     @endphp
@@ -197,8 +262,20 @@
                 ->unique()
                 ->map(fn ($service) => $serviceNames[$service] ?? $service)
                 ->implode('، ');
-            $paymentSummary = 'مدفوع ' . $customerOrders->where('payment_status', 'paid')->count()
-                . ' / غير مدفوع ' . $customerOrders->where('payment_status', '!=', 'paid')->count();
+            $paymentSummary = $paymentView === 'paid'
+                ? 'مدفوع ' . $customerOrders->count()
+                : 'غير مدفوع ' . $customerOrders->count();
+            $allCustomerOrdersCompleted = $customerOrders->every(
+                fn ($order) => in_array($order->status, ['completed', 'finished'], true)
+            );
+            $hasNewCustomerOrder = $customerOrders->contains(
+                fn ($order) => ! in_array($order->status, ['completed', 'finished'], true) && blank($order->admin_opened_at)
+            );
+            [$customerStatusText, $customerStatusClass] = $allCustomerOrdersCompleted
+                ? ['طلب مكتمل', 'status-completed']
+                : ($hasNewCustomerOrder
+                    ? ['طلب جديد', 'status-new']
+                    : ['طلب قيد العمل', 'status-processing']);
         @endphp
 
         <div class="order orders-customer-card">
@@ -208,6 +285,9 @@
                 <div><span class="label">آخر طلب</span><span class="order-summary-value" data-local-datetime="{{ $latestOrder->created_at->toIso8601String() }}">{{ $createdAtText }}</span></div>
                 <div><span class="label">نوع الخدمة</span><span class="order-summary-value">{{ $servicesText }}</span></div>
                 <div><span class="label">حالة الدفع</span><span class="order-summary-value">{{ $paymentSummary }}</span></div>
+                @if ($paymentView === 'paid')
+                    <div class="summary-status-box {{ $customerStatusClass }}"><span class="label">حالة الطلب</span><span class="summary-status-value">{{ $customerStatusText }}</span></div>
+                @endif
                 <div><span class="label">المبلغ</span><span class="order-summary-value">{{ $customerOrders->sum('grand_total') }} ريال</span></div>
                 <div class="summary-action">
                     <button class="save small-button" type="button" onclick="openAdminModal('طلبات {{ $customer->name }}', '{{ $customerKey }}')">عرض الطلب</button>
@@ -222,7 +302,7 @@
                             'color_printing' => 'التغليف',
                             'notes' => 'التغليف',
                             'formatting' => 'التنسيق',
-                            'research' => 'إنشاء البحث',
+                            'research' => 'إنشاء البحوث',
                             'stationery' => 'المنتجات',
                             default => 'التجليد',
                         };
@@ -231,7 +311,7 @@
                             'color_printing' => 'سعر التغليف',
                             'notes' => 'سعر التغليف',
                             'formatting' => 'سعر التنسيق',
-                            'research' => 'سعر إنشاء البحث',
+                            'research' => 'سعر إنشاء البحوث',
                             'stationery' => 'إجمالي المنتجات',
                             default => 'سعر التجليد',
                         };
@@ -281,11 +361,20 @@
                             'gold' => 'كتابة باللون الذهبي',
                             'black' => 'كتابة باللون الأسود',
                         ];
+                        $leatherColorNames = [
+                            'black' => 'جلد أسود',
+                            'green' => 'جلد أخضر',
+                            'red' => 'جلد أحمر',
+                            'blue' => 'جلد أزرق',
+                            'beige' => 'جلد بيج',
+                            'brown' => 'جلد بني',
+                        ];
                         $isPaid = $order->payment_status === 'paid';
                         $isEffectivelyCompleted = $isPaid && in_array($order->status, ['completed', 'finished'], true);
+                        $canCompleteOrder = $isPaid && ! in_array($order->status, ['completed', 'finished', 'cancelled'], true);
                         $displayStatus = $isEffectivelyCompleted
                             ? 'مكتمل'
-                            : (in_array($order->status, ['completed', 'finished'], true) ? 'بانتظار الدفع' : $order->status);
+                            : (in_array($order->status, ['completed', 'finished'], true) ? 'بانتظار الدفع' : ($statusNames[$order->status] ?? 'غير محدد'));
                         $orderDotColor = $isEffectivelyCompleted
                             ? 'green'
                             : (blank($order->admin_opened_at) ? 'red' : 'yellow');
@@ -297,7 +386,7 @@
                             <div><span class="label">رقم الطلب</span><span class="tiny-status-dot {{ $orderDotColor }}" data-order-status-dot></span>#{{ $order->id }}</div>
                             <div><span class="label">العميل</span>{{ $order->user->name }} - {{ $order->user->phone }}</div>
                             <div><span class="label">تاريخ إنشاء الطلب</span><span data-local-datetime="{{ $order->created_at->toIso8601String() }}">{{ $orderCreatedAtText }}</span></div>
-                            <div><span class="label">الخدمة</span>{{ $serviceNames[$order->service_type] ?? $order->service_type }}</div>
+                            <div class="order-service-field"><span class="label">الخدمة</span><strong class="order-service-name">{{ $serviceFullNames[$order->service_type] ?? $serviceNames[$order->service_type] ?? $order->service_type }}</strong></div>
                             <div><span class="label">الحالة</span><span class="badge">{{ $displayStatus }}</span></div>
                             <div><span class="label">الدفع</span><span class="badge">{{ $isPaid ? 'مدفوع' : 'غير مدفوع' }}</span>{{ $order->payment_method ? ' - ' . (['apple_pay' => 'Apple Pay', 'google_pay' => 'Google Pay', 'mada' => 'Mada', 'visa' => 'Visa', 'mastercard' => 'Mastercard', 'card' => 'بطاقة'][$order->payment_method] ?? $order->payment_method) : '' }}</div>
                             @if (in_array($order->service_type, ['notes', 'books', 'color_printing', 'thesis', 'phd', 'stationery'], true))
@@ -323,10 +412,17 @@
                                     <br><span class="muted">خصم {{ $order->discount_code }}: {{ $order->discount_amount }} ريال</span>
                                 @endif
                             </div>
-                            @if (($order->payment_status === 'paid' && auth()->user()->hasAdminPermission('invoices_view')) || auth()->user()->hasAdminPermission('orders_delete'))
+                            @if (($order->payment_status === 'paid' && auth()->user()->hasAdminPermission('invoices_view')) || auth()->user()->hasAdminPermission('orders_delete') || ($canCompleteOrder && auth()->user()->hasAdminPermission('orders_view')))
                                 <div>
                                     <span class="label">الإجراءات</span>
                                     <div class="compact-actions">
+                                        @if ($canCompleteOrder && auth()->user()->hasAdminPermission('orders_view'))
+                                            <form method="post" action="{{ route('admin.orders.complete', $order) }}">
+                                                @csrf
+                                                @method('patch')
+                                                <button class="save small-button complete-order-button" type="submit">إكمال الطلب</button>
+                                            </form>
+                                        @endif
                                         @if ($order->payment_status === 'paid' && auth()->user()->hasAdminPermission('invoices_view'))
                                             <button class="invoice-admin-button" type="button" onclick="openAdminModal('فاتورة ضريبية مبسطة #{{ $order->id }}', 'invoice-admin-{{ $order->id }}')">الفاتورة</button>
                                         @endif
@@ -456,6 +552,12 @@
                                             <strong>{{ ['white' => 'أبيض', 'yellow' => 'أصفر'][$file->paper_color] ?? 'أبيض' }}</strong>
                                         </div>
                                     @endif
+                                    @if ($order->service_type === 'books')
+                                        <div class="order-file-field">
+                                            <span>لون الجلد</span>
+                                            <strong>{{ $leatherColorNames[$file->cover_color] ?? '-' }}</strong>
+                                        </div>
+                                    @endif
                                     @if (in_array($order->service_type, ['notes', 'books', 'color_printing'], true) && filled($file->binding_type))
                                         <div class="order-file-field">
                                             <span>{{ $bindingLabel }}</span>
@@ -483,7 +585,7 @@
                                             @if (auth()->user()->hasAdminPermission('files_download'))
                                                 <div class="file-action-buttons">
                                                     <a class="file-action-button view" href="{{ route('admin.files.view', $file) }}">عرض الملف</a>
-                                                    <a class="file-action-button download" href="{{ route('admin.files.download', $file) }}" data-complete-order-download>تحميل الملف</a>
+                                                    <a class="file-action-button download" href="{{ route('admin.files.download', $file) }}" data-direct-file-download>تحميل الملف</a>
                                                 </div>
                                             @else
                                                 <strong class="muted">لا توجد صلاحية تحميل</strong>
@@ -539,7 +641,7 @@
             </template>
         </div>
     @empty
-        <div class="panel empty">لا توجد طلبات حتى الآن.</div>
+        <div class="panel empty">{{ $paymentView === 'paid' ? 'لا توجد طلبات مدفوعة حتى الآن.' : 'لا توجد طلبات غير مدفوعة في سلال العملاء حاليًا.' }}</div>
     @endforelse
 
     @foreach ($orders as $order)

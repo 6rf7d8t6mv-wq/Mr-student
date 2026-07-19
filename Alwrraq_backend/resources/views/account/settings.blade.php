@@ -477,7 +477,6 @@
             });
         }
     </script>
-    @include('shared.chat-widget')
     @include('shared.language-tools')
 </body>
 </html>

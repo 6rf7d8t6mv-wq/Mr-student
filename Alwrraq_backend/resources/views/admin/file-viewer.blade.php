@@ -40,14 +40,22 @@
         .preview-head h2 { margin: 0; font-size: 13px; color: #111827; }
         .preview-head span { color: #64748b; font-size: 9px; font-weight: 900; }
         .preview-frame { width: 100%; flex: 1; min-height: 760px; border: 0; background: #ffffff; }
+        .word-preview { flex: 1; min-height: 760px; padding: clamp(22px, 4vw, 48px); overflow: auto; background: #ffffff; color: #111827; font-family: Arial, Tahoma, sans-serif; font-size: 15px; line-height: 1.9; }
+        .word-preview p { margin: 0 0 11px; white-space: pre-wrap; }
+        .word-table-wrap { width: 100%; margin: 14px 0; overflow-x: auto; }
+        .word-table { width: 100%; border-collapse: collapse; }
+        .word-table td { min-width: 90px; padding: 8px 9px; border: 1px solid #cbd5e1; vertical-align: top; }
+        .word-table td p { margin-bottom: 4px; }
         .unsupported { min-height: 520px; padding: 20px; display: grid; place-items: center; text-align: center; }
         .unsupported-box { max-width: 520px; padding: 16px; border: 1px dashed #cbd5e1; border-radius: 10px; background: #f8fafc; }
         .unsupported-box h2 { margin: 0 0 6px; font-size: 16px; }
         .unsupported-box p { margin: 0; color: #475569; font-size: 11px; font-weight: 800; line-height: 1.7; }
+        .invoice-print-source { display: none; }
         @media (max-width: 900px) {
             .viewer-shell { grid-template-columns: 1fr; }
             .info-panel { position: static; }
             .preview-frame { min-height: 620px; }
+            .word-preview { min-height: 620px; }
             .brand { min-height: 44px; }
             .meta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
@@ -73,6 +81,7 @@
             .preview-head h2 { font-size: 11px; }
             .preview-head span { font-size: 8px; }
             .preview-frame { min-height: 560px; }
+            .word-preview { min-height: 560px; padding: 16px 12px; font-size: 13px; }
         }
         @media (min-width: 1100px) {
             .viewer-shell { grid-template-columns: minmax(300px, 350px) minmax(0, 1fr); }
@@ -154,6 +163,12 @@
                         <span>حجم الصفحة</span>
                         <strong>{{ $pageSizeNames[$file->page_size] ?? 'A4' }}</strong>
                     </div>
+                    @if ($order->service_type === 'books')
+                    <div class="meta-item">
+                        <span>لون الجلد</span>
+                        <strong>{{ ['black' => 'جلد أسود', 'green' => 'جلد أخضر', 'red' => 'جلد أحمر', 'blue' => 'جلد أزرق', 'beige' => 'جلد بيج', 'brown' => 'جلد بني'][$file->cover_color] ?? '-' }}</strong>
+                    </div>
+                    @endif
                     <div class="meta-item">
                         <span>نمط الطباعة</span>
                         <strong>{{ $printColor }}</strong>
@@ -166,15 +181,15 @@
                 </div>
 
                 <div class="notice">
-                    الطباعة المباشرة تفتح نافذة الطابعة من المتصفح. تأكد من ضبط الطابعة على نفس البيانات أعلاه، ولا تعتمد على لون الورق من أمر الطباعة.
+                    الطباعة المباشرة تفتح طباعة الفاتورة أولًا، وبعد إنهائها تفتح طباعة الملف. تأكد من ضبط الطابعة على نفس البيانات أعلاه، ولا تعتمد على لون الورق من أمر الطباعة.
                 </div>
 
                 <div class="actions">
                     @if ($isPrintablePreview)
-                        <button class="action yellow" type="button" onclick="printPreview('{{ route('admin.files.view', ['file' => $file, 'raw' => 1]) }}')">طباعة الملف مباشرة</button>
+                        <button class="action yellow" type="button" onclick="printInvoiceThenPreview('adminFileInvoice{{ $order->id }}', '{{ route('admin.files.view', ['file' => $file, 'raw' => 1]) }}')">طباعة الملف مباشرة</button>
                     @endif
-                    <a class="action blue" href="{{ route('admin.files.download', $file) }}" data-complete-order-download>تحميل الملف</a>
-                    <a class="action green" href="{{ route('admin.orders', ['open_order' => $order->id]) }}">العودة لعرض الطلب</a>
+                    <a class="action blue" href="{{ route('admin.files.download', $file) }}" data-direct-file-download>تحميل الملف</a>
+                    <a class="action green" href="{{ route($order->payment_status === 'paid' ? 'admin.orders' : 'admin.orders.unpaid', ['open_order' => $order->id]) }}">العودة لعرض الطلب</a>
                 </div>
             </aside>
 
@@ -184,13 +199,15 @@
                     <span>{{ $displayFileType }}</span>
                 </div>
 
-                @if ($isPrintablePreview)
+                @if ($isPdf)
                     <iframe id="filePreview" class="preview-frame" src="{{ route('admin.files.view', ['file' => $file, 'raw' => 1]) }}"></iframe>
+                @elseif ($wordPreviewHtml)
+                    <article class="word-preview" dir="auto">{!! $wordPreviewHtml !!}</article>
                 @else
                     <div class="unsupported">
                         <div class="unsupported-box">
-                            <h2>المعاينة المباشرة غير مدعومة لهذا النوع</h2>
-                            <p>ملفات Word غالبًا لا يعرضها المتصفح مباشرة. استخدم زر تحميل الملف إذا احتجت فتحه في Word.</p>
+                            <h2>تعذر عرض ملف Word</h2>
+                            <p>تعذر قراءة محتوى الملف. تأكد أن ملف Word بصيغة DOCX سليمة، أو استخدم زر تحميل الملف.</p>
                         </div>
                     </div>
                 @endif
@@ -198,24 +215,126 @@
         </div>
     </div>
 
+    @if ($isPrintablePreview)
+        <div class="invoice-print-source" aria-hidden="true">
+            @include('shared.invoice', ['order' => $order, 'invoiceId' => 'adminFileInvoice'.$order->id])
+        </div>
+    @endif
+
     <script>
-        function printPreview(rawUrl) {
+        function printInvoiceThenPreview(invoiceId, rawUrl) {
+            const previewJob = preparePreview(rawUrl);
+            const invoice = document.getElementById(invoiceId);
+            if (!invoice) {
+                printPreparedPreview(previewJob);
+                return;
+            }
+
+            const invoiceFrame = document.createElement('iframe');
+            invoiceFrame.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;';
+            document.body.appendChild(invoiceFrame);
+
+            const invoiceDocument = invoiceFrame.contentWindow.document;
+            invoiceDocument.write(`
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="utf-8">
+                    <title>فاتورة ضريبية مبسطة</title>
+                    <style>
+                        @page { size: A4; margin: 12mm; }
+                        * { box-sizing: border-box; }
+                        body { margin: 0; color: #111827; direction: rtl; font-family: Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { padding: 7px; border: 1px solid #e5e7eb; text-align: right; font-size: 10px; }
+                        th { background: #f8fafc; }
+                        .invoice-document { border: 0; padding: 0; }
+                        .invoice-head { display: flex; justify-content: space-between; gap: 14px; padding-bottom: 12px; border-bottom: 3px solid #0f172a; margin-bottom: 12px; }
+                        .invoice-brand { display: flex; align-items: center; gap: 9px; }
+                        .invoice-logo { width: 40px; height: 40px; border-radius: 9px; overflow: hidden; }
+                        .invoice-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+                        .invoice-head h2 { margin: 0; font-size: 23px; }
+                        .invoice-head p { margin: 3px 0 0; }
+                        .invoice-number { text-align: left; }
+                        .invoice-number span, .invoice-grid span, .invoice-totals span { display: block; margin-bottom: 3px; color: #64748b; font-size: 9px; font-weight: 700; }
+                        .invoice-number small { display: inline-block; margin-top: 4px; }
+                        .invoice-grid, .invoice-totals, .invoice-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
+                        .invoice-grid div, .invoice-totals div, .invoice-summary-note { padding: 7px; border: 1px solid #e5e7eb; border-radius: 7px; }
+                        .invoice-grid .full { grid-column: 1 / -1; }
+                        .invoice-totals .grand { background: #0f172a; color: #ffffff; }
+                        .invoice-section-title { margin: 10px 0 6px; font-size: 12px; font-weight: 900; }
+                        .invoice-note { margin-top: 12px; color: #64748b; font-size: 9px; text-align: center; }
+                        .invoice-toolbar { display: none; }
+                    </style>
+                </head>
+                <body>${invoice.outerHTML}</body>
+                </html>
+            `);
+            invoiceDocument.close();
+
+            let continued = false;
+            const continueWithFile = () => {
+                if (continued) return;
+                continued = true;
+                setTimeout(() => {
+                    invoiceFrame.remove();
+                    printPreparedPreview(previewJob);
+                }, 350);
+            };
+
+            invoiceFrame.contentWindow.addEventListener('afterprint', continueWithFile, { once: true });
+            setTimeout(() => {
+                try {
+                    invoiceFrame.contentWindow.focus();
+                    invoiceFrame.contentWindow.print();
+                    setTimeout(continueWithFile, 500);
+                } catch (error) {
+                    continueWithFile();
+                }
+            }, 450);
+        }
+
+        function preparePreview(rawUrl) {
             const printFrame = document.createElement('iframe');
             printFrame.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;';
             document.body.appendChild(printFrame);
 
-            const triggerPrint = () => {
-                try {
-                    printFrame.contentWindow.focus();
-                    printFrame.contentWindow.print();
-                    setTimeout(() => printFrame.remove(), 1000);
-                } catch (error) {
-                    printFrame.remove();
-                }
+            const job = {
+                frame: printFrame,
+                ready: false,
+                requested: false,
+                printed: false,
             };
 
-            printFrame.addEventListener('load', () => setTimeout(triggerPrint, 300), { once: true });
+            printFrame.addEventListener('load', () => {
+                job.ready = true;
+                if (job.requested) {
+                    printPreparedPreview(job);
+                }
+            }, { once: true });
             printFrame.src = rawUrl;
+
+            return job;
+        }
+
+        function printPreparedPreview(job) {
+            job.requested = true;
+            if (!job.ready || job.printed) return;
+            job.printed = true;
+
+            setTimeout(() => {
+                try {
+                    job.frame.contentWindow.focus();
+                    job.frame.contentWindow.print();
+                    setTimeout(() => job.frame.remove(), 1500);
+                } catch (error) {
+                    job.frame.remove();
+                }
+            }, 300);
+        }
+
+        function printPreview(rawUrl) {
+            printPreparedPreview(preparePreview(rawUrl));
         }
     </script>
     @include('shared.language-tools')

@@ -8,6 +8,7 @@ use App\Models\OrderDeliveredFile;
 use App\Models\OrderFile;
 use App\Models\User;
 use App\Services\AdminLiveUpdateService;
+use App\Services\WordPreviewService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -139,19 +140,44 @@ class AdminController extends Controller
         $this->ensureAdmin();
         $this->ensurePermission('orders_view');
 
+        $paymentView = $request->routeIs('admin.orders.unpaid') ? 'unpaid' : 'paid';
+        $pageRouteName = $paymentView === 'unpaid' ? 'admin.orders.unpaid' : 'admin.orders';
+
         Order::query()
             ->whereNull('admin_notification_seen_at')
+            ->when($paymentView === 'paid', fn ($query) => $query->where('payment_status', 'paid'))
+            ->when($paymentView === 'unpaid', fn ($query) => $query->where('payment_status', '!=', 'paid'))
             ->update(['admin_notification_seen_at' => now()]);
 
         $search = trim((string) $request->query('search', ''));
-        $statusFilter = (string) $request->query('status_filter', '');
+        $requestedStatusFilter = (string) $request->query('status_filter', '');
+        $statusFilter = in_array($requestedStatusFilter, ['new', 'in_progress', 'completed'], true)
+            ? $requestedStatusFilter
+            : '';
 
-        if (! in_array($statusFilter, ['new', 'in_progress', 'completed'], true)) {
+        if ($paymentView === 'paid' && $statusFilter === '') {
+            $hasNewOrders = Order::query()
+                ->where('payment_status', 'paid')
+                ->whereNull('admin_opened_at')
+                ->whereNotIn('status', ['completed', 'finished'])
+                ->exists();
+            $hasInProgressOrders = Order::query()
+                ->where('payment_status', 'paid')
+                ->whereNotNull('admin_opened_at')
+                ->whereNotIn('status', ['completed', 'finished'])
+                ->exists();
+
+            $statusFilter = $hasNewOrders ? 'new' : ($hasInProgressOrders ? 'in_progress' : 'completed');
+        }
+
+        if ($paymentView === 'unpaid') {
             $statusFilter = '';
         }
 
         $orders = Order::query()
             ->with(['user', 'files', 'deliveredFiles'])
+            ->when($paymentView === 'paid', fn ($query) => $query->where('payment_status', 'paid'))
+            ->when($paymentView === 'unpaid', fn ($query) => $query->where('payment_status', '!=', 'paid'))
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($searchQuery) use ($search) {
                     $searchQuery->where('id', $search)
@@ -163,17 +189,11 @@ class AdminController extends Controller
             })
             ->when($statusFilter === 'new', function ($query) {
                 $query->whereNull('admin_opened_at')
-                    ->where(function ($statusQuery) {
-                        $statusQuery->whereNotIn('status', ['completed', 'finished'])
-                            ->orWhere('payment_status', '!=', 'paid');
-                    });
+                    ->whereNotIn('status', ['completed', 'finished']);
             })
             ->when($statusFilter === 'in_progress', function ($query) {
                 $query->whereNotNull('admin_opened_at')
-                    ->where(function ($statusQuery) {
-                        $statusQuery->whereNotIn('status', ['completed', 'finished'])
-                            ->orWhere('payment_status', '!=', 'paid');
-                    });
+                    ->whereNotIn('status', ['completed', 'finished']);
             })
             ->when($statusFilter === 'completed', function ($query) {
                 $query->where('payment_status', 'paid')
@@ -182,7 +202,18 @@ class AdminController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.orders', compact('orders', 'search', 'statusFilter'));
+        $paidOrdersCount = Order::query()->where('payment_status', 'paid')->count();
+        $unpaidOrdersCount = Order::query()->where('payment_status', '!=', 'paid')->count();
+
+        return view('admin.orders', compact(
+            'orders',
+            'search',
+            'statusFilter',
+            'paymentView',
+            'pageRouteName',
+            'paidOrdersCount',
+            'unpaidOrdersCount'
+        ));
     }
 
     public function liveStatus(AdminLiveUpdateService $liveUpdates)
@@ -544,22 +575,56 @@ class AdminController extends Controller
 
         abort_unless(is_file($absolutePath), 404);
 
-        if ($file->order->payment_status === 'paid' && ! in_array($file->order->service_type, ['formatting', 'research'], true)) {
-            $file->order->update([
+        return Response::download($absolutePath, $file->original_name);
+    }
+
+    public function completeOrder(Order $order)
+    {
+        $this->ensureAdmin();
+        $this->ensurePermission('orders_view');
+
+        if ($order->payment_status !== 'paid') {
+            return back()->withErrors([
+                'order' => 'لا يمكن إكمال الطلب قبل الدفع.',
+            ]);
+        }
+
+        if (! in_array($order->status, ['completed', 'finished'], true)) {
+            $order->update([
                 'status' => 'completed',
                 'customer_notification_seen_at' => null,
             ]);
         }
 
-        return Response::download($absolutePath, $file->original_name);
+        $nextIncompleteOrder = Order::query()
+            ->where('user_id', $order->user_id)
+            ->where('payment_status', 'paid')
+            ->whereNotIn('status', ['completed', 'finished', 'cancelled'])
+            ->latest()
+            ->first();
+
+        if ($nextIncompleteOrder) {
+            $nextStatusFilter = blank($nextIncompleteOrder->admin_opened_at) ? 'new' : 'in_progress';
+
+            return redirect()
+                ->route('admin.orders', [
+                    'status_filter' => $nextStatusFilter,
+                    'open_order' => $nextIncompleteOrder->id,
+                ])
+                ->with('status', 'تم إكمال الطلب بنجاح.');
+        }
+
+        return redirect()
+            ->route('admin.orders')
+            ->with('status', 'تم إكمال آخر طلب غير مكتمل للعميل بنجاح.');
     }
 
-    public function viewFile(Request $request, OrderFile $file)
+    public function viewFile(Request $request, OrderFile $file, WordPreviewService $wordPreview)
     {
         $this->ensureAdmin();
         $this->ensurePermission('files_download');
 
-        $file->load('order.user');
+        $file->load(['order.user', 'order.files', 'order.productItems']);
 
         $absolutePath = storage_path('app/'.$file->path);
 
@@ -603,11 +668,15 @@ class AdminController extends Controller
             'color_printing' => 'طباعة الملفات بالألوان',
             'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
             'phd' => 'طباعة وتجليد رسالة دكتوراه',
-            'formatting' => 'تنسيق الرسائل الجامعية',
-            'research' => 'إنشاء بحث',
+            'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+            'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
         ];
 
-        $isPrintablePreview = strtolower($file->file_type) === 'pdf';
+        $isPdf = strtolower($file->file_type) === 'pdf';
+        $wordPreviewHtml = strtolower($file->file_type) === 'word'
+            ? $wordPreview->toHtml($absolutePath)
+            : null;
+        $isPrintablePreview = $isPdf;
         $printColor = $order->service_type === 'color_printing' ? 'ألوان' : 'أبيض وأسود';
 
         return view('admin.file-viewer', compact(
@@ -617,6 +686,8 @@ class AdminController extends Controller
             'pageSizeNames',
             'bindingNames',
             'serviceNames',
+            'isPdf',
+            'wordPreviewHtml',
             'isPrintablePreview',
             'printColor'
         ));
@@ -656,7 +727,7 @@ class AdminController extends Controller
         ]);
 
         $order->update([
-            'status' => $order->payment_status === 'paid' ? 'completed' : 'processing',
+            'status' => in_array($order->status, ['completed', 'finished'], true) ? $order->status : 'processing',
             'customer_notification_seen_at' => null,
             'delivered_file_original_name' => $file->getClientOriginalName(),
             'delivered_file_stored_name' => $storedName,
@@ -681,7 +752,9 @@ class AdminController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('admin.orders')->with('status', 'تم فتح الطلب.');
+        return redirect()
+            ->route($order->payment_status === 'paid' ? 'admin.orders' : 'admin.orders.unpaid')
+            ->with('status', 'تم فتح الطلب.');
     }
 
     public function downloadDeliveredFile(OrderDeliveredFile $deliveredFile)
@@ -757,9 +830,10 @@ class AdminController extends Controller
             }
         }
 
+        $returnRoute = $order->payment_status === 'paid' ? 'admin.orders' : 'admin.orders.unpaid';
         $order->delete();
 
-        return redirect()->route('admin.orders')->with('status', 'تم حذف الطلب بنجاح.');
+        return redirect()->route($returnRoute)->with('status', 'تم حذف الطلب بنجاح.');
     }
 
     private function ensureAdmin(): void

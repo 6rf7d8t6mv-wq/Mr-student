@@ -191,6 +191,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::patch('/stationery-products/{product}', [AdminStationeryProductController::class, 'update'])->name('stationery-products.update');
     Route::delete('/stationery-products/{product}', [AdminStationeryProductController::class, 'destroy'])->name('stationery-products.destroy');
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+    Route::get('/orders/unpaid', [AdminController::class, 'orders'])->name('orders.unpaid');
     Route::get('/live-status', [AdminController::class, 'liveStatus'])->name('live-status');
     Route::get('/users', [AdminController::class, 'users'])->name('users');
     Route::get('/customers', [AdminController::class, 'customers'])->name('customers');
@@ -202,6 +203,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::patch('/users/{user}/permissions', [AdminController::class, 'updateUserPermissions'])->name('users.permissions.update');
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
     Route::patch('/orders/{order}/open', [AdminController::class, 'openOrder'])->name('orders.open');
+    Route::patch('/orders/{order}/complete', [AdminController::class, 'completeOrder'])->name('orders.complete');
     Route::patch('/orders/{order}/discount', [AdminController::class, 'applyOrderDiscount'])->name('orders.discount.apply');
     Route::delete('/orders/{order}', [AdminController::class, 'destroyOrder'])->name('orders.destroy');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');

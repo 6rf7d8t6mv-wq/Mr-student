@@ -139,6 +139,13 @@ class ApiController extends Controller
             ], 422);
         }
 
+        if ($order->service_type === 'books' && $order->files->contains(fn ($file) => blank($file->cover_color))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'اختر لون الجلد لكل ملف قبل الدفع.',
+            ], 422);
+        }
+
         $data = $request->validate([
             'payment_method' => ['required', Rule::in(PaymentGatewayService::METHODS)],
             'card_name' => ['required_if:payment_method,mada,visa,mastercard', 'nullable', 'string', 'max:255'],

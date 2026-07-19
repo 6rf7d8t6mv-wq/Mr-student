@@ -78,13 +78,17 @@
         .paid { background: #ecfdf5; color: #047857; padding: 14px; border-radius: 10px; font-weight: 900; }
         .close-to-orders { display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; min-width: 150px; padding: 11px 16px; border-radius: 9px; background: #0f172a; color: #ffffff; text-decoration: none; font-weight: 900; }
         .close-to-orders:hover { background: #1e293b; }
-        .cart-top-actions { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 10px; }
-        .add-service-button { gap: 10px; margin-top: 0; min-width: 230px; padding: 9px 13px; border-radius: 12px; background: linear-gradient(135deg, #fffdf2 0%, #fef3c7 100%); color: #78350f; border: 1px solid #f6d365; box-shadow: 0 10px 24px rgba(146, 64, 14, 0.12); transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
+        .cart-top-actions { display: flex; direction: rtl; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+        .cart-top-actions.empty-cart-actions { margin-top: 10px; }
+        .cart-top-actions .add-service-button { flex: 0 0 auto; width: auto; }
+        .add-service-button { width: auto; gap: 6px; margin-top: 0; min-width: 0; padding: 6px 9px; border-radius: 8px; background: linear-gradient(135deg, #fffdf2 0%, #fef3c7 100%); color: #78350f; border: 1px solid #f6d365; box-shadow: 0 7px 16px rgba(146, 64, 14, 0.12); transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease; }
         .add-service-button:hover { background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%); color: #78350f; transform: translateY(-1px); box-shadow: 0 14px 28px rgba(146, 64, 14, 0.16); }
-        .add-service-icon { width: 30px; height: 30px; flex: 0 0 auto; display: inline-grid; place-items: center; border-radius: 9px; background: #f59e0b; color: #ffffff; font-size: 21px; font-weight: 900; line-height: 1; box-shadow: 0 5px 12px rgba(245, 158, 11, 0.24); }
+        .add-service-icon { width: 22px; height: 22px; flex: 0 0 auto; display: inline-grid; place-items: center; border-radius: 6px; background: #f59e0b; color: #ffffff; font-size: 16px; font-weight: 900; line-height: 1; box-shadow: 0 4px 9px rgba(245, 158, 11, 0.22); }
         .add-service-copy { min-width: 0; display: grid; gap: 1px; text-align: start; }
-        .add-service-copy strong { font-size: 13px; line-height: 1.35; }
+        .add-service-copy strong { font-size: 11px; line-height: 1.3; }
         .add-service-copy small { color: #a16207; font-size: 10px; font-weight: 800; line-height: 1.35; }
+        .toggle-all-orders-button { width: auto; min-width: 0; margin: 0; font-family: inherit; cursor: pointer; }
+        .toggle-all-orders-button:hover { background: #dbeafe; border-color: #60a5fa; }
         .missing-info { margin-top: 16px; padding: 14px 16px; background: #fffbeb; color: #92400e; border: 1px solid #fde68a; border-radius: 10px; font-weight: 900; line-height: 1.8; }
         .missing-info ul { margin: 8px 0 0; padding: 0 18px 0 0; }
         .delivery-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; align-items: stretch; }
@@ -124,7 +128,7 @@
         .summary-item.total-after strong { color: #ffffff; font-size: 14px; }
         .summary-files { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
         .summary-files li { padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 9px; background: #ffffff; color: #0f172a; font-size: 14px; font-weight: 900; line-height: 1.7; word-break: break-word; }
-        .cart-order-detail { display: grid; gap: 14px; padding: 16px; border: 1px solid #dbe3ef; border-radius: 14px; background: #ffffff; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06); }
+        .cart-order-detail { display: grid; gap: 14px; padding: 16px; border: 1px solid #dbe3ef; border-inline-start: 4px solid #2563eb; border-radius: 14px; background: #ffffff; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06); }
         .cart-order-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
         .cart-order-title { margin: 0; color: #0f172a; font-size: 18px; font-weight: 900; line-height: 1.6; }
         .cart-order-meta { margin: 0; color: #64748b; font-size: 13px; font-weight: 800; }
@@ -132,6 +136,14 @@
         .cart-order-label { color: #64748b; font-size: 14px; font-weight: 900; }
         .cart-order-heading .cart-order-title { text-align: center; }
         .cart-order-heading .cart-order-meta { text-align: left; }
+        .cart-payment-selector { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 6px 9px; border: 1px solid #93c5fd; border-radius: 9px; background: #eff6ff; color: #1e3a8a; font-size: 11px; font-weight: 900; line-height: 1.25; cursor: pointer; white-space: nowrap; }
+        .cart-payment-selector input { flex: 0 0 auto; width: 17px; height: 17px; margin: 0; accent-color: #2563eb; cursor: pointer; }
+        .cart-payment-selector.toggle-all-orders-button { min-height: 38px; padding: 7px 11px; font-size: 12px; }
+        .cart-payment-selector.toggle-all-orders-button input { width: 19px; height: 19px; }
+        .cart-order-detail.selected-for-payment { border-color: #60a5fa; border-inline-start-color: #1d4ed8; background: #f8fbff; box-shadow: 0 14px 32px rgba(37, 99, 235, 0.12); }
+        .cart-page-actions.cart-selection-actions { display: flex; justify-content: flex-end; align-items: center; }
+        .cart-selection-actions .cart-pay-link { min-width: 150px; border: 0; cursor: pointer; font-family: inherit; }
+        .cart-selection-actions .cart-pay-link:disabled { background: #94a3b8; cursor: not-allowed; opacity: .8; }
         .cart-order-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
         .cart-section-box { padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
         .cart-section-box h3 { margin: 0 0 10px; color: #0f172a; font-size: 15px; font-weight: 900; }
@@ -217,6 +229,9 @@
             .cart-order-heading .cart-order-title { display: block; overflow: visible; font-size: 9px; white-space: normal; line-height: 1.25; overflow-wrap: normal; word-break: normal; }
             .cart-order-heading .cart-order-meta { font-size: 9px; line-height: 1.3; overflow-wrap: normal; word-break: normal; }
             .cart-order-heading .cart-order-meta span { display: block; max-width: 100%; white-space: normal; }
+            .cart-order-head { flex-direction: row; align-items: center; gap: 6px; }
+            .cart-payment-selector { min-height: 29px; padding: 4px 6px; border-radius: 7px; font-size: 8px; gap: 4px; }
+            .cart-payment-selector input { width: 14px; height: 14px; }
             .detail-table-wrap tbody { gap: 8px; }
             .detail-table-wrap tr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 9px; border-radius: 11px; }
             .detail-table-wrap td { display: grid; grid-template-columns: minmax(0, 48%) minmax(0, 52%); align-items: center; gap: 4px; min-width: 0; min-height: 42px; padding: 7px 8px; border-radius: 8px; font-size: 10.5px; line-height: 1.25; background: #f8fafc; overflow-wrap: normal; word-break: normal; }
@@ -246,6 +261,8 @@
             .file-format-badge { padding: 2px 6px; font-size: 10px; }
             .payment-summary,
             .cart-page-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+            .cart-page-actions.cart-selection-actions { display: flex; }
+            .cart-selection-actions .cart-pay-link { min-width: 105px; }
             .summary-item { padding: 7px 8px; border-radius: 8px; }
             .summary-item span { font-size: 10.5px; }
             .summary-item strong { font-size: 11.5px; }
@@ -280,6 +297,7 @@
             .detail-table-wrap td::before { font-size: 8.5px; }
             .payment-summary,
             .cart-page-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .cart-page-actions.cart-selection-actions { grid-template-columns: minmax(0, 1fr) auto; }
             .delivery-options { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
             .delivery-option { min-height: 56px; padding: 5px; gap: 4px; }
             .delivery-option input { width: 16px; height: 16px; }
@@ -360,8 +378,8 @@
                     'color_printing' => 'طباعة الملفات بالألوان',
                     'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
                     'phd' => 'طباعة وتجليد رسالة دكتوراه',
-                    'formatting' => 'تنسيق الرسائل الجامعية',
-                    'research' => 'إنشاء بحث',
+                    'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
+                    'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
                     'stationery' => 'القرطاسية',
                 ];
                 $noPrintServices = ['formatting', 'research', 'stationery'];
@@ -383,6 +401,14 @@
                 $writingColorNames = [
                     'gold' => 'كتابة باللون الذهبي',
                     'black' => 'كتابة باللون الأسود',
+                ];
+                $leatherColorNames = [
+                    'black' => 'جلد أسود',
+                    'green' => 'جلد أخضر',
+                    'red' => 'جلد أحمر',
+                    'blue' => 'جلد أزرق',
+                    'beige' => 'جلد بيج',
+                    'brown' => 'جلد بني',
                 ];
                 $cdTypeNames = [
                     'none' => 'بدون CD',
@@ -442,6 +468,9 @@
                     if (in_array($cartOrder->service_type, ['notes', 'books', 'color_printing'], true) && $cartOrder->files->contains(fn ($file) => blank($file->binding_type))) {
                         $missingRequirements->push($serviceLabel . ': اختيار نوع التغليف لكل ملف.');
                     }
+                    if ($cartOrder->service_type === 'books' && $cartOrder->files->contains(fn ($file) => blank($file->cover_color))) {
+                        $missingRequirements->push($serviceLabel . ': اختيار لون الجلد لكل ملف.');
+                    }
                     $academicPdfFiles = in_array($cartOrder->service_type, ['thesis', 'phd'], true)
                         ? $cartOrder->files->where('file_type', 'pdf')
                         : collect();
@@ -465,17 +494,23 @@
 
             @if ($cartOrders->isEmpty())
                 <div class="missing-info">السلة فارغة. لا توجد طلبات غير مدفوعة حاليًا.</div>
-                <a class="close-to-orders add-service-button" href="{{ route('home') }}" target="_top">
-                    <span class="add-service-icon">+</span>
-                    <span class="add-service-copy"><strong>إضافة خدمة جديدة</strong><small>اختر خدمة أخرى وأضفها للسلة</small></span>
-                </a>
+                <div class="cart-top-actions empty-cart-actions">
+                    <a class="close-to-orders add-service-button" href="{{ route('home') }}" target="_top">
+                        <span class="add-service-icon">+</span>
+                        <span class="add-service-copy"><strong>إضافة خدمة جديدة</strong></span>
+                    </a>
+                </div>
             @else
                 @unless ($paymentPage)
                 <div class="cart-top-actions">
                     <a class="close-to-orders add-service-button" href="{{ route('home') }}" target="_top">
                         <span class="add-service-icon">+</span>
-                        <span class="add-service-copy"><strong>إضافة خدمة جديدة</strong><small>اختر خدمة أخرى وأضفها للسلة</small></span>
+                        <span class="add-service-copy"><strong>إضافة خدمة جديدة</strong></span>
                     </a>
+                    <label class="cart-payment-selector toggle-all-orders-button">
+                        <input type="checkbox" checked data-toggle-all-orders>
+                        <span>اختيار جميع الطلبات للدفع</span>
+                    </label>
                 </div>
                 <div class="files-panel" style="margin-top:16px;">
                     <div class="cart-orders-list">
@@ -508,7 +543,7 @@
                                     'color_printing' => 'التغليف',
                                     'notes' => 'التغليف',
                                     'formatting' => 'التنسيق',
-                                    'research' => 'إنشاء البحث',
+                                    'research' => 'إنشاء البحوث',
                                     default => 'التجليد',
                                 };
                                 $cartBindingPriceLabel = match ($cartOrder->service_type) {
@@ -516,7 +551,7 @@
                                     'color_printing' => 'سعر التغليف',
                                     'notes' => 'سعر التغليف',
                                     'formatting' => 'سعر التنسيق',
-                                    'research' => 'سعر إنشاء البحث',
+                                    'research' => 'سعر إنشاء البحوث',
                                     'stationery' => 'إجمالي المنتجات',
                                     default => 'سعر التجليد',
                                 };
@@ -529,7 +564,16 @@
                                         ->values()
                                     : collect();
                             @endphp
-                            <div class="cart-order-detail">
+                            <div class="cart-order-detail"
+                                 data-order-id="{{ $cartOrder->id }}"
+                                 data-order-files="{{ $cartOrder->files->count() }}"
+                                 data-order-products="{{ $cartOrder->productItems->sum('quantity') }}"
+                                 data-order-print="{{ (float) $cartOrder->print_total }}"
+                                 data-order-binding="{{ (float) $cartOrder->binding_total }}"
+                                 data-order-cd="{{ (float) $cartOrder->files->sum('cd_price') }}"
+                                 data-order-discount="{{ (float) $cartOrder->discount_amount }}"
+                                 data-order-delivery-eligible="{{ in_array($cartOrder->service_type, ['notes', 'books', 'color_printing', 'thesis', 'phd', 'stationery'], true) ? '1' : '0' }}"
+                                 data-order-delivery-method="{{ $cartOrder->delivery_method }}">
                                 <div class="cart-order-head">
                                     <div class="cart-order-heading">
                                         <span class="cart-order-label">الخدمة المختارة</span>
@@ -538,6 +582,10 @@
                                             <span data-local-datetime="{{ $cartOrder->created_at->toIso8601String() }}">{{ $createdAtText }}</span>
                                         </div>
                                     </div>
+                                    <label class="cart-payment-selector">
+                                        <input type="checkbox" name="order_ids[]" value="{{ $cartOrder->id }}" form="selectedCartPaymentForm" checked data-cart-order-selector>
+                                        <span>اختيار للدفع</span>
+                                    </label>
                                 </div>
 
                                 <div class="cart-section-box">
@@ -607,8 +655,13 @@
                                                     @if (in_array($cartOrder->service_type, ['notes', 'books'], true))
                                                         <th>لون الورق</th>
                                                     @endif
-                                                    @if (! in_array($cartOrder->service_type, $noPrintServices, true))
+                                                    @if ($cartOrder->service_type === 'books')
+                                                        <th>لون الجلد</th>
+                                                    @endif
+                                                    @if (in_array($cartOrder->service_type, ['notes', 'color_printing'], true))
                                                         <th>{{ $cartBindingLabel }}</th>
+                                                    @endif
+                                                    @if (! in_array($cartOrder->service_type, $noPrintServices, true))
                                                         <th>سعر الطباعة</th>
                                                     @endif
                                                     <th>{{ $cartBindingPriceLabel }}</th>
@@ -670,8 +723,13 @@
                                                         @if (in_array($cartOrder->service_type, ['notes', 'books'], true))
                                                             <td data-label="لون الورق" data-mobile-label="الورق"><span class="detail-value">{{ $paperColorNames[$file->paper_color] ?? 'أبيض' }}</span></td>
                                                         @endif
-                                                        @if (! in_array($cartOrder->service_type, $noPrintServices, true))
+                                                        @if ($cartOrder->service_type === 'books')
+                                                            <td data-label="لون الجلد" data-mobile-label="الجلد"><span class="detail-value">{{ $leatherColorNames[$file->cover_color] ?? '-' }}</span></td>
+                                                        @endif
+                                                        @if (in_array($cartOrder->service_type, ['notes', 'color_printing'], true))
                                                             <td data-label="{{ $cartBindingLabel }}" data-mobile-label="{{ $cartBindingLabel }}"><span class="detail-value">{{ $cartBindingNames[$file->binding_type] ?? '-' }}</span></td>
+                                                        @endif
+                                                        @if (! in_array($cartOrder->service_type, $noPrintServices, true))
                                                             <td class="price-cell" data-label="سعر الطباعة" data-mobile-label="الطباعة"><span class="detail-value">{{ $file->print_price }} ريال</span></td>
                                                         @endif
                                                         <td class="price-cell" data-label="{{ $cartBindingPriceLabel }}" data-mobile-label="السعر"><span class="detail-value">{{ $file->binding_price }} ريال</span></td>
@@ -691,7 +749,7 @@
                         @if ($cartDeliveryOrder)
                             <div class="cart-order-detail">
                                 <div class="cart-section-box delivery-section-box">
-                                    <h3>الاستلام والتوصيل لكامل الطلب</h3>
+                                    <h3>حدد طريقة الاستلام والتوصيل التي ترغب بها</h3>
                                     <form method="post" action="{{ route('cart.delivery.update', $cartDeliveryOrder) }}" data-delivery-form>
                                         @csrf
                                         @method('patch')
@@ -742,21 +800,21 @@
                 @endunless
 
                 <div class="payment-summary">
-                    <div class="summary-item"><span>عدد الخدمات في الطلب</span><strong>{{ $cartSummary['orders_count'] }} خدمة</strong></div>
-                    <div class="summary-item"><span>عدد الملفات</span><strong>{{ $cartSummary['files_count'] }} ملف</strong></div>
+                    <div class="summary-item"><span>عدد الخدمات في الطلب</span><strong data-selected-summary="orders">{{ $cartSummary['orders_count'] }} خدمة</strong></div>
+                    <div class="summary-item"><span>عدد الملفات</span><strong data-selected-summary="files">{{ $cartSummary['files_count'] }} ملف</strong></div>
                     @if (($cartSummary['products_count'] ?? 0) > 0)
-                        <div class="summary-item"><span>عدد المنتجات</span><strong>{{ $cartSummary['products_count'] }} منتج</strong></div>
+                        <div class="summary-item"><span>عدد المنتجات</span><strong data-selected-summary="products">{{ $cartSummary['products_count'] }} منتج</strong></div>
                     @endif
-                    <div class="summary-item total-before"><span>المبلغ الإجمالي قبل الخصم</span><strong>{{ $totalBeforeDiscount }} ريال</strong></div>
-                    <div class="summary-item"><span>الخصم</span><strong>{{ $cartSummary['discount_amount'] }} ريال</strong></div>
-                    <div class="summary-item"><span>رسوم التوصيل</span><strong>{{ $cartSummary['delivery_fee'] }} ريال</strong></div>
+                    <div class="summary-item total-before"><span>المبلغ الإجمالي قبل الخصم</span><strong data-selected-summary="beforeDiscount">{{ $totalBeforeDiscount }} ريال</strong></div>
+                    <div class="summary-item"><span>الخصم</span><strong data-selected-summary="discount">{{ $cartSummary['discount_amount'] }} ريال</strong></div>
+                    <div class="summary-item"><span>رسوم التوصيل</span><strong data-selected-summary="delivery">{{ $cartSummary['delivery_fee'] }} ريال</strong></div>
                     @if ($hasAcademicService)
-                        <div class="summary-item"><span>سعر CD</span><strong>{{ $cartSummary['cd_total'] }} ريال</strong></div>
+                        <div class="summary-item"><span>سعر CD</span><strong data-selected-summary="cd">{{ $cartSummary['cd_total'] }} ريال</strong></div>
                     @endif
-                    <div class="summary-item total-after"><span>المبلغ الإجمالي بعد الخصم</span><strong>{{ $totalAfterDiscount }} ريال</strong></div>
+                    <div class="summary-item total-after"><span>المبلغ الإجمالي بعد الخصم</span><strong data-selected-summary="afterDiscount">{{ $totalAfterDiscount }} ريال</strong></div>
                 </div>
 
-                @if ($missingRequirements->isNotEmpty())
+                @if ($paymentPage && $missingRequirements->isNotEmpty())
                     <div class="missing-info">
                         لا يمكن اعتماد السلة قبل إكمال المعلومات التالية:
                         <ul>
@@ -768,13 +826,9 @@
                 @endif
 
                 @unless ($paymentPage)
-                    <div class="cart-page-actions">
-                        @if ($missingRequirements->isEmpty())
-                            <a class="submit-card cart-pay-link" href="{{ route('cart.payment') }}">الانتقال للدفع</a>
-                        @else
-                            <span class="submit-card cart-pay-link disabled">أكمل بيانات السلة قبل الدفع</span>
-                        @endif
-                    </div>
+                    <form class="cart-page-actions cart-selection-actions" id="selectedCartPaymentForm" method="get" action="{{ route('cart.payment') }}">
+                        <button class="submit-card cart-pay-link" type="submit" data-selected-payment-button>الانتقال للدفع</button>
+                    </form>
                 @endunless
             @endif
         </section>
@@ -797,11 +851,17 @@
                             <div class="wallet-buttons">
                                 <form method="post" action="{{ route('cart.pay-all') }}">
                                     @csrf
+                                    @foreach ($selectedOrderIds as $selectedOrderId)
+                                        <input type="hidden" name="order_ids[]" value="{{ $selectedOrderId }}">
+                                    @endforeach
                                     <input type="hidden" name="payment_method" value="apple_pay">
                                     <button class="apple-pay" type="submit">Apple Pay</button>
                                 </form>
                                 <form method="post" action="{{ route('cart.pay-all') }}">
                                     @csrf
+                                    @foreach ($selectedOrderIds as $selectedOrderId)
+                                        <input type="hidden" name="order_ids[]" value="{{ $selectedOrderId }}">
+                                    @endforeach
                                     <input type="hidden" name="payment_method" value="google_pay">
                                     <button class="google-pay" type="submit">Google Pay</button>
                                 </form>
@@ -813,6 +873,9 @@
                         <h2>بطاقة بنكية</h2>
                         <form method="post" action="{{ route('cart.pay-all') }}">
                             @csrf
+                            @foreach ($selectedOrderIds as $selectedOrderId)
+                                <input type="hidden" name="order_ids[]" value="{{ $selectedOrderId }}">
+                            @endforeach
                             <input type="hidden" name="payment_method" value="mada">
                             <div class="form-grid">
                                 <div class="full">
@@ -862,6 +925,140 @@
                 hour12: false,
                 timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             }).format(date).replace('،', ' -');
+        });
+
+        const cartOrderSelectors = Array.from(document.querySelectorAll('[data-cart-order-selector]'));
+        const selectedCartPaymentForm = document.getElementById('selectedCartPaymentForm');
+        const selectedPaymentButton = selectedCartPaymentForm?.querySelector('[data-selected-payment-button]');
+        const toggleAllOrdersCheckbox = document.querySelector('[data-toggle-all-orders]');
+        const cartSelectionStorageKey = 'alwrraq:selected-cart-orders-v2';
+        const availableOrderIds = cartOrderSelectors.map((selector) => selector.value);
+        const selectedSummaryNodes = Object.fromEntries(
+            Array.from(document.querySelectorAll('[data-selected-summary]'))
+                .map((node) => [node.dataset.selectedSummary, node])
+        );
+        const formatSelectedAmount = (amount) => new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(Math.max(0, Number(amount) || 0));
+
+        const updateSelectedCartSummary = () => {
+            if (cartOrderSelectors.length === 0 || Object.keys(selectedSummaryNodes).length === 0) return;
+
+            const selectedCards = cartOrderSelectors
+                .filter((selector) => selector.checked)
+                .map((selector) => selector.closest('.cart-order-detail'))
+                .filter(Boolean);
+            const sum = (key) => selectedCards.reduce((total, card) => total + (Number(card.dataset[key]) || 0), 0);
+            const files = sum('orderFiles');
+            const products = sum('orderProducts');
+            const printTotal = sum('orderPrint');
+            const bindingTotal = sum('orderBinding');
+            const cdTotal = sum('orderCd');
+            const baseTotal = printTotal + bindingTotal + cdTotal;
+            const discount = Math.min(sum('orderDiscount'), baseTotal);
+            const deliveryCard = selectedCards.find((card) => card.dataset.orderDeliveryEligible === '1');
+            const deliveryMethod = deliveryCard?.dataset.orderDeliveryMethod || '';
+            let deliveryFee = 0;
+
+            if (deliveryMethod === 'islamic_university_delivery') deliveryFee = baseTotal >= 35 ? 0 : 5;
+            if (deliveryMethod === 'madinah_delivery') deliveryFee = 20;
+            if (deliveryMethod === 'redbox_delivery') deliveryFee = 30;
+
+            if (selectedSummaryNodes.orders) selectedSummaryNodes.orders.textContent = `${selectedCards.length} خدمة`;
+            if (selectedSummaryNodes.files) selectedSummaryNodes.files.textContent = `${files} ملف`;
+            if (selectedSummaryNodes.products) selectedSummaryNodes.products.textContent = `${products} منتج`;
+            if (selectedSummaryNodes.beforeDiscount) selectedSummaryNodes.beforeDiscount.textContent = `${formatSelectedAmount(baseTotal + deliveryFee)} ريال`;
+            if (selectedSummaryNodes.discount) selectedSummaryNodes.discount.textContent = `${formatSelectedAmount(discount)} ريال`;
+            if (selectedSummaryNodes.delivery) selectedSummaryNodes.delivery.textContent = `${formatSelectedAmount(deliveryFee)} ريال`;
+            if (selectedSummaryNodes.cd) selectedSummaryNodes.cd.textContent = `${formatSelectedAmount(cdTotal)} ريال`;
+            if (selectedSummaryNodes.afterDiscount) selectedSummaryNodes.afterDiscount.textContent = `${formatSelectedAmount(baseTotal - discount + deliveryFee)} ريال`;
+        };
+
+        const updateCartOrderSelection = (persist = true) => {
+            const selectedOrderIds = [];
+            const selectedOrderCards = [];
+            cartOrderSelectors.forEach((selector) => {
+                selector.closest('.cart-order-detail')?.classList.toggle('selected-for-payment', selector.checked);
+                if (selector.checked) {
+                    selectedOrderIds.push(selector.value);
+                    const orderCard = selector.closest('.cart-order-detail');
+                    if (orderCard) selectedOrderCards.push(orderCard);
+                }
+            });
+
+            const selectedOrdersRequireDelivery = selectedOrderCards.some((card) => card.dataset.orderDeliveryEligible === '1');
+            const deliveryForm = document.querySelector('[data-delivery-form]');
+            const selectedDeliveryMethod = deliveryForm?.querySelector('input[name="delivery_method"]:checked')?.value || '';
+            const requiredDeliveryFields = {
+                branch_pickup: [],
+                islamic_university_delivery: ['delivery_unit', 'delivery_floor', 'delivery_room'],
+                madinah_delivery: ['delivery_district', 'delivery_street', 'delivery_map_url'],
+                redbox_delivery: ['delivery_city', 'delivery_district', 'delivery_street', 'delivery_map_url'],
+            };
+            const deliveryFields = requiredDeliveryFields[selectedDeliveryMethod];
+            const deliveryIsReady = !selectedOrdersRequireDelivery || (deliveryFields !== undefined && deliveryFields.every((name) => {
+                const input = deliveryForm?.querySelector(`[name="${name}"]`);
+                return input && input.value.trim() !== '';
+            }));
+
+            if (selectedPaymentButton) selectedPaymentButton.disabled = selectedOrderIds.length === 0 || !deliveryIsReady;
+            if (toggleAllOrdersCheckbox) {
+                const allSelected = cartOrderSelectors.length > 0 && selectedOrderIds.length === cartOrderSelectors.length;
+                toggleAllOrdersCheckbox.checked = allSelected;
+                toggleAllOrdersCheckbox.indeterminate = false;
+            }
+            updateSelectedCartSummary();
+            if (persist) {
+                sessionStorage.setItem(cartSelectionStorageKey, JSON.stringify({
+                    orderIds: availableOrderIds,
+                    selectedIds: selectedOrderIds,
+                }));
+            }
+        };
+
+        cartOrderSelectors.forEach((selector) => {
+            selector.addEventListener('change', () => updateCartOrderSelection());
+        });
+
+        toggleAllOrdersCheckbox?.addEventListener('change', () => {
+            const selectAll = toggleAllOrdersCheckbox.checked;
+            cartOrderSelectors.forEach((selector) => {
+                selector.checked = selectAll;
+            });
+            updateCartOrderSelection();
+        });
+
+        if (cartOrderSelectors.length > 0) {
+            let savedSelection = null;
+            try {
+                savedSelection = JSON.parse(sessionStorage.getItem(cartSelectionStorageKey) || 'null');
+            } catch (error) {
+                sessionStorage.removeItem(cartSelectionStorageKey);
+            }
+
+            const sameOrders = Array.isArray(savedSelection?.orderIds)
+                && savedSelection.orderIds.length === availableOrderIds.length
+                && savedSelection.orderIds.every((orderId, index) => String(orderId) === availableOrderIds[index]);
+
+            if (sameOrders && Array.isArray(savedSelection?.selectedIds)) {
+                const selectedIds = new Set(savedSelection.selectedIds.map(String));
+                cartOrderSelectors.forEach((selector) => {
+                    selector.checked = selectedIds.has(selector.value);
+                });
+            } else {
+                cartOrderSelectors.forEach((selector) => {
+                    selector.checked = true;
+                });
+            }
+
+            updateCartOrderSelection(true);
+        }
+
+        selectedCartPaymentForm?.addEventListener('submit', (event) => {
+            if (!cartOrderSelectors.some((selector) => selector.checked)) {
+                event.preventDefault();
+            }
         });
 
         document.querySelectorAll('[data-delivery-form]').forEach((form) => {
@@ -956,12 +1153,19 @@
             form.querySelectorAll('input[name="delivery_method"]').forEach((input) => {
                 input.addEventListener('change', () => {
                     updateDeliveryFields();
+                    updateCartOrderSelection(false);
                     scheduleSave();
                 });
             });
             form.querySelectorAll('input:not([name="delivery_method"]):not([type="hidden"])').forEach((input) => {
-                input.addEventListener('input', () => scheduleSave(650));
-                input.addEventListener('change', () => scheduleSave());
+                input.addEventListener('input', () => {
+                    updateCartOrderSelection(false);
+                    scheduleSave(650);
+                });
+                input.addEventListener('change', () => {
+                    updateCartOrderSelection(false);
+                    scheduleSave();
+                });
             });
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
@@ -998,7 +1202,6 @@
             showWarning();
         });
     </script>
-    @include('shared.chat-widget')
     @include('shared.language-tools')
 </body>
 </html>

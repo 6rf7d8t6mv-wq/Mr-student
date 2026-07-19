@@ -68,7 +68,7 @@ class CustomerOrderController extends Controller
 
         if (! File::isFile($absolutePath)) {
             $message = $order->service_type === 'research'
-                ? 'طلب إنشاء البحث لا يحتوي على ملف مرفوع للعرض.'
+                ? 'طلب إنشاء البحوث لا يحتوي على ملف مرفوع للعرض.'
                 : 'الملف غير موجود في التخزين، لذلك تعذر عرضه.';
 
             if (request('from') === 'cart') {

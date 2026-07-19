@@ -66,4 +66,10 @@ class ExampleTest extends TestCase
     {
         $this->get('/live-status')->assertRedirect('/login');
     }
+
+    public function test_paid_and_unpaid_admin_order_pages_are_private(): void
+    {
+        $this->get('/admin/orders')->assertRedirect('/login');
+        $this->get('/admin/orders/unpaid')->assertRedirect('/login');
+    }
 }

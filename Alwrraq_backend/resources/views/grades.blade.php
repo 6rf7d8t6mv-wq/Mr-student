@@ -601,14 +601,14 @@
 
                 <article class="service-card">
                     <div class="service-icon">✍️</div>
-                    <h3 class="service-title">تنسيق الرسائل الجامعية</h3>
+                    <h3 class="service-title">تنسيق وتدقيق الرسائل الجامعية</h3>
                     <p class="service-description">رفع ملف Word فقط واحتساب سعر التنسيق تلقائيًا حسب عدد الصفحات.</p>
                     <button class="service-entry" type="button" onclick="selectService('formatting')">الدخول للخدمة</button>
                 </article>
 
                 <article class="service-card">
-                    <div class="service-icon">🔎</div>
-                    <h3 class="service-title">إنشاء بحث</h3>
+                    <div class="service-icon">📑</div>
+                    <h3 class="service-title">إنشاء بحوث جامعية وأكاديمية ودراسية</h3>
                     <p class="service-description">اكتب اسم البحث وعدد الصفحات المطلوبة، ويتم احتساب سعر الخدمة تلقائيًا.</p>
                     <button class="service-entry" type="button" onclick="selectService('research')">الدخول للخدمة</button>
                 </article>
@@ -940,7 +940,7 @@
             <!-- Upload Section for Formatting -->
             <div id="uploadFormatting" class="upload-content">
                 <button class="back-button" onclick="backToServices()">← العودة للخدمات</button>
-                <h2>تنسيق الرسائل الجامعية</h2>
+                <h2>تنسيق وتدقيق الرسائل الجامعية</h2>
                 <div class="service-notice">
                     <span class="service-notice-icon">i</span>
                     <div class="service-notice-content">
@@ -979,7 +979,7 @@
                 </div>
 
                 <div class="binding-section">
-                    <h3>إجمالي تنسيق الرسائل الجامعية</h3>
+                    <h3>إجمالي تنسيق وتدقيق الرسائل الجامعية</h3>
                     <div id="formattingPricingSummary" class="pricing-summary empty">ارفع ملفات Word لعرض الإجمالي.</div>
                 </div>
             </div>
@@ -987,7 +987,7 @@
             <!-- Research Creation Service -->
             <div id="uploadResearch" class="upload-content">
                 <button class="back-button" onclick="backToServices()">← العودة للخدمات</button>
-                <h2>إنشاء بحث</h2>
+                <h2>إنشاء بحوث جامعية وأكاديمية ودراسية</h2>
 
                 <div class="binding-section">
                     <h3>تفاصيل البحث</h3>
@@ -1024,7 +1024,7 @@
                 </div>
 
                 <div class="binding-section">
-                    <h3>إجمالي إنشاء البحث</h3>
+                    <h3>إجمالي إنشاء البحوث</h3>
                     <div class="research-delivery-notice">سيتم إرسال الملف بعد الانتهاء داخل التطبيق في صفحة طلباتي خلال ٢٤ ساعة إلى ٤٨ ساعة إن شاء الله.</div>
                     <div id="researchPricingSummary" class="pricing-summary empty">اكتب اسم البحث وعدد الصفحات لعرض الإجمالي.</div>
                 </div>
@@ -1159,6 +1159,14 @@
                 gold: 'كتابة باللون الذهبي',
                 black: 'كتابة باللون الأسود'
             };
+            const bookLeatherColors = {
+                black: 'جلد أسود',
+                green: 'جلد أخضر',
+                red: 'جلد أحمر',
+                blue: 'جلد أزرق',
+                beige: 'جلد بيج',
+                brown: 'جلد بني'
+            };
             const blackWritingAllowedCovers = ['beige', 'light_blue', 'light_green', 'white'];
 
             function escapeHtml(value) {
@@ -1225,6 +1233,7 @@
 
             function selectService(service) {
                 initializeSaudiUniversitiesList();
+                document.body.classList.add('customer-service-view');
                 const uploadIds = {
                     color_printing: 'uploadColorPrinting'
                 };
@@ -1237,6 +1246,7 @@
             }
 
             function backToServices() {
+                document.body.classList.remove('customer-service-view');
                 const homeUrl = new URL(window.location.href);
                 homeUrl.searchParams.delete('service');
                 homeUrl.searchParams.delete('order');
@@ -1516,7 +1526,7 @@
 
                 const noPrintServiceLabels = {
                     formatting: 'سعر التنسيق',
-                    research: 'سعر إنشاء البحث'
+                    research: 'سعر إنشاء البحوث'
                 };
                 const productBindingLabel = service === 'books'
                     ? 'سعر التجليد'
@@ -1577,6 +1587,11 @@
 
                 if (service !== 'books' && files.some(fileData => !fileData.binding)) {
                     renderCheckoutSummary(summary, service, 'اختر نوع التغليف لكل ملف قبل الانتقال للسلة.');
+                    return;
+                }
+
+                if (service === 'books' && files.some(fileData => !fileData.coverColor)) {
+                    renderCheckoutSummary(summary, service, 'اختر لون الجلد لكل ملف قبل الانتقال للسلة.');
                     return;
                 }
 
@@ -1701,7 +1716,7 @@
                 if (!hasSavedCurrentRequest) {
                     summary.classList.remove('empty');
                     summary.innerHTML = `
-                        <div>سعر إنشاء البحث: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال</div>
+                        <div>سعر إنشاء البحوث: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال</div>
                         <div class="checkout-row">
                             <span class="checkout-button disabled">احفظ الطلب أولًا</span>
                         </div>
@@ -1766,7 +1781,7 @@
                     const result = await response.json();
 
                     if (!response.ok || !result.success) {
-                        throw new Error(result.message || 'تعذر حفظ طلب إنشاء البحث');
+                        throw new Error(result.message || 'تعذر حفظ طلب إنشاء البحوث');
                     }
 
                     currentOrders.research = result.order_id;
@@ -1778,7 +1793,7 @@
                     updateResearchPricingSummary();
                 } catch (error) {
                     errorDiv.style.display = 'block';
-                    errorDiv.textContent = error.message || 'تعذر حفظ طلب إنشاء البحث';
+                    errorDiv.textContent = error.message || 'تعذر حفظ طلب إنشاء البحوث';
                 } finally {
                     button.disabled = false;
                     button.textContent = 'حفظ الطلب';
@@ -1923,6 +1938,16 @@
                             </div>
                         `
                         : '';
+                    const bookLeatherColorHtml = config.service === 'books'
+                        ? `
+                            <div data-label="لون الجلد">
+                                <select class="binding-select" onchange="setBookLeatherColor('${config.service}', '${config.type}', ${index}, this.value)">
+                                    <option value="" ${!fileData.coverColor ? 'selected' : ''} disabled>اختر لون الجلد</option>
+                                    ${Object.entries(bookLeatherColors).map(([value, label]) => `<option value="${value}" ${fileData.coverColor === value ? 'selected' : ''}>${label}</option>`).join('')}
+                                </select>
+                            </div>
+                        `
+                        : '';
                     const printSidesHtml = showPrintSides
                         ? `
                             <div class="${showAcademicPrice ? 'academic-choice-cell' : ''}" data-label="نوع الطباعة">
@@ -2045,6 +2070,7 @@
                             ${printSidesHtml}
                             ${pageSizeHtml}
                             ${paperColorHtml}
+                            ${bookLeatherColorHtml}
                             ${bindingHtml}
                             ${notesPrintPriceHtml}
                             ${notesBindingPriceHtml}
@@ -2196,6 +2222,16 @@
                     print_price: price.printPrice,
                     binding_price: price.bindingPrice,
                     total_price: price.total
+                });
+                updateFilesList(getConfigKey(service, type));
+                updatePrintProductPricingSummary(service);
+            }
+
+            function setBookLeatherColor(service, type, index, coverColor) {
+                const fileData = uploadedFiles[service][type][index];
+                fileData.coverColor = coverColor || '';
+                updateStoredFile(fileData, {
+                    cover_color: fileData.coverColor || null
                 });
                 updateFilesList(getConfigKey(service, type));
                 updatePrintProductPricingSummary(service);

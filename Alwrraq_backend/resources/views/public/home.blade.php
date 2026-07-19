@@ -52,8 +52,8 @@
                         'طباعة وتجليد رسائل الماجستير',
                         'طباعة وتجليد رسائل الدكتوراه',
                         'طباعة الكتب والمذكرات والملفات',
-                        'تنسيق الرسائل العلمية',
-                        'إنشاء البحوث',
+                        'تنسيق وتدقيق الرسائل الجامعية',
+                        'إنشاء بحوث جامعية وأكاديمية ودراسية',
                         'منتجات القرطاسية',
                     ])->map(fn ($name) => [
                         '@type' => 'OfferCatalog',
@@ -540,11 +540,11 @@
                     <p>خدمات أكاديمية وطباعية ومنتجات قرطاسية تخدم جميع الفئات في أنحاء المملكة، مع فرع في المدينة المنورة وشحن عبر RedBox.</p>
                 </div>
                 <div class="cards">
-                    <article class="card"><div class="card-icon">01</div><h3>تنسيق رسائل الدكتوراه والماجستير</h3></article>
+                    <article class="card"><div class="card-icon">01</div><h3>تنسيق وتدقيق الرسائل الجامعية</h3></article>
                     <article class="card"><div class="card-icon">02</div><h3>تدقيق لغوي للرسائل العلمية</h3></article>
                     <article class="card"><div class="card-icon">03</div><h3>طباعة وتجليد رسائل الماجستير</h3></article>
                     <article class="card"><div class="card-icon">04</div><h3>طباعة وتجليد رسائل الدكتوراه</h3></article>
-                    <article class="card"><div class="card-icon">05</div><h3>إنشاء البحوث</h3></article>
+                    <article class="card"><div class="card-icon">05</div><h3>إنشاء بحوث جامعية وأكاديمية ودراسية</h3></article>
                     <article class="card"><div class="card-icon">06</div><h3>طباعة المذكرات والكتب</h3></article>
                     <article class="card"><div class="card-icon">07</div><h3>تجليد الكتب كعب جلد طبيعي</h3></article>
                     <article class="card"><div class="card-icon">08</div><h3>طباعة الملفات بالألوان</h3></article>
