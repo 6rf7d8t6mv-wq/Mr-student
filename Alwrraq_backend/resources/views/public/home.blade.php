@@ -128,7 +128,8 @@
     <style>
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; scroll-padding-top: 92px; }
-        body { margin: 0; font-family: Arial, Tahoma, sans-serif; background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 44%, #f7fafc 100%); color: #0f172a; line-height: 1.8; }
+        body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; margin: 0; font-family: Arial, Tahoma, sans-serif; background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 44%, #f7fafc 100%); color: #0f172a; line-height: 1.8; }
+        body > main { flex: 1 0 auto; }
         a { color: inherit; }
         .container { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
         .stationery-announcement { position: relative; z-index: 21; background: linear-gradient(135deg, #0f4c81, #10233f); color: #ffffff; border-bottom: 1px solid rgba(147, 197, 253, 0.28); }
@@ -258,7 +259,7 @@
         .contact-channel.call { background: #0f4c81; }
         .contact-channel.whatsapp { background: #16a34a; }
         .contact-channel.telegram { background: #0284c7; }
-        .site-footer { padding: 26px 0; border-top: 1px solid #e2e8f0; background: #ffffff; color: #64748b; }
+        .site-footer { flex: 0 0 auto; margin-top: auto; padding: 26px 0; border-top: 1px solid #e2e8f0; background: #ffffff; color: #64748b; }
         .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
         .footer-links { display: flex; gap: 14px; flex-wrap: wrap; }
         .footer-links a { color: #334155; text-decoration: none; font-weight: 800; }

@@ -349,7 +349,7 @@
                                         <span>المنتج</span>
                                         <div class="ordered-product-main">
                                             @if ($item->image_path)
-                                                <img class="ordered-product-image" src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->product_name }}">
+                                                <img class="ordered-product-image" src="{{ route('stationery.image', ['filename' => basename($item->image_path)], false) }}" alt="" loading="lazy">
                                             @else
                                                 <span class="ordered-product-image ordered-product-image-placeholder" aria-hidden="true">🛍️</span>
                                             @endif

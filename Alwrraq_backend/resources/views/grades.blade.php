@@ -8,7 +8,7 @@
         <style>
             :root { --sidebar-width: clamp(180px, 20vw, 240px); --page-gap: clamp(14px, 3vw, 40px); }
             * { box-sizing: border-box; }
-            body { font-family: Arial, sans-serif; background: #f3f4f6; color: #1f2937; margin: 0; padding: 0 calc(var(--sidebar-width) + var(--page-gap)) 0 var(--page-gap); }
+            body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; font-family: Arial, sans-serif; background: #f3f4f6; color: #1f2937; margin: 0; padding: 0 calc(var(--sidebar-width) + var(--page-gap)) 0 var(--page-gap); }
             .page-header { width: var(--sidebar-width); min-height: 100vh; max-height: 100vh; overflow-y: auto; background: #0f172a; color: #f8fafc; padding: clamp(16px, 2vw, 24px) clamp(12px, 1.6vw, 18px); box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15); position: fixed; top: 0; right: 0; z-index: 10; }
             .header-inner { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 0; }
             .brand { font-size: clamp(18px, 2vw, 24px); font-weight: 700; letter-spacing: 0.02em; overflow-wrap: anywhere; margin-bottom: 4px; }
@@ -201,7 +201,7 @@
             .checkout-button:hover { background: #065f46; }
             .checkout-button.disabled { background: #cbd5e1; color: #64748b; pointer-events: none; }
 
-            .page-footer { background: #0f172a; color: #cbd5e1; padding: 14px 18px; }
+            .page-footer { flex: 0 0 auto; width: 100%; margin-top: auto; background: #0f172a; color: #cbd5e1; padding: 14px 18px; }
             .footer-content { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 4px; font-size: 12px; line-height: 1.45; }
             @media (max-width: 1180px) {
                 .services-screen { grid-template-columns: repeat(2, minmax(0, 1fr)); }

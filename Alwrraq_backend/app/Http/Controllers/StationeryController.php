@@ -8,9 +8,23 @@ use App\Models\StationeryProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class StationeryController extends Controller
 {
+    public function image(string $filename)
+    {
+        abort_unless($filename === basename($filename), 404);
+
+        $path = 'stationery-products/'.$filename;
+        abort_unless(Storage::disk('public')->exists($path), 404);
+
+        return Storage::disk('public')->response($path, null, [
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     public function index(Request $request)
     {
         $search = trim((string) $request->query('q', ''));

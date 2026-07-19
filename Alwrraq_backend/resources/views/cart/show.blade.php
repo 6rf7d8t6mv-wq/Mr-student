@@ -551,7 +551,7 @@
                                                         <tr>
                                                             <td data-label="المنتج">
                                                                 <div class="stationery-product-line">
-                                                                    @if ($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->product_name }}">@endif
+                                                                    @if ($item->image_path)<img src="{{ route('stationery.image', ['filename' => basename($item->image_path)], false) }}" alt="" loading="lazy">@endif
                                                                     <strong class="stationery-product-name">{{ $item->product_name }}</strong>
                                                                     <div class="stationery-product-actions">
                                                                         <a class="edit-file-button" href="{{ route('stationery.index') }}" target="_top">تعديل</a>

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -32,5 +33,19 @@ class ExampleTest extends TestCase
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
             ->assertSee('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">', false)
             ->assertSee(route('public.home'), false);
+    }
+
+    public function test_stationery_images_are_served_without_a_public_storage_symlink(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('stationery-products/test-product.png', 'image-content');
+
+        $response = $this->get('/stationery-images/test-product.png');
+
+        $response->assertStatus(200);
+        $this->assertSame('image-content', $response->streamedContent());
+        $this->assertStringContainsString('max-age=31536000', (string) $response->headers->get('Cache-Control'));
+
+        $this->get('/stationery-images/missing-product.png')->assertNotFound();
     }
 }

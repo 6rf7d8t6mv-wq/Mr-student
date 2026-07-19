@@ -134,7 +134,8 @@
                     <article class="product-card" data-product-card="{{ $product->id }}">
                         <div class="product-image-wrap">
                             @if ($product->image_path)
-                                <img class="product-image" src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">
+                                <img class="product-image" src="{{ route('stationery.image', ['filename' => basename($product->image_path)], false) }}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+                                <div class="product-placeholder" style="display:none" aria-label="تعذر عرض صورة {{ $product->name }}">✏️</div>
                             @else
                                 <div class="product-placeholder">✏️</div>
                             @endif

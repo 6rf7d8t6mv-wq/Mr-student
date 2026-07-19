@@ -52,6 +52,10 @@ Route::get('/sitemap.xml', function () {
         ->header('Content-Type', 'application/xml; charset=UTF-8');
 })->name('sitemap');
 
+Route::get('/stationery-images/{filename}', [StationeryController::class, 'image'])
+    ->where('filename', '[A-Za-z0-9._-]+')
+    ->name('stationery.image');
+
 Route::middleware('auth')->prefix('chat')->name('chat.')->group(function () {
     Route::get('/conversations', [ChatController::class, 'conversations'])->name('conversations');
     Route::get('/conversations/{conversation}', [ChatController::class, 'show'])->name('conversations.show');

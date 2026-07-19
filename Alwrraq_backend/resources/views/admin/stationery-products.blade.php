@@ -76,7 +76,8 @@
                 <article class="admin-product-card">
                     <div class="admin-product-image-wrap">
                         @if ($product->image_path)
-                            <img class="admin-product-image" src="{{ asset('storage/'.$product->image_path) }}" alt="{{ $product->name }}">
+                            <img class="admin-product-image" src="{{ route('stationery.image', ['filename' => basename($product->image_path)], false) }}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+                            <div class="admin-product-image-empty" style="display:none">تعذر عرض الصورة</div>
                         @else
                             <div class="admin-product-image-empty">بدون صورة</div>
                         @endif
