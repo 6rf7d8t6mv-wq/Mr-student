@@ -431,7 +431,7 @@
 
             refresh();
             requestAnimationFrame(scanOrderAlerts);
-            pollTimer = setInterval(refresh, 12000);
+            pollTimer = setInterval(refresh, 1000);
             window.addEventListener('beforeunload', () => {
                 clearInterval(pollTimer);
                 if (viewportFrame) cancelAnimationFrame(viewportFrame);

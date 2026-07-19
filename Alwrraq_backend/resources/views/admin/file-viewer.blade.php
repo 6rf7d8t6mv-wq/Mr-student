@@ -218,7 +218,6 @@
             printFrame.src = rawUrl;
         }
     </script>
-    @include('shared.admin-live-updates', ['adminLiveRefreshMain' => false])
     @include('shared.language-tools')
 </body>
 </html>

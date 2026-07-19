@@ -61,4 +61,9 @@ class ExampleTest extends TestCase
 
         $this->get('/showcase-images/unknown')->assertNotFound();
     }
+
+    public function test_live_status_is_private(): void
+    {
+        $this->get('/live-status')->assertRedirect('/login');
+    }
 }

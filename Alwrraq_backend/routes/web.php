@@ -9,6 +9,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\EducationalInstitutionController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\LivePageUpdateController;
 use App\Http\Controllers\PublicAssetController;
 use App\Http\Controllers\StationeryController;
 use App\Models\Order;
@@ -40,6 +41,10 @@ Route::post('/language', function (Request $request) {
 })->name('language.switch');
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+Route::get('/live-status', LivePageUpdateController::class)
+    ->middleware('auth')
+    ->name('live-status');
 
 Route::get('/sitemap.xml', function () {
     $homeView = resource_path('views/public/home.blade.php');

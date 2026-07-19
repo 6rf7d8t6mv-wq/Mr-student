@@ -904,6 +904,8 @@
     })();
 </script>
 
+@include('shared.live-page-updates')
+
 <script>
     (() => {
         document.addEventListener('click', (event) => {

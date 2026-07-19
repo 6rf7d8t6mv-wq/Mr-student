@@ -710,9 +710,6 @@
             });
         });
     </script>
-    @include('shared.admin-live-updates', [
-        'adminLiveRefreshMain' => request()->routeIs('admin.dashboard', 'admin.orders'),
-    ])
     @include('shared.chat-widget')
     @include('shared.language-tools')
 </body>
