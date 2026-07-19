@@ -40,6 +40,18 @@ Route::post('/language', function (Request $request) {
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
+Route::get('/sitemap.xml', function () {
+    $homeView = resource_path('views/public/home.blade.php');
+    $lastModified = date('c', filemtime($homeView));
+
+    return response()
+        ->view('public.sitemap', [
+            'homeUrl' => route('public.home'),
+            'lastModified' => $lastModified,
+        ])
+        ->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('sitemap');
+
 Route::middleware('auth')->prefix('chat')->name('chat.')->group(function () {
     Route::get('/conversations', [ChatController::class, 'conversations'])->name('conversations');
     Route::get('/conversations/{conversation}', [ChatController::class, 'show'])->name('conversations.show');

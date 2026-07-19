@@ -1,2 +1,12 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /account
+Disallow: /admin
+Disallow: /cart
+Disallow: /chat
+Disallow: /my-orders
+Disallow: /upload-file
+Disallow: /order-files
+Disallow: /storage
+
+Sitemap: https://alwrraq.com/sitemap.xml

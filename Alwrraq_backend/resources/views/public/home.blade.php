@@ -3,11 +3,91 @@
     $pageUrl = $siteUrl . '/';
     $isEnglish = session('ui_locale', 'ar') === 'en';
     $pageTitle = $isEnglish
-        ? 'Alwrraq | Printing, Binding, Stationery, and File Services for Everyone'
-        : 'الورّاق | خدمات الطباعة والتجليد والقرطاسية لجميع الفئات';
+        ? 'Alwrraq | Printing, Binding, and Stationery Across Saudi Arabia'
+        : 'الورّاق | طباعة وتجليد الرسائل والكتب والقرطاسية في السعودية';
     $pageDescription = $isEnglish
-        ? 'Alwrraq serves students, teachers, professors, lecturers, teaching assistants, researchers, and everyone through printing, binding, stationery, file upload, and order tracking services.'
-        : 'الورّاق يخدم الدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات بخدمات الطباعة والتجليد والقرطاسية ورفع الملفات ومتابعة الطلبات.';
+        ? 'Print and bind theses, books, and notes, upload PDF and Word files, and shop stationery with delivery across Saudi Arabia. Alwrraq branch is in Madinah.'
+        : 'طباعة وتجليد رسائل الماجستير والدكتوراه والكتب والمذكرات، ورفع ملفات PDF وWord وشراء القرطاسية مع التوصيل لجميع مناطق السعودية. فرعنا في المدينة المنورة.';
+    $logoUrl = $siteUrl . '/images/alwrraq-logo.jpeg';
+    $socialImageUrl = $siteUrl . '/images/alwrraq-desktop-preview.png';
+    $structuredData = [
+        '@context' => 'https://schema.org',
+        '@graph' => [
+            [
+                '@type' => 'Store',
+                '@id' => $siteUrl . '/#organization',
+                'name' => 'الورّاق',
+                'alternateName' => ['Alwrraq', 'الوراق'],
+                'legalName' => 'شركة مسير المدينة المحدودة',
+                'url' => $pageUrl,
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $logoUrl,
+                ],
+                'image' => $socialImageUrl,
+                'telephone' => '+966542440582',
+                'taxID' => '314417169600003',
+                'currenciesAccepted' => 'SAR',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'addressLocality' => 'المدينة المنورة',
+                    'addressRegion' => 'المدينة المنورة',
+                    'addressCountry' => 'SA',
+                ],
+                'areaServed' => [
+                    '@type' => 'Country',
+                    'name' => 'المملكة العربية السعودية',
+                ],
+                'contactPoint' => [
+                    '@type' => 'ContactPoint',
+                    'telephone' => '+966542440582',
+                    'contactType' => 'customer service',
+                    'areaServed' => 'SA',
+                    'availableLanguage' => ['ar', 'en'],
+                ],
+                'hasOfferCatalog' => [
+                    '@type' => 'OfferCatalog',
+                    'name' => 'خدمات الورّاق',
+                    'itemListElement' => collect([
+                        'طباعة وتجليد رسائل الماجستير',
+                        'طباعة وتجليد رسائل الدكتوراه',
+                        'طباعة الكتب والمذكرات والملفات',
+                        'تنسيق الرسائل العلمية',
+                        'إنشاء البحوث',
+                        'منتجات القرطاسية',
+                    ])->map(fn ($name) => [
+                        '@type' => 'OfferCatalog',
+                        'name' => $name,
+                    ])->all(),
+                ],
+            ],
+            [
+                '@type' => 'WebSite',
+                '@id' => $siteUrl . '/#website',
+                'url' => $pageUrl,
+                'name' => 'الورّاق',
+                'alternateName' => 'Alwrraq',
+                'inLanguage' => 'ar-SA',
+                'publisher' => ['@id' => $siteUrl . '/#organization'],
+            ],
+            [
+                '@type' => 'WebPage',
+                '@id' => $pageUrl . '#webpage',
+                'url' => $pageUrl,
+                'name' => $pageTitle,
+                'description' => $pageDescription,
+                'inLanguage' => 'ar-SA',
+                'isPartOf' => ['@id' => $siteUrl . '/#website'],
+                'about' => ['@id' => $siteUrl . '/#organization'],
+                'primaryImageOfPage' => [
+                    '@type' => 'ImageObject',
+                    'url' => $socialImageUrl,
+                    'width' => 2879,
+                    'height' => 1625,
+                ],
+            ],
+        ],
+    ];
     $loginUrl = route('login');
     $registerUrl = route('login') . '#register';
 @endphp
@@ -18,15 +98,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDescription }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="canonical" href="{{ $pageUrl }}">
-    <link rel="icon" type="image/jpeg" href="{{ asset('images/alwrraq-logo.jpeg') }}">
-    <link rel="apple-touch-icon" href="{{ asset('images/alwrraq-logo.jpeg') }}">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('sitemap') }}">
+    <link rel="icon" type="image/jpeg" href="{{ $logoUrl }}">
+    <link rel="apple-touch-icon" href="{{ $logoUrl }}">
+    <link rel="preload" as="image" href="{{ $logoUrl }}" fetchpriority="high">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="{{ $isEnglish ? 'en_US' : 'ar_SA' }}">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ $pageUrl }}">
-    <meta property="og:site_name" content="Alwrraq">
+    <meta property="og:site_name" content="الورّاق">
+    <meta property="og:image" content="{{ $socialImageUrl }}">
+    <meta property="og:image:secure_url" content="{{ $socialImageUrl }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="2879">
+    <meta property="og:image:height" content="1625">
+    <meta property="og:image:alt" content="واجهة منصة الورّاق على الكمبيوتر">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    <meta name="twitter:image" content="{{ $socialImageUrl }}">
+    <meta name="twitter:image:alt" content="واجهة منصة الورّاق على الكمبيوتر">
+    <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}</script>
     <style>
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; scroll-padding-top: 92px; }
@@ -57,6 +155,8 @@
         .hero-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr); gap: 28px; align-items: center; }
         .eyebrow { display: inline-flex; padding: 7px 13px; border-radius: 999px; background: #dbeafe; color: #0f4c81; font-size: 13px; font-weight: 900; margin-bottom: 16px; border: 1px solid #bfdbfe; }
         h1 { margin: 0; font-size: clamp(34px, 6vw, 56px); line-height: 1.25; letter-spacing: 0; }
+        .hero-title { width: 100%; max-width: 680px; text-align: center; }
+        .hero-title-line { display: block; width: 100%; white-space: nowrap; }
         .hero p { max-width: 620px; margin: 18px 0 0; color: #475569; font-size: clamp(16px, 2vw, 19px); }
         .hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; max-width: 620px; }
         .stat { background: rgba(255, 255, 255, 0.82); border: 1px solid #dbe3ef; border-radius: 16px; padding: 14px; box-shadow: 0 14px 36px rgba(15, 23, 42, 0.06); }
@@ -194,7 +294,7 @@
             .hero { padding: 18px 0 12px; }
             .hero-grid { gap: 8px; }
             .eyebrow { margin-bottom: 6px; padding: 4px 8px; font-size: 10px; }
-            h1 { font-size: 22px; line-height: 1.35; }
+            h1 { font-size: clamp(18px, 5.8vw, 22px); line-height: 1.35; }
             .hero p { margin-top: 7px; font-size: 11.5px; line-height: 1.65; }
             .hero-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
             .stat { min-width: 0; padding: 6px; border-radius: 8px; box-shadow: none; }
@@ -278,7 +378,7 @@
             .hero { padding: 42px 0 24px; }
             .hero-grid { grid-template-columns: minmax(0, 1.12fr) minmax(380px, 0.88fr); gap: 22px; }
             .eyebrow { margin-bottom: 11px; padding: 7px 12px; font-size: 15px; }
-            h1 { font-size: 46px; line-height: 1.25; }
+            h1 { font-size: clamp(31px, 3vw, 42px); line-height: 1.25; }
             .hero p { margin-top: 12px; font-size: 18px; line-height: 1.75; }
             .hero-stats { gap: 9px; margin-top: 18px; }
             .stat { padding: 11px 12px; border-radius: 12px; }
@@ -346,7 +446,7 @@
     <header class="site-header">
         <div class="container nav">
             <a class="brand" href="{{ route('public.home') }}" aria-label="الورّاق">
-                <span class="logo"><img src="{{ asset('images/alwrraq-logo.jpeg') }}" alt="شعار الورّاق"></span>
+                <span class="logo"><img src="{{ asset('images/alwrraq-logo.jpeg') }}" alt="شعار الورّاق" width="48" height="48" fetchpriority="high"></span>
                 <span>الورّاق</span>
             </a>
             <nav class="nav-links" aria-label="روابط الصفحة">
@@ -369,8 +469,12 @@
             <div class="container hero-grid">
                 <div>
                     <span class="eyebrow">طباعة الرسائل العلمية والكتب والمذكرات وتجليدها وخدمات القرطاسية</span>
-                    <h1>الورّاق لإدارة طلبات الطباعة ورفع الملفات بسهولة</h1>
-                    <p>منصة تخدم الدكتور والأستاذ والمعيد والمعلم والباحث والطالب وجميع الفئات في رفع الملفات، اختيار الطباعة والتجليد، شراء القرطاسية، ومتابعة الطلب من مكان واحد.</p>
+                    <h1 class="hero-title" aria-label="الورّاق الأول في السعودية لطباعة وتجليد الرسائل العلمية والكتب وبيع الخدمات القرطاسية وتوصلك لبيتك">
+                        <span class="hero-title-line">الورّاق الأول في السعــودية لطباعـة</span>
+                        <span class="hero-title-line">وتجليد الرسائل العلمية والكتب وبيع</span>
+                        <span class="hero-title-line">الخدمـات القرطاسـية وتوصـلك لبيتـك</span>
+                    </h1>
+                    <p>منصة تخدم الدكتور والأستاذ والمعيد والمعلم والباحث والطالب وجميع الفئات في رفع الملفات، واختيار الطباعة والتجليد، وشراء القرطاسية، ومتابعة الطلب من مكان واحد. فرعنا في المدينة المنورة ونوصل لجميع مناطق المملكة عبر شركة RedBox.</p>
                     <div class="hero-stats" aria-label="مميزات مختصرة">
                         <div class="stat"><strong>رفع إلكتروني</strong><span>ملفاتك داخل حسابك</span></div>
                         <div class="stat"><strong>متابعة مباشرة</strong><span>حالة الطلب والفاتورة</span></div>
@@ -396,7 +500,7 @@
                         <span class="about-badge">من نحن</span>
                         <h2>الورّاق تجربة متكاملة لجميع الفئات بخدمة موثوقة وتنفيذ منظم</h2>
                         <p>
-                            الورّاق منصة متخصصة في تسهيل خدمات الطباعة والتجليد والقرطاسية ورفع الملفات ومتابعة الطلبات للدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات. صممت لتجمع بين وضوح الإجراءات وسرعة التنفيذ وحفظ تفاصيل الطلب في مكان واحد. نحن إحدى مؤسسات شركة مسير المدينة المحدودة، ونعمل على تقديم تجربة رقمية مرتبة تساعد كل عميل على إنجاز طلبه بثقة وراحة حتى الاستلام.
+                            الورّاق منصة متخصصة في تسهيل خدمات الطباعة والتجليد والقرطاسية ورفع الملفات ومتابعة الطلبات للدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات. صممت لتجمع بين وضوح الإجراءات وسرعة التنفيذ وحفظ تفاصيل الطلب في مكان واحد. نحن إحدى مؤسسات شركة مسير المدينة المحدودة، وفرعنا في المدينة المنورة مع توصيل الطلبات إلى جميع مناطق المملكة العربية السعودية عبر شركة RedBox.
                         </p>
                     </div>
                     <div class="about-panel" aria-label="قيم الورّاق">
@@ -418,10 +522,10 @@
                     </div>
                     <div class="devices">
                         <figure class="device device-desktop">
-                            <img class="showcase-preview" src="{{ asset('images/alwrraq-desktop-preview.png') }}" alt="واجهة الورّاق على شاشة الكمبيوتر" loading="lazy">
+                            <img class="showcase-preview" src="{{ asset('images/alwrraq-desktop-preview.png') }}" alt="واجهة منصة الورّاق لطلبات الطباعة والقرطاسية على الكمبيوتر" width="2879" height="1625" loading="lazy" decoding="async">
                         </figure>
                         <figure class="device device-phone">
-                            <img class="showcase-preview" src="{{ asset('images/alwrraq-mobile-preview.png') }}" alt="واجهة الورّاق على شاشة الجوال" loading="lazy">
+                            <img class="showcase-preview" src="{{ asset('images/alwrraq-mobile-preview.png') }}" alt="واجهة منصة الورّاق لخدمات الطباعة والتجليد على الجوال" width="702" height="1462" loading="lazy" decoding="async">
                         </figure>
                     </div>
                 </div>
@@ -432,7 +536,7 @@
             <div class="container">
                 <div class="section-head">
                     <h2>خدماتنا</h2>
-                    <p>خدمات أكاديمية وطباعية ومنتجات قرطاسية تخدم الدكاترة والأساتذة والمعيدين والمعلمين والباحثين والطلاب وجميع الفئات.</p>
+                    <p>خدمات أكاديمية وطباعية ومنتجات قرطاسية تخدم جميع الفئات في أنحاء المملكة، مع فرع في المدينة المنورة وشحن عبر RedBox.</p>
                 </div>
                 <div class="cards">
                     <article class="card"><div class="card-icon">01</div><h3>تنسيق رسائل الدكتوراه والماجستير</h3></article>
@@ -484,7 +588,7 @@
                 <div class="contact">
                     <div>
                         <h2>تواصل معنا</h2>
-                        <p>للاستفسارات أو المساعدة في الطلبات، تواصل معنا مباشرة عبر الاتصال أو واتساب أو تلجرام.</p>
+                        <p>للاستفسارات أو المساعدة في الطلبات، تواصل معنا مباشرة عبر الاتصال أو واتساب أو تلجرام. فرع الورّاق في المدينة المنورة، والتوصيل متاح لجميع مناطق المملكة عبر RedBox.</p>
                         <a class="contact-phone" href="tel:+966542440582" aria-label="رقم التواصل">+966 54 244 0582</a>
                     </div>
                     <div class="contact-actions" aria-label="قنوات التواصل">
