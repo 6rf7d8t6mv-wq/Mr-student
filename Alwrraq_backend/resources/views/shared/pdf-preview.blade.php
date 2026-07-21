@@ -9,13 +9,27 @@
         if (!preview || !status) return;
 
         try {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = @json($pdfJsBasePath.'/pdf.worker.min.js');
-
             // Keep the authenticated PDF request on the exact WebView origin.
             // Laravel may be configured with "localhost" while the app is opened
             // through "127.0.0.1", which browsers correctly treat as two origins.
             const configuredPdfUrl = new URL(@json($pdfUrl), window.location.href);
             const sameOriginPdfUrl = `${configuredPdfUrl.pathname}${configuredPdfUrl.search}${configuredPdfUrl.hash}`;
+            const usesMobileViewer = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            if (!usesMobileViewer) {
+                const nativeViewer = document.createElement('iframe');
+                nativeViewer.src = sameOriginPdfUrl;
+                nativeViewer.title = 'معاينة ملف PDF';
+                nativeViewer.style.width = '100%';
+                nativeViewer.style.minHeight = 'calc(100vh - 120px)';
+                nativeViewer.style.flex = '1';
+                nativeViewer.style.border = '0';
+                preview.replaceChildren(nativeViewer);
+                return;
+            }
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc = @json($pdfJsBasePath.'/pdf.worker.min.js');
             const response = await fetch(sameOriginPdfUrl, {
                 credentials: 'same-origin',
                 cache: 'no-store',
