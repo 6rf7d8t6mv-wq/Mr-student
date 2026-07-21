@@ -105,7 +105,14 @@
 @endphp
 
 <div class="invoice-toolbar">
-    <button class="action secondary" type="button" onclick="printInvoice('{{ $invoiceId }}')">تحميل PDF</button>
+    @if (! empty($invoicePrintUrl))
+        <a class="action secondary" href="{{ $invoicePrintUrl }}">تحميل الفاتورة PDF</a>
+    @else
+        <button class="action secondary" type="button" onclick="printInvoice('{{ $invoiceId }}')">تحميل الفاتورة PDF</button>
+    @endif
+    @if (! empty($invoiceViewUrl))
+        <a class="action invoice-button" href="{{ $invoiceViewUrl }}">عرض الفاتورة</a>
+    @endif
 </div>
 
 <section class="invoice-document" id="{{ $invoiceId }}" dir="rtl">
@@ -246,7 +253,7 @@
                         @endif
                         @if (in_array($order->service_type, ['thesis', 'phd'], true))
                             <td data-label="الجامعة/المعهد">{{ $file->university_name ?: '-' }}</td>
-                            <td data-label="خيار CD">{{ ['none' => 'بدون CD', 'plain' => 'CD بدون طباعة', 'printed' => 'CD مع طباعة'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}</td>
+                            <td data-label="خيار CD">{{ ['none' => 'بدون CD', 'plain' => 'CD بدون طباعة', 'printed' => 'سي دي بغلاف مطبوع'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}</td>
                             <td data-label="عدد CD">{{ $file->cd_type === 'none' ? 0 : $file->cd_copies }}</td>
                             <td data-label="سعر CD">{{ $file->cd_price }} ريال</td>
                         @endif

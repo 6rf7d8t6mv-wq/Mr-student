@@ -71,7 +71,9 @@
                 </div>
 
                 <div class="actions">
-                    @if (request('from') === 'cart')
+                    @if (request('from') === 'upload')
+                        <a class="action green" href="{{ route('home', ['service' => $order->service_type, 'order' => $order->id]) }}">العودة للملفات المحملة</a>
+                    @elseif (request('from') === 'cart')
                         <a class="action green" href="{{ route('cart.index') }}">العودة للسلة</a>
                     @else
                         <a class="action green" href="{{ route('orders.index', ['open_order' => $order->id]) }}">العودة لعرض الطلب</a>

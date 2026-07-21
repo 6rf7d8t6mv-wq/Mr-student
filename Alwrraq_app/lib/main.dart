@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
@@ -31,6 +33,9 @@ class AlwrraqWebApp extends StatefulWidget {
 
 class _AlwrraqWebAppState extends State<AlwrraqWebApp> {
   static final Uri _siteUri = Uri.parse('http://127.0.0.1:8000/app');
+  static const MethodChannel _downloadsChannel = MethodChannel(
+    'alwrraq/downloads',
+  );
 
   late final WebViewController _controller;
   var _isLoading = true;
@@ -44,6 +49,45 @@ class _AlwrraqWebAppState extends State<AlwrraqWebApp> {
       ..setBackgroundColor(const Color(0xFFF3F4F6))
       ..setNavigationDelegate(
         NavigationDelegate(
+          onNavigationRequest: (request) async {
+            final uri = Uri.tryParse(request.url);
+            final isDeliveredFileDownload =
+                uri != null &&
+                uri.path.contains('/delivered-files/') &&
+                !uri.path.endsWith('/view') &&
+                !uri.path.endsWith('/raw');
+            if (!const {
+                  TargetPlatform.android,
+                  TargetPlatform.iOS,
+                }.contains(defaultTargetPlatform) ||
+                (uri?.queryParameters['download'] != '1' &&
+                    !isDeliveredFileDownload)) {
+              return NavigationDecision.navigate;
+            }
+
+            final fileName = uri?.queryParameters['filename'] ?? 'alwrraq-file';
+
+            try {
+              await _downloadsChannel.invokeMethod<Object>('download', {
+                'url': request.url,
+                'fileName': fileName,
+              });
+
+              if (mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('بدأ تحميل $fileName')));
+              }
+            } on PlatformException {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('تعذر بدء تحميل الملف')),
+                );
+              }
+            }
+
+            return NavigationDecision.prevent;
+          },
           onPageStarted: (_) {
             if (!mounted) return;
             setState(() {

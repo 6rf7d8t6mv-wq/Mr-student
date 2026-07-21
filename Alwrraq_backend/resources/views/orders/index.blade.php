@@ -85,6 +85,8 @@
         .orders-table thead { display: none; }
         .orders-table tbody { display: grid; gap: 14px; }
         .orders-table tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px; overflow: hidden; border: 1px solid #dbe3ef; border-inline-start: 4px solid #2563eb; border-radius: 14px; background: #ffffff; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07); }
+        .orders-table tr { scroll-margin-top: 72px; }
+        .orders-table tr:target { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18), 0 12px 28px rgba(15, 23, 42, 0.09); }
         .orders-table td { display: flex; min-width: 0; flex-direction: row; justify-content: space-between; align-items: center; gap: 6px; min-height: 48px; padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; white-space: normal; overflow-wrap: anywhere; font-size: 12px; }
         .orders-table td::before { content: attr(data-label); color: #64748b; font-size: 11px; font-weight: 900; line-height: 1.4; }
         .orders-table .order-main-cell { grid-column: 1 / -1; display: block; min-height: 0; padding: 2px 3px 8px; border: 0; border-radius: 0; background: transparent; }
@@ -128,8 +130,8 @@
         .delivered-file-item { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; }
         .delivered-file-name { color: #0f172a; font-weight: 900; line-height: 1.6; word-break: break-word; }
         .delivered-file-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-        .invoice-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
-        .invoice-toolbar .action { padding: 12px 18px; min-width: 142px; justify-content: center; border-radius: 10px; font-size: 15px; }
+        .invoice-toolbar { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .invoice-toolbar .action { flex: 1 1 0; width: auto; min-width: 0; padding: 12px 8px; justify-content: center; border-radius: 10px; font-size: 15px; }
         .invoice-document { color: #111827; background: #ffffff; border: 1px solid #dbe3ef; border-radius: 14px; padding: clamp(12px, 2vw, 18px); box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08); }
         .invoice-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #0f172a; color: #ffffff; margin-bottom: 12px; }
         .invoice-brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -168,7 +170,7 @@
         .invoice-totals .grand strong { font-size: 11px; }
         .invoice-note { margin-top: 16px; color: #64748b; font-size: 12px; text-align: center; }
         @media (max-width: 820px) {
-            :root { --sidebar-width: 0px; --page-gap: 10px; }
+            :root { --sidebar-width: 0px; --page-gap: 10px; --mobile-header-height: 50px; }
             body { padding: 0; }
             .header { position: sticky; top: 0; width: 100%; min-height: 0; max-height: none; padding: 8px 10px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); }
             .header-inner { height: auto; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
@@ -186,6 +188,8 @@
             .actions > .action,
             .actions > .inline-form { width: 100%; }
             .modal-actions { grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); }
+            .modal-backdrop { inset: var(--mobile-header-height) 0 0; padding: 14px 8px 8px; }
+            .modal { max-height: calc(100vh - var(--mobile-header-height) - 22px); max-height: calc(100dvh - var(--mobile-header-height) - 22px); margin: 0 0 auto; }
             .invoice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .invoice-totals { grid-template-columns: repeat(4, minmax(0, 1fr)); }
             .invoice-summary { grid-template-columns: 1fr; }
@@ -221,9 +225,9 @@
             .detail-card span { font-size: 10px; }
             .detail-card strong { font-size: 10px; line-height: 1.35; overflow-wrap: normal; word-break: normal; }
             .totals-grid { gap: 4px; }
-            .total-card { min-height: 38px; gap: 3px; padding: 5px; border-radius: 7px; }
-            .total-card span { font-size: 8px; }
-            .total-card strong { font-size: 9px; }
+            .total-card { min-height: 38px; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 5px; border-radius: 7px; }
+            .total-card span { width: 100%; font-size: 8px; line-height: 1.15; text-align: center; }
+            .total-card strong { width: 100%; font-size: 9px; line-height: 1.15; text-align: center; }
             .invoice-head { gap: 6px; padding: 8px; }
             .invoice-logo { width: 32px; height: 32px; }
             .invoice-head h2 { font-size: 15px; }
@@ -237,10 +241,10 @@
             .invoice-grid span { font-size: 9px; }
             .invoice-grid strong { font-size: 10px; }
             .invoice-totals { gap: 4px; }
-            .invoice-totals div { min-height: 37px; gap: 3px; padding: 5px; }
-            .invoice-totals span { font-size: 8px; }
+            .invoice-totals div { min-height: 37px; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 5px; }
+            .invoice-totals span { display: block; width: 100%; font-size: 7px; line-height: 1.15; letter-spacing: 0; text-align: center; white-space: nowrap; }
             .invoice-totals strong,
-            .invoice-totals .grand strong { font-size: 9px; }
+            .invoice-totals .grand strong { display: block; width: 100%; font-size: 8.5px; line-height: 1.15; letter-spacing: 0; text-align: center; }
             .invoice-table-wrap tr { gap: 4px; padding: 6px; }
             .invoice-table-wrap td { min-height: 34px; padding: 4px 5px; font-size: 8px; }
             .invoice-table-wrap td::before { font-size: 7px; }
@@ -332,14 +336,14 @@
                         @foreach ($orders as $order)
                             @php
                                 $serviceNames = [
-                                    'notes' => 'مذكرات',
-                                    'books' => 'كتب',
+                                    'notes' => 'طباعة المذكرات وملفات PDF',
+                                    'books' => 'طباعة وتجليد كتب كعب جلد طبيعي',
                                     'color_printing' => 'طباعة الملفات بالألوان',
-                                    'thesis' => 'ماجستير',
-                                    'phd' => 'دكتوراه',
+                                    'thesis' => 'طباعة وتجليد رسالة ماجستير أو بحث تكميلي أو بحث تخرج',
+                                    'phd' => 'طباعة وتجليد رسالة دكتوراه',
                                     'formatting' => 'تنسيق وتدقيق الرسائل الجامعية',
                                     'research' => 'إنشاء بحوث جامعية وأكاديمية ودراسية',
-                                    'stationery' => 'القرطاسية',
+                                    'stationery' => 'منتجات القرطاسية',
                                 ];
                                 $projectNames = [
                                     'thesis' => 'رسالة ماجستير',
@@ -398,7 +402,7 @@
                                 $dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
                                 $createdAtText = $dayNames[$order->created_at->dayOfWeek] . ' - ' . $order->created_at->format('Y-m-d H:i');
                             @endphp
-                            <tr>
+                            <tr id="order-{{ $order->id }}">
                                 <td class="order-main-cell">
                                     <div class="order-main-line">
                                         <div class="order-main-item">
@@ -754,7 +758,7 @@
                                 <td data-label="الجامعة/المعهد">{{ $file->university_name ?: '-' }}</td>
                                 <td data-label="لون الرسالة">{{ $coverColorNames[$file->cover_color] ?? '-' }}</td>
                                 <td data-label="لون الكتابة">{{ $writingColorNames[$file->writing_color] ?? '-' }}</td>
-                                <td data-label="خيار CD">{{ ['none' => 'بدون CD', 'plain' => 'CD بدون طباعة', 'printed' => 'CD مع طباعة'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}</td>
+                                <td data-label="خيار CD">{{ ['none' => 'بدون CD', 'plain' => 'CD بدون طباعة', 'printed' => 'سي دي بغلاف مطبوع'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}</td>
                                 <td data-label="عدد CD">{{ $file->cd_type === 'none' ? 0 : $file->cd_copies }}</td>
                                 <td class="price-cell" data-label="سعر CD">{{ $file->cd_price }} ريال</td>
                             @endif
@@ -844,7 +848,11 @@
                                     <button class="modal-close" type="button" onclick="closeOrderModal(null, 'invoiceModal{{ $order->id }}')">إغلاق</button>
                                 </div>
                                 <div class="modal-body">
-                                    @include('shared.invoice', ['order' => $order, 'invoiceId' => 'customerInvoice' . $order->id])
+                                    @include('shared.invoice', [
+                                        'order' => $order,
+                                        'invoiceId' => 'customerInvoice' . $order->id,
+                                        'invoicePrintUrl' => route('orders.invoice', ['order' => $order, 'print' => 1]),
+                                    ])
                                 </div>
                             </div>
                         </div>
@@ -867,9 +875,9 @@
                                                         <div class="service-detail" data-local-datetime="{{ $deliveredFile->created_at->toIso8601String() }}">{{ $deliveredFile->created_at->format('Y-m-d H:i') }}</div>
                                                     </div>
                                                     <div class="delivered-file-buttons">
-                                                        <a class="action ghost" href="{{ route('orders.delivered-file', ['order' => $order, 'deliveredFile' => $deliveredFile, 'view' => 1]) }}">عرض</a>
-                                                        <a class="action secondary notice-action" href="{{ route('orders.delivered-file', [$order, $deliveredFile]) }}" data-delivered-file-download data-order-id="{{ $order->id }}" data-delivered-file-id="{{ $deliveredFile->id }}">
-                                                            تحميل
+                                                        <a class="action ghost" href="{{ route('orders.delivered-file.view', [$order, $deliveredFile]) }}">عرض الملف المستلم</a>
+                                                        <a class="action secondary notice-action" href="{{ route('orders.delivered-file', ['order' => $order, 'deliveredFile' => $deliveredFile, 'download' => 1, 'filename' => $deliveredFile->original_name]) }}" data-delivered-file-download data-order-id="{{ $order->id }}" data-delivered-file-id="{{ $deliveredFile->id }}">
+                                                            تحميل الملف المستلم
                                                             @if (blank($deliveredFile->customer_downloaded_at))
                                                                 <span class="order-notice-dot" data-delivered-file-dot="{{ $deliveredFile->id }}" aria-label="ملف لم يتم تحميله"></span>
                                                             @endif

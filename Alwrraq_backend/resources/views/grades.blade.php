@@ -2,7 +2,7 @@
 <html lang="{{ session('ui_locale', 'ar') === 'en' ? 'en' : 'ar' }}" dir="{{ session('ui_locale', 'ar') === 'en' ? 'ltr' : 'rtl' }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>خدمات الطباعة والتجليد</title>
         <style>
@@ -119,7 +119,10 @@
             }
             .files-list-item > div:empty { display: none; }
             .file-name-cell {
-                display: block !important;
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: center !important;
+                gap: 8px !important;
                 padding: 0 0 10px !important;
                 border-bottom: 1px solid #e2e8f0 !important;
                 font-size: 17px;
@@ -127,10 +130,14 @@
             }
             .file-name-cell::before {
                 display: block;
+                grid-column: 1 / -1;
                 margin-bottom: 6px;
             }
             .files-list-item:last-child { margin-bottom: 0; }
             .file-name-cell { color: #111827; font-weight: 900; word-break: normal; overflow-wrap: anywhere; line-height: 1.75; }
+            .file-name-text { min-width: 0; overflow-wrap: anywhere; }
+            .file-view-button { width: auto; min-width: max-content; margin: 0; padding: 7px 10px; border: 0; border-radius: 8px; background: #2563eb; color: #ffffff; font-size: 12px; font-weight: 900; line-height: 1.2; cursor: pointer; box-shadow: 0 5px 12px rgba(37, 99, 235, 0.22); }
+            .file-view-button:hover { background: #1d4ed8; }
             .file-pages { color: #475569; font-size: 16px; font-weight: 800; }
             .file-size { color: #6b7280; font-size: 16px; font-weight: 800; }
             .file-price { color: #0f172a; font-size: 16px; font-weight: 900; }
@@ -139,12 +146,13 @@
             .binding-select:invalid { color: #6b7280; }
             .binding-select option { padding: 12px 10px; line-height: 2; border-bottom: 1px solid #e5e7eb; background: #ffffff; color: #111827; }
             .binding-select option:checked { background: #e0f2fe; color: #0f172a; font-weight: 900; }
-            .university-cell { display: flex; flex-direction: column; gap: 8px; min-width: 190px; }
+            .university-cell { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 190px; overflow: visible !important; }
+            .university-cell:has(.university-dropdown.active) { z-index: 40; }
             .university-input { width: 100%; min-width: 198px; padding: 12px 13px; border: 1px solid #cbd5e1; border-radius: 9px; background: #ffffff; color: #111827; font-size: 14px; font-weight: 800; }
             .university-input:placeholder-shown { color: #6b7280; }
             .university-custom-input { width: 100%; min-width: 198px; padding: 12px 13px; border: 1px solid #94a3b8; border-radius: 9px; background: #f8fafc; color: #111827; font-size: 14px; font-weight: 800; }
             .university-picker-button { width: 100%; margin: 0; padding: 12px 13px; border: 0; border-radius: 9px; background: #0f172a; color: #ffffff; font-size: 14px; font-weight: 900; cursor: pointer; }
-            .university-dropdown { display: none; }
+            .university-dropdown { position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; left: 0; display: none; min-width: 210px; padding: 7px; border: 1px solid #cbd5e1; border-radius: 9px; background: #ffffff; box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18); }
             .university-dropdown.active { display: block; }
             .university-results { display: block; margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; overflow: hidden; max-height: 170px; overflow-y: auto; }
             .university-result { width: 100%; margin: 0; padding: 10px 12px; border: 0; border-bottom: 1px solid #e5e7eb; border-radius: 0; background: #ffffff; color: #111827; text-align: right; font-size: 14px; font-weight: 800; cursor: pointer; }
@@ -327,11 +335,14 @@
                 .files-list-item > div {
                     width: 100%;
                     display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 5px;
+                    flex-direction: column;
+                    align-items: stretch;
+                    justify-content: flex-start;
+                    gap: 4px;
                     min-width: 0;
-                    padding: 6px 7px;
+                    max-width: 100%;
+                    overflow: hidden;
+                    padding: 6px 5px;
                     border: 1px solid #edf2f7;
                     border-radius: 8px;
                     background: #f8fafc;
@@ -343,14 +354,19 @@
                     content: attr(data-label);
                     flex: 0 0 auto;
                     color: #64748b;
-                    font-size: 10.5px;
+                    font-size: 9.5px;
                     font-weight: 900;
-                    white-space: nowrap;
+                    white-space: normal;
+                    overflow-wrap: anywhere;
+                    line-height: 1.3;
                 }
                 .files-list-item > div:empty { display: none; }
                 .file-name-cell {
                     grid-column: 1 / -1;
-                    display: flex !important;
+                    display: grid !important;
+                    grid-template-columns: minmax(0, 1fr) auto;
+                    align-items: center !important;
+                    gap: 6px !important;
                     padding: 7px 8px !important;
                     border: 1px solid #dbeafe !important;
                     border-radius: 9px;
@@ -360,9 +376,11 @@
                     line-height: 1.45;
                 }
                 .file-name-cell::before {
-                    display: inline-flex;
+                    display: block;
+                    grid-column: 1 / -1;
                     margin-bottom: 0;
                 }
+                .file-view-button { padding: 6px 8px; font-size: 10px; }
                 .binding-select,
                 .copies-input,
                 .copies-stepper,
@@ -376,9 +394,11 @@
                 .university-input,
                 .university-custom-input,
                 .university-picker-button {
-                    padding: 7px 8px;
+                    max-width: 100%;
+                    padding: 7px 4px;
                     border-radius: 7px;
-                    font-size: 10.5px;
+                    font-size: 11px;
+                    text-overflow: ellipsis;
                 }
                 .academic-choice-cell {
                     flex-direction: column;
@@ -392,9 +412,9 @@
                     font-size: 9px;
                     line-height: 1.2;
                 }
-                .copies-stepper { grid-template-columns: 28px minmax(34px, 1fr) 28px; gap: 4px; }
-                .copies-stepper-button { width: 28px; height: 28px; border-radius: 7px; font-size: 15px; }
-                .copies-input { width: 100%; height: 28px; padding: 4px 5px; border-radius: 7px; font-size: 11px; }
+                .copies-stepper { grid-template-columns: 24px minmax(28px, 1fr) 24px; gap: 3px; }
+                .copies-stepper-button { width: 24px; height: 28px; border-radius: 7px; font-size: 14px; }
+                .copies-input { width: 100%; height: 28px; padding: 3px; border-radius: 7px; font-size: 12px; }
                 .research-pages-stepper .copies-stepper-button { width: 28px; height: 28px; border-radius: 7px; font-size: 15px; }
                 .research-pages-stepper .copies-input { width: 100%; height: 28px; border-radius: 7px; }
                 .research-pages-stepper { width: auto; min-width: 0; flex: 0 0 98px; grid-template-columns: 28px 34px 28px; }
@@ -404,7 +424,7 @@
                 #researchSaveButton { padding: 5px 8px; font-size: 10px; }
                 .academic-copies-cell .copies-stepper { grid-template-columns: 22px minmax(24px, 1fr) 22px; gap: 2px; }
                 .academic-copies-cell .copies-stepper-button { width: 22px; height: 26px; border-radius: 6px; font-size: 13px; }
-                .academic-copies-cell .copies-input { height: 26px; padding: 3px; font-size: 10px; }
+                .academic-copies-cell .copies-input { height: 30px; padding: 3px; font-size: 16px; }
                 .file-pages,
                 .file-size,
                 .file-price,
@@ -448,6 +468,9 @@
                     line-height: 1.25;
                     text-align: center;
                 }
+                .checkout-summary-metric { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+                .checkout-summary-label { display: block; width: 100%; color: #64748b; font-size: 9px; line-height: 1.15; white-space: nowrap; }
+                .checkout-summary-value { display: block; width: 100%; color: #0f172a; font-size: 10.5px; line-height: 1.15; white-space: nowrap; }
                 .checkout-row {
                     display: flex;
                     justify-content: stretch;
@@ -478,7 +501,7 @@
                 .service-title { font-size: 11px; line-height: 1.4; overflow-wrap: normal; word-break: normal; }
                 .service-description { font-size: 9.5px; line-height: 1.45; }
                 .service-entry { margin-top: auto; padding: 8px 5px; border-radius: 8px; font-size: 10px; line-height: 1.25; }
-                .academic-choice-select { padding-inline: 2px; font-size: 8.5px; }
+                .academic-choice-select { padding-inline: 2px; font-size: 10px; }
                 .files-list-item,
                 .files-list-item.has-price,
                 .files-list-item.has-copies-price,
@@ -486,7 +509,7 @@
                 .files-list-item.has-academic-university,
                 .files-list-item.has-formatting-price,
                 .files-list-item.has-thesis-project {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
                 }
             }
             @media (min-width: 1100px) {
@@ -1541,19 +1564,19 @@
                     ? 'سعر التجليد'
                     : (['notes', 'color_printing'].includes(service) ? 'سعر التغليف' : (noPrintServiceLabels[service] || 'سعر التجليد'));
                 const cdMetric = ['thesis', 'phd'].includes(service)
-                    ? `<span class="checkout-summary-metric">سعر CD: ${formatMoney(totals.cd || 0)} ريال</span>`
+                    ? `<span class="checkout-summary-metric"><span class="checkout-summary-label">سعر CD</span><strong class="checkout-summary-value">${formatMoney(totals.cd || 0)} ريال</strong></span>`
                     : '';
 
                 const totalsHtml = noPrintServiceLabels[service]
                     ? `
-                        <span class="checkout-summary-metric">${noPrintServiceLabels[service]}: ${formatMoney(totals.binding)} ريال</span>
-                        <span class="checkout-summary-metric">الإجمالي: ${formatMoney(totals.total)} ريال</span>
+                        <span class="checkout-summary-metric"><span class="checkout-summary-label">${noPrintServiceLabels[service]}</span><strong class="checkout-summary-value">${formatMoney(totals.binding)} ريال</strong></span>
+                        <span class="checkout-summary-metric"><span class="checkout-summary-label">الإجمالي</span><strong class="checkout-summary-value">${formatMoney(totals.total)} ريال</strong></span>
                     `
                     : `
-                        <span class="checkout-summary-metric">سعر الطباعة: ${formatMoney(totals.print)} ريال</span>
-                        <span class="checkout-summary-metric">${productBindingLabel}: ${formatMoney(totals.binding)} ريال</span>
+                        <span class="checkout-summary-metric"><span class="checkout-summary-label">سعر الطباعة</span><strong class="checkout-summary-value">${formatMoney(totals.print)} ريال</strong></span>
+                        <span class="checkout-summary-metric"><span class="checkout-summary-label">${productBindingLabel}</span><strong class="checkout-summary-value">${formatMoney(totals.binding)} ريال</strong></span>
                         ${cdMetric}
-                        <span class="checkout-summary-metric">الإجمالي: ${formatMoney(totals.total)} ريال</span>
+                        <span class="checkout-summary-metric"><span class="checkout-summary-label">الإجمالي</span><strong class="checkout-summary-value">${formatMoney(totals.total)} ريال</strong></span>
                     `;
                 const deliveryNoticeMessages = {
                     formatting: 'سيتم إرسال الملف بعد الانتهاء داخل التطبيق في صفحة طلباتي فور الانتهاء من التنسيق إن شاء الله.'
@@ -1725,9 +1748,12 @@
                 if (!hasSavedCurrentRequest) {
                     summary.classList.remove('empty');
                     summary.innerHTML = `
-                        <div>سعر إنشاء البحوث: ${totals.binding} ريال | الإجمالي: ${totals.total} ريال</div>
-                        <div class="checkout-row">
-                            <span class="checkout-button disabled">احفظ الطلب أولًا</span>
+                        <div class="checkout-summary-line">
+                            <span class="checkout-summary-metric"><span class="checkout-summary-label">سعر إنشاء البحوث</span><strong class="checkout-summary-value">${formatMoney(totals.binding)} ريال</strong></span>
+                            <span class="checkout-summary-metric"><span class="checkout-summary-label">الإجمالي</span><strong class="checkout-summary-value">${formatMoney(totals.total)} ريال</strong></span>
+                            <div class="checkout-row">
+                                <span class="checkout-button disabled">احفظ الطلب أولًا</span>
+                            </div>
                         </div>
                     `;
                     return;
@@ -1998,7 +2024,7 @@
                             <select class="binding-select academic-choice-select" onchange="setAcademicCdType('${config.service}', '${config.type}', ${index}, this.value)">
                                 <option value="none" ${(fileData.cdType || 'none') === 'none' ? 'selected' : ''}>بدون CD</option>
                                 <option value="plain" ${fileData.cdType === 'plain' ? 'selected' : ''}>CD عادي (${formatMoney(servicePricing.academic_cd_plain)} ريال)</option>
-                                <option value="printed" ${fileData.cdType === 'printed' ? 'selected' : ''}>CD مطبوع (${formatMoney(servicePricing.academic_cd_printed)} ريال)</option>
+                                <option value="printed" ${fileData.cdType === 'printed' ? 'selected' : ''}>سي دي بغلاف مطبوع (${formatMoney(servicePricing.academic_cd_printed)} ريال)</option>
                             </select>
                         </div>`
                         : '';
@@ -2073,7 +2099,10 @@
 
                     html += `
                         <div class="files-list-item${showPrice ? ' has-price' : ''}${showColorPrintingPrice ? ' has-color-printing-price' : ''}${showAcademicPrice ? ' has-academic-university' : ''}${showThesisProject ? ' has-thesis-project' : ''}${showFormattingPrice ? ' has-formatting-price' : ''}">
-                            <div class="file-name-cell" data-label="اسم الملف">${fileData.filename}</div>
+                            <div class="file-name-cell" data-label="اسم الملف">
+                                <span class="file-name-text">${escapeHtml(fileData.filename)}</span>
+                                <button class="file-view-button" type="button" onclick="viewUploadedFile('${config.service}', '${config.type}', ${index})">عرض الملف</button>
+                            </div>
                             <div class="file-pages" data-label="الصفحات">${fileData.pages} صفحة</div>
                             <div class="file-size" data-label="الحجم">${fileData.size}</div>
                             ${printSidesHtml}
@@ -2128,6 +2157,17 @@
                 } catch (error) {
                     console.error('Failed to delete file', error);
                 }
+            }
+
+            function viewUploadedFile(service, type, index) {
+                const fileData = uploadedFiles[service]?.[type]?.[index];
+                const orderId = currentOrders[service];
+
+                if (!fileData?.id || !orderId) {
+                    return;
+                }
+
+                window.location.assign(`/my-orders/${encodeURIComponent(orderId)}/files/${encodeURIComponent(fileData.id)}?from=upload`);
             }
 
             async function removeFile(service, type, index) {
@@ -2473,12 +2513,21 @@
                 setAcademicFileUniversity(service, type, index, saudiUniversitiesAndInstitutes[universityIndex] || '');
             }
 
+            function closeAcademicUniversityDropdowns(except = null) {
+                document.querySelectorAll('.university-dropdown.active').forEach((dropdown) => {
+                    if (dropdown !== except) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            }
+
             function toggleAcademicUniversityDropdown(service, type, index) {
                 const { dropdownId, searchId } = academicUniversityIds(service, type, index);
                 const dropdown = document.getElementById(dropdownId);
                 const search = document.getElementById(searchId);
                 if (!dropdown || !search) return;
 
+                closeAcademicUniversityDropdowns(dropdown);
                 const isOpen = dropdown.classList.toggle('active');
                 if (isOpen) {
                     search.value = '';
@@ -2486,6 +2535,12 @@
                     search.focus();
                 }
             }
+
+            document.addEventListener('pointerdown', (event) => {
+                if (!event.target.closest('.university-cell')) {
+                    closeAcademicUniversityDropdowns();
+                }
+            });
 
             function setAcademicCoverColor(service, type, index, coverColor) {
                 const fileData = uploadedFiles[service][type][index];

@@ -513,7 +513,7 @@
                                         </div>
                                         <div class="order-file-field">
                                             <span>خيار CD</span>
-                                            <strong>{{ ['none' => 'بدون CD', 'plain' => 'CD بدون طباعة', 'printed' => 'CD مع طباعة'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}</strong>
+                                            <strong>{{ ['none' => 'بدون CD', 'plain' => 'CD بدون طباعة', 'printed' => 'سي دي بغلاف مطبوع'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}</strong>
                                         </div>
                                         <div class="order-file-field">
                                             <span>عدد CD</span>
@@ -609,8 +609,8 @@
                                                 </div>
                                                 <div class="delivered-file-actions">
                                                     @if (auth()->user()->hasAdminPermission('delivered_files_download'))
-                                                        <a class="ghost" href="{{ route('admin.delivered-files.download', ['deliveredFile' => $deliveredFile, 'view' => 1]) }}">عرض</a>
-                                                        <a class="save small-button" href="{{ route('admin.delivered-files.download', $deliveredFile) }}">تحميل</a>
+                                                        <a class="ghost" href="{{ route('admin.delivered-files.view', $deliveredFile) }}">عرض الملف المستلم</a>
+                                                        <a class="save small-button" href="{{ route('admin.delivered-files.download', ['deliveredFile' => $deliveredFile, 'download' => 1, 'filename' => $deliveredFile->original_name]) }}">تحميل الملف المستلم</a>
                                                     @endif
                                                     @if (auth()->user()->hasAdminPermission('delivered_files_delete'))
                                                         <form method="post" action="{{ route('admin.delivered-files.destroy', $deliveredFile) }}" onsubmit="return confirm('حذف ملف التسليم هذا؟')">

@@ -46,7 +46,7 @@ class CartController extends Controller
             fn (Order $order) => in_array($order->service_type, ['notes', 'books', 'color_printing', 'thesis', 'phd', 'stationery'], true)
         );
 
-        if ($selectedDeliveryOrders->isNotEmpty() && ! $selectedDeliveryOrders->contains(fn (Order $order) => filled($order->delivery_method))) {
+        if ($selectedDeliveryOrders->contains(fn (Order $order) => blank($order->delivery_method))) {
             return redirect()->route('cart.index')->withErrors([
                 'delivery_method' => 'اختر طريقة الاستلام أو التوصيل قبل الانتقال إلى الدفع.',
             ]);

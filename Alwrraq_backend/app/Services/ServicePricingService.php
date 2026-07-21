@@ -34,7 +34,7 @@ class ServicePricingService
         'academic_black_single' => ['group' => 'الماجستير والدكتوراه', 'label' => 'التجليد والكتابة السوداء لنسخة واحدة', 'default' => 60, 'suffix' => 'ريال'],
         'academic_black_multiple' => ['group' => 'الماجستير والدكتوراه', 'label' => 'التجليد والكتابة السوداء لكل نسخة عند التعدد', 'default' => 45, 'suffix' => 'ريال'],
         'academic_cd_plain' => ['group' => 'الماجستير والدكتوراه', 'label' => 'CD بدون طباعة', 'default' => 5, 'suffix' => 'ريال'],
-        'academic_cd_printed' => ['group' => 'الماجستير والدكتوراه', 'label' => 'CD مع الطباعة', 'default' => 10, 'suffix' => 'ريال'],
+        'academic_cd_printed' => ['group' => 'الماجستير والدكتوراه', 'label' => 'سي دي بغلاف مطبوع', 'default' => 10, 'suffix' => 'ريال'],
 
         'formatting_page_price' => ['group' => 'الخدمات الأكاديمية', 'label' => 'تنسيق وتدقيق الرسائل لكل صفحة', 'default' => 10, 'suffix' => 'ريال'],
         'research_page_price' => ['group' => 'الخدمات الأكاديمية', 'label' => 'إنشاء البحوث لكل صفحة', 'default' => 10, 'suffix' => 'ريال'],

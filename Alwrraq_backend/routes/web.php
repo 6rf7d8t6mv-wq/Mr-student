@@ -169,12 +169,21 @@ Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
 Route::get('/my-orders', [CustomerOrderController::class, 'index'])
     ->middleware('auth')
     ->name('orders.index');
+Route::get('/my-orders/{order}/invoice', [CustomerOrderController::class, 'invoice'])
+    ->middleware('auth')
+    ->name('orders.invoice');
 Route::delete('/my-orders/{order}', [CustomerOrderController::class, 'destroy'])
     ->middleware('auth')
     ->name('orders.destroy');
 Route::get('/my-orders/{order}/files/{file}', [CustomerOrderController::class, 'viewUploadedFile'])
     ->middleware('auth')
     ->name('orders.file.view');
+Route::get('/my-orders/{order}/delivered-files/{deliveredFile}/view', [CustomerOrderController::class, 'downloadDeliveredFile'])
+    ->middleware('auth')
+    ->name('orders.delivered-file.view');
+Route::get('/my-orders/{order}/delivered-files/{deliveredFile}/raw', [CustomerOrderController::class, 'downloadDeliveredFile'])
+    ->middleware('auth')
+    ->name('orders.delivered-file.raw');
 Route::get('/my-orders/{order}/delivered-files/{deliveredFile}', [CustomerOrderController::class, 'downloadDeliveredFile'])
     ->middleware('auth')
     ->name('orders.delivered-file');
@@ -215,6 +224,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     Route::patch('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
     Route::post('/orders/{order}/delivered-file', [AdminController::class, 'uploadDeliveredFile'])->name('orders.delivered-file.upload');
+    Route::get('/delivered-files/{deliveredFile}/view', [AdminController::class, 'downloadDeliveredFile'])->name('delivered-files.view');
+    Route::get('/delivered-files/{deliveredFile}/raw', [AdminController::class, 'downloadDeliveredFile'])->name('delivered-files.raw');
     Route::get('/delivered-files/{deliveredFile}/download', [AdminController::class, 'downloadDeliveredFile'])->name('delivered-files.download');
     Route::delete('/delivered-files/{deliveredFile}', [AdminController::class, 'destroyDeliveredFile'])->name('delivered-files.destroy');
     Route::get('/files/{file}/view', [AdminController::class, 'viewFile'])->name('files.view');

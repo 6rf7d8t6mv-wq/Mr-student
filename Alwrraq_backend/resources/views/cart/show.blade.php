@@ -141,9 +141,10 @@
         .cart-payment-selector.toggle-all-orders-button { min-height: 38px; padding: 7px 11px; font-size: 12px; }
         .cart-payment-selector.toggle-all-orders-button input { width: 19px; height: 19px; }
         .cart-order-detail.selected-for-payment { border-color: #60a5fa; border-inline-start-color: #1d4ed8; background: #f8fbff; box-shadow: 0 14px 32px rgba(37, 99, 235, 0.12); }
-        .cart-page-actions.cart-selection-actions { display: flex; justify-content: flex-end; align-items: center; }
+        .cart-page-actions.cart-selection-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
         .cart-selection-actions .cart-pay-link { min-width: 150px; border: 0; cursor: pointer; font-family: inherit; }
         .cart-selection-actions .cart-pay-link:disabled { background: #94a3b8; cursor: not-allowed; opacity: .8; }
+        .payment-inline-alert { flex: 0 0 100%; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid #93c5fd; border-radius: 9px; background: #eff6ff; color: #1e3a8a; font-size: 12px; font-weight: 900; line-height: 1.6; text-align: right; }
         .cart-order-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
         .cart-section-box { padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; }
         .cart-section-box h3 { margin: 0 0 10px; color: #0f172a; font-size: 15px; font-weight: 900; }
@@ -413,7 +414,7 @@
                 $cdTypeNames = [
                     'none' => 'بدون CD',
                     'plain' => 'CD بدون طباعة',
-                    'printed' => 'CD مع طباعة',
+                    'printed' => 'سي دي بغلاف مطبوع',
                 ];
                 $printSideNames = [
                     'one_side' => 'وجه واحد',
@@ -460,6 +461,7 @@
                 $paymentPage = $paymentPage ?? false;
                 $deliveryServiceTypes = ['notes', 'books', 'color_printing', 'thesis', 'phd', 'stationery'];
                 $deliveryOrders = $cartOrders->filter(fn ($order) => in_array($order->service_type, $deliveryServiceTypes, true));
+                $hasMissingDeliveryMethod = $deliveryOrders->contains(fn ($order) => blank($order->delivery_method));
                 $cartDeliveryOrder = $deliveryOrders->first(fn ($order) => filled($order->delivery_method)) ?? $deliveryOrders->first();
                 $cartDiscountOrder = $cartOrders->first(fn ($order) => filled($order->discount_code)) ?? $cartOrders->first();
                 $missingRequirements = collect();
@@ -484,7 +486,7 @@
                         $missingRequirements->push($serviceLabel . ': اختيار نوع مشروع الرسالة لكل ملف PDF.');
                     }
                 }
-                if ($deliveryOrders->isNotEmpty() && ! $deliveryOrders->contains(fn ($order) => filled($order->delivery_method))) {
+                if ($hasMissingDeliveryMethod) {
                     $missingRequirements->push('اختيار طريقة الاستلام أو التوصيل للسلة.');
                 }
                 $missingRequirements = $missingRequirements->unique()->values();
@@ -706,7 +708,7 @@
                                                             <td data-label="الجامعة/المعهد" data-mobile-label="الجامعة"><span class="detail-value">{{ $file->university_name ?: '-' }}</span></td>
                                                             <td data-label="لون الرسالة" data-mobile-label="الغلاف"><span class="detail-value">{{ $coverColorNames[$file->cover_color] ?? '-' }}</span></td>
                                                             <td data-label="لون الكتابة" data-mobile-label="الكتابة"><span class="detail-value" data-mobile-value="{{ ['gold' => 'ذهبي', 'black' => 'أسود'][$file->writing_color] ?? '-' }}">{{ $writingColorNames[$file->writing_color] ?? '-' }}</span></td>
-                                                            <td data-label="خيار CD" data-mobile-label="CD"><span class="detail-value" data-mobile-value="{{ ['none' => 'بدون CD', 'plain' => 'CD عادي', 'printed' => 'CD مطبوع'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}">{{ $cdTypeNames[$file->cd_type ?: 'none'] ?? 'بدون CD' }}</span></td>
+                                                            <td data-label="خيار CD" data-mobile-label="CD"><span class="detail-value" data-mobile-value="{{ ['none' => 'بدون CD', 'plain' => 'CD عادي', 'printed' => 'سي دي بغلاف مطبوع'][$file->cd_type ?: 'none'] ?? 'بدون CD' }}">{{ $cdTypeNames[$file->cd_type ?: 'none'] ?? 'بدون CD' }}</span></td>
                                                             <td data-label="عدد CD" data-mobile-label="العدد"><span class="detail-value">{{ $file->cd_type === 'none' ? 0 : $file->cd_copies }}</span></td>
                                                             <td class="price-cell" data-label="سعر CD" data-mobile-label="السعر"><span class="detail-value">{{ $file->cd_price }} ريال</span></td>
                                                         @endif
@@ -828,6 +830,7 @@
                 @unless ($paymentPage)
                     <form class="cart-page-actions cart-selection-actions" id="selectedCartPaymentForm" method="get" action="{{ route('cart.payment') }}">
                         <button class="submit-card cart-pay-link" type="submit" data-selected-payment-button>الانتقال للدفع</button>
+                        <div class="payment-inline-alert" data-delivery-payment-alert hidden></div>
                     </form>
                 @endunless
             @endif
@@ -849,7 +852,7 @@
                         <div class="wallet-heading-row">
                             <h2>المحافظ الرقمية</h2>
                             <div class="wallet-buttons">
-                                <form method="post" action="{{ route('cart.pay-all') }}">
+                                <form method="post" action="{{ route('cart.pay-all') }}" data-payment-submit-form>
                                     @csrf
                                     @foreach ($selectedOrderIds as $selectedOrderId)
                                         <input type="hidden" name="order_ids[]" value="{{ $selectedOrderId }}">
@@ -857,7 +860,7 @@
                                     <input type="hidden" name="payment_method" value="apple_pay">
                                     <button class="apple-pay" type="submit">Apple Pay</button>
                                 </form>
-                                <form method="post" action="{{ route('cart.pay-all') }}">
+                                <form method="post" action="{{ route('cart.pay-all') }}" data-payment-submit-form>
                                     @csrf
                                     @foreach ($selectedOrderIds as $selectedOrderId)
                                         <input type="hidden" name="order_ids[]" value="{{ $selectedOrderId }}">
@@ -871,7 +874,7 @@
 
                     <div class="pay-card">
                         <h2>بطاقة بنكية</h2>
-                        <form method="post" action="{{ route('cart.pay-all') }}">
+                        <form method="post" action="{{ route('cart.pay-all') }}" data-payment-submit-form>
                             @csrf
                             @foreach ($selectedOrderIds as $selectedOrderId)
                                 <input type="hidden" name="order_ids[]" value="{{ $selectedOrderId }}">
@@ -899,6 +902,7 @@
                         </form>
                     </div>
                 </div>
+                <div class="payment-inline-alert" data-delivery-payment-alert hidden></div>
             @endif
         </section>
         @endif
@@ -930,6 +934,7 @@
         const cartOrderSelectors = Array.from(document.querySelectorAll('[data-cart-order-selector]'));
         const selectedCartPaymentForm = document.getElementById('selectedCartPaymentForm');
         const selectedPaymentButton = selectedCartPaymentForm?.querySelector('[data-selected-payment-button]');
+        const deliveryPaymentAlert = document.querySelector('[data-delivery-payment-alert]');
         const toggleAllOrdersCheckbox = document.querySelector('[data-toggle-all-orders]');
         const cartSelectionStorageKey = 'alwrraq:selected-cart-orders-v2';
         const availableOrderIds = cartOrderSelectors.map((selector) => selector.value);
@@ -941,6 +946,19 @@
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }).format(Math.max(0, Number(amount) || 0));
+
+        const showDeliveryPaymentAlert = (message) => {
+            if (!deliveryPaymentAlert) return;
+            deliveryPaymentAlert.textContent = message;
+            deliveryPaymentAlert.hidden = false;
+            deliveryPaymentAlert.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        const clearDeliveryPaymentAlert = () => {
+            if (!deliveryPaymentAlert) return;
+            deliveryPaymentAlert.hidden = true;
+            deliveryPaymentAlert.textContent = '';
+        };
 
         const updateSelectedCartSummary = () => {
             if (cartOrderSelectors.length === 0 || Object.keys(selectedSummaryNodes).length === 0) return;
@@ -1006,7 +1024,10 @@
                 return input && input.value.trim() !== '';
             }));
 
-            if (selectedPaymentButton) selectedPaymentButton.disabled = selectedOrderIds.length === 0 || !deliveryIsReady;
+            if (selectedPaymentButton) {
+                selectedPaymentButton.disabled = selectedOrderIds.length === 0;
+                selectedPaymentButton.dataset.deliveryReady = deliveryIsReady ? '1' : '0';
+            }
             if (toggleAllOrdersCheckbox) {
                 const allSelected = cartOrderSelectors.length > 0 && selectedOrderIds.length === cartOrderSelectors.length;
                 toggleAllOrdersCheckbox.checked = allSelected;
@@ -1062,7 +1083,37 @@
         selectedCartPaymentForm?.addEventListener('submit', (event) => {
             if (!cartOrderSelectors.some((selector) => selector.checked)) {
                 event.preventDefault();
+                return;
             }
+
+            const selectedRequiresDelivery = cartOrderSelectors.some((selector) => {
+                const card = selector.closest('.cart-order-detail');
+                return selector.checked && card?.dataset.orderDeliveryEligible === '1';
+            });
+            const deliveryForm = document.querySelector('[data-delivery-form]');
+            const selectedDeliveryMethod = deliveryForm?.querySelector('input[name="delivery_method"]:checked');
+
+            if (selectedRequiresDelivery && !selectedDeliveryMethod) {
+                event.preventDefault();
+                showDeliveryPaymentAlert('يجب اختيار طريقة الاستلام أو التوصيل قبل الدفع.');
+                return;
+            }
+
+            if (selectedRequiresDelivery && selectedPaymentButton?.dataset.deliveryReady !== '1') {
+                event.preventDefault();
+                showDeliveryPaymentAlert('أكمل بيانات طريقة الاستلام أو التوصيل المطلوبة قبل الدفع.');
+            }
+        });
+
+        document.querySelectorAll('[data-payment-submit-form]').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                const hasMissingDelivery = @json($hasMissingDeliveryMethod);
+
+                if (hasMissingDelivery) {
+                    event.preventDefault();
+                    showDeliveryPaymentAlert('يجب اختيار طريقة الاستلام أو التوصيل قبل الدفع.');
+                }
+            });
         });
 
         document.querySelectorAll('[data-delivery-form]').forEach((form) => {
@@ -1156,6 +1207,7 @@
 
             form.querySelectorAll('input[name="delivery_method"]').forEach((input) => {
                 input.addEventListener('change', () => {
+                    clearDeliveryPaymentAlert();
                     updateDeliveryFields();
                     updateCartOrderSelection(false);
                     scheduleSave();

@@ -2,7 +2,7 @@
 <html lang="{{ session('ui_locale', 'ar') === 'en' ? 'en' : 'ar' }}" dir="{{ session('ui_locale', 'ar') === 'en' ? 'ltr' : 'rtl' }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <title>الدخول - الورّاق</title>
     <style>
@@ -41,33 +41,21 @@
         .institution-result:last-child { border-bottom: 0; }
         .institution-meta { display: block; margin-top: 4px; color: #64748b; font-size: 11px; font-weight: 700; }
         .institution-empty { padding: 11px 12px; color: #64748b; font-size: 12px; font-weight: 800; line-height: 1.7; }
-        .institution-dropdown { display: none; margin-top: 8px; }
+        .institution-control { position: relative; }
+        .institution-dropdown { position: absolute; z-index: 40; top: calc(100% + 6px); right: 0; left: 0; display: none; margin: 0; padding: 7px; border: 1px solid #cbd5e1; border-radius: 10px; background: #ffffff; box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18); }
         .institution-dropdown.active { display: block; }
-        .institution-dropdown-search { margin: 0 0 8px; }
-        .institution-saved { background: #f8fafc; }
-        #institutionSearch,
+        .institution-picker { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; }
+        .institution-picker input { min-width: 0; }
+        .institution-picker button { width: auto; margin: 0; white-space: nowrap; }
         #institutionName { -webkit-appearance: none; appearance: none; background-image: none !important; }
-        #institutionSearch::-webkit-search-decoration,
-        #institutionSearch::-webkit-search-cancel-button,
-        #institutionSearch::-webkit-search-results-button,
-        #institutionSearch::-webkit-search-results-decoration,
         #institutionName::-webkit-contacts-auto-fill-button,
         #institutionName::-webkit-credentials-auto-fill-button,
-        #institutionName::-webkit-calendar-picker-indicator,
-        #institutionSearch::-webkit-contacts-auto-fill-button,
-        #institutionSearch::-webkit-credentials-auto-fill-button,
-        #institutionSearch::-webkit-calendar-picker-indicator { display: none !important; visibility: hidden; pointer-events: none; opacity: 0; }
-        .institution-label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; }
-        .institution-label-row label { margin: 0; }
-        .institution-manual-note { color: #64748b; font-size: 11px; font-weight: 800; line-height: 1.5; text-align: left; }
-        .institution-save-row { display: none; align-items: center; gap: 8px; margin-top: 8px; }
-        .institution-save-row.active { display: flex; }
-        .institution-save-row button { width: auto; margin-top: 0; padding: 9px 12px; font-size: 12px; }
-        .institution-save-status { color: #047857; font-size: 12px; font-weight: 800; }
+        #institutionName::-webkit-calendar-picker-indicator { display: none !important; visibility: hidden; pointer-events: none; opacity: 0; }
+        .institution-manual-note { display: block; margin-top: 7px; color: #64748b; font-size: 11px; font-weight: 800; line-height: 1.5; }
         @media (max-width: 520px) {
             .form-grid { grid-template-columns: 1fr; gap: 0; }
-            .institution-label-row { align-items: flex-start; flex-direction: column; }
-            .institution-manual-note { text-align: right; }
+            .institution-picker { grid-template-columns: 1fr; }
+            .institution-picker button { width: 100%; }
         }
     </style>
 </head>
@@ -142,22 +130,17 @@
                         <span>غير مهتم</span>
                     </label>
                     <div id="institutionBox" class="institution-box">
-                        <label for="institutionToggle">جامعتك / معهدك / مدرستك</label>
-                        <button id="institutionToggle" type="button">اختيار من القائمة</button>
-                        <div id="institutionDropdown" class="institution-dropdown">
-                            <input id="institutionSearch" class="institution-dropdown-search" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" role="combobox" placeholder="ابحث داخل القائمة">
-                            <div id="institutionResults" class="institution-results" aria-live="polite"></div>
+                        <label for="institutionName">جامعتك / معهدك / مدرستك</label>
+                        <div class="institution-control">
+                            <div class="institution-picker">
+                                <input id="institutionName" name="institution_name" value="{{ old('institution_name') }}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" role="combobox" aria-controls="institutionResults" aria-expanded="false" placeholder="ابحث في القائمة أو اكتب اسم الجهة">
+                                <button id="institutionToggle" type="button">فتح القائمة</button>
+                            </div>
+                            <div id="institutionDropdown" class="institution-dropdown">
+                                <div id="institutionResults" class="institution-results" aria-live="polite"></div>
+                            </div>
                         </div>
-
-                        <div class="institution-label-row">
-                            <label for="institutionName">الجهة المختارة</label>
-                            <span class="institution-manual-note">إذا ما حصلت جامعتك / معهدك / مدرستك ادخلها يدويًا</span>
-                        </div>
-                        <input id="institutionName" class="institution-saved" name="institution_name" value="{{ old('institution_name') }}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text" placeholder="اختر من القائمة أو اكتب اسم الجهة هنا">
-                        <div id="institutionSaveRow" class="institution-save-row">
-                            <button id="institutionSaveManual" type="button">احفظ الجهة التعليمية</button>
-                            <span id="institutionSaveStatus" class="institution-save-status"></span>
-                        </div>
+                        <span class="institution-manual-note">إذا لم تجد الجهة في القائمة، اكتب اسمها في نفس الخانة.</span>
                     </div>
 
                     <label for="password">كلمة المرور</label>
@@ -263,50 +246,37 @@
 
         const institutionCheckbox = document.getElementById('institutionNotInterested');
         const institutionBox = document.getElementById('institutionBox');
-        const institutionSearch = document.getElementById('institutionSearch');
         const institutionToggle = document.getElementById('institutionToggle');
         const institutionDropdown = document.getElementById('institutionDropdown');
         const institutionInput = document.getElementById('institutionName');
         const institutionResults = document.getElementById('institutionResults');
-        const institutionSaveRow = document.getElementById('institutionSaveRow');
-        const institutionSaveManual = document.getElementById('institutionSaveManual');
-        const institutionSaveStatus = document.getElementById('institutionSaveStatus');
         const institutionSearchUrl = @json(route('educational-institutions.index'));
         let institutionSearchTimer = null;
         let institutionSearchController = null;
-        let selectedInstitutionName = institutionInput.value.trim();
+
+        function setInstitutionDropdown(open) {
+            institutionDropdown.classList.toggle('active', open);
+            institutionResults.classList.toggle('active', open);
+            institutionInput.setAttribute('aria-expanded', open ? 'true' : 'false');
+            institutionToggle.textContent = open ? 'إغلاق القائمة' : 'فتح القائمة';
+        }
 
         function syncInstitutionInterest() {
             const notInterested = institutionCheckbox.checked;
             institutionBox.classList.toggle('disabled', notInterested);
-            institutionSearch.disabled = notInterested;
             institutionToggle.disabled = notInterested;
             institutionInput.disabled = notInterested;
             institutionInput.required = !notInterested;
 
             if (notInterested) {
-                institutionSearch.value = '';
                 institutionInput.value = '';
                 institutionInput.setCustomValidity('');
-                selectedInstitutionName = '';
-                institutionSaveStatus.textContent = '';
-                institutionSaveRow.classList.remove('active');
-                institutionDropdown.classList.remove('active');
-                institutionResults.classList.remove('active');
-            }
-        }
-
-        function syncManualInstitutionSave() {
-            const currentValue = institutionInput.value.trim();
-            const needsSave = currentValue !== '' && currentValue !== selectedInstitutionName;
-            institutionSaveRow.classList.toggle('active', needsSave);
-
-            if (needsSave) {
-                institutionSaveStatus.textContent = '';
+                setInstitutionDropdown(false);
             }
         }
 
         function debounceInstitutionSearch() {
+            setInstitutionDropdown(true);
             clearTimeout(institutionSearchTimer);
             institutionSearchTimer = setTimeout(loadInstitutionOptions, 250);
         }
@@ -323,7 +293,7 @@
             institutionSearchController = new AbortController();
 
             const url = new URL(institutionSearchUrl, window.location.origin);
-            url.searchParams.set('q', institutionSearch.value.trim());
+            url.searchParams.set('q', institutionInput.value.trim());
             url.searchParams.set('per_page', '100');
 
             fetch(url, {
@@ -342,19 +312,15 @@
                         empty.textContent = 'ما لقينا نتيجة مطابقة. تقدر تحفظ الاسم اللي كتبته.';
                         institutionResults.appendChild(empty);
 
-                        if (institutionSearch.value.trim() !== '') {
+                        if (institutionInput.value.trim() !== '') {
                             const manual = document.createElement('button');
                             manual.type = 'button';
                             manual.className = 'institution-result';
-                            manual.textContent = `استخدام: ${institutionSearch.value.trim()}`;
+                            manual.textContent = `استخدام الاسم المكتوب: ${institutionInput.value.trim()}`;
                             manual.addEventListener('click', () => {
-                                institutionInput.value = institutionSearch.value.trim();
-                                selectedInstitutionName = institutionInput.value.trim();
+                                institutionInput.value = institutionInput.value.trim();
                                 institutionInput.setCustomValidity('');
-                                institutionSaveStatus.textContent = 'تم حفظ الجهة التعليمية';
-                                institutionSaveRow.classList.remove('active');
-                                institutionDropdown.classList.remove('active');
-                                institutionResults.classList.remove('active');
+                                setInstitutionDropdown(false);
                             });
                             institutionResults.appendChild(manual);
                         }
@@ -376,13 +342,8 @@
 
                         result.addEventListener('click', () => {
                             institutionInput.value = institution.name_ar;
-                            institutionSearch.value = institution.name_ar;
-                            selectedInstitutionName = institution.name_ar;
                             institutionInput.setCustomValidity('');
-                            institutionSaveStatus.textContent = '';
-                            institutionSaveRow.classList.remove('active');
-                            institutionDropdown.classList.remove('active');
-                            institutionResults.classList.remove('active');
+                            setInstitutionDropdown(false);
                         });
                         institutionResults.appendChild(result);
                     });
@@ -392,41 +353,36 @@
                 .catch((error) => {
                     if (! error || error.name !== 'AbortError') {
                         institutionResults.innerHTML = '';
-                        institutionResults.classList.remove('active');
+                        const unavailable = document.createElement('div');
+                        unavailable.className = 'institution-empty';
+                        unavailable.textContent = 'تعذر تحميل القائمة الآن. يمكنك كتابة اسم الجهة في نفس الخانة.';
+                        institutionResults.appendChild(unavailable);
+                        setInstitutionDropdown(true);
                     }
                 });
         }
 
         institutionCheckbox.addEventListener('change', syncInstitutionInterest);
         institutionToggle.addEventListener('click', () => {
-            const isOpen = institutionDropdown.classList.toggle('active');
+            const isOpen = !institutionDropdown.classList.contains('active');
+            setInstitutionDropdown(isOpen);
 
             if (isOpen) {
-                institutionSearch.value = '';
-                institutionResults.classList.add('active');
                 loadInstitutionOptions();
-                institutionSearch.focus();
-            } else {
-                institutionResults.classList.remove('active');
+                institutionInput.focus({ preventScroll: true });
             }
         });
-        institutionSearch.addEventListener('input', debounceInstitutionSearch);
-        institutionInput.addEventListener('input', syncManualInstitutionSave);
-        institutionSaveManual.addEventListener('click', () => {
-            selectedInstitutionName = institutionInput.value.trim();
-            institutionInput.value = selectedInstitutionName;
-            institutionInput.setCustomValidity('');
-            institutionSaveStatus.textContent = selectedInstitutionName === '' ? '' : 'تم حفظ الجهة التعليمية';
-            institutionSaveRow.classList.remove('active');
+        institutionInput.addEventListener('focus', () => {
+            setInstitutionDropdown(true);
+            loadInstitutionOptions();
         });
-        document.addEventListener('click', (event) => {
+        institutionInput.addEventListener('input', debounceInstitutionSearch);
+        document.addEventListener('pointerdown', (event) => {
             if (! institutionBox.contains(event.target)) {
-                institutionDropdown.classList.remove('active');
-                institutionResults.classList.remove('active');
+                setInstitutionDropdown(false);
             }
         });
         syncInstitutionInterest();
-        syncManualInstitutionSave();
     </script>
     @include('shared.language-tools')
 </body>

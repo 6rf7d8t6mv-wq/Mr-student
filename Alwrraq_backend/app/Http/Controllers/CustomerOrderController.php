@@ -25,6 +25,13 @@ class CustomerOrderController extends Controller
         return view('orders.index', compact('orders'));
     }
 
+    public function invoice(Order $order)
+    {
+        $this->authorizeInvoice($order);
+
+        return view('orders.invoice', compact('order'));
+    }
+
     public function destroy(Order $order)
     {
         abort_unless($order->user_id === Auth::id(), 403);
@@ -71,6 +78,13 @@ class CustomerOrderController extends Controller
                 ? 'طلب إنشاء البحوث لا يحتوي على ملف مرفوع للعرض.'
                 : 'الملف غير موجود في التخزين، لذلك تعذر عرضه.';
 
+            if (request('from') === 'upload') {
+                return redirect()->route('home', [
+                    'service' => $order->service_type,
+                    'order' => $order->id,
+                ])->withErrors(['file' => $message]);
+            }
+
             if (request('from') === 'cart') {
                 return redirect()->route('cart.index')->withErrors(['file' => $message]);
             }
@@ -100,7 +114,7 @@ class CustomerOrderController extends Controller
             ->header('Expires', '0');
     }
 
-    public function downloadDeliveredFile(Order $order, OrderDeliveredFile $deliveredFile)
+    public function downloadDeliveredFile(Order $order, OrderDeliveredFile $deliveredFile, WordPreviewService $wordPreview)
     {
         abort_unless($order->user_id === Auth::id(), 403);
         abort_unless(in_array($order->service_type, ['formatting', 'research'], true), 404);
@@ -110,11 +124,46 @@ class CustomerOrderController extends Controller
 
         abort_unless(File::isFile($absolutePath), 404);
 
-        if (request()->boolean('view')) {
+        if (request()->boolean('raw') || request()->routeIs('orders.delivered-file.raw')) {
             return response()->file($absolutePath, [
                 'Content-Type' => $deliveredFile->mime ?: 'application/octet-stream',
                 'Content-Disposition' => 'inline; filename="'.addslashes($deliveredFile->original_name).'"',
             ]);
+        }
+
+        if (request()->boolean('view') || request()->routeIs('orders.delivered-file.view')) {
+            $extension = strtolower(pathinfo($deliveredFile->original_name, PATHINFO_EXTENSION));
+            $isPdf = $extension === 'pdf' || $deliveredFile->mime === 'application/pdf';
+            $isWord = in_array($extension, ['docx', 'doc'], true)
+                || in_array($deliveredFile->mime, [
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ], true);
+            $wordPreviewHtml = $isWord && $extension === 'docx'
+                ? $wordPreview->toHtml($absolutePath)
+                : null;
+            $backUrl = route('orders.index').'#order-'.$order->id;
+            $rawUrl = route('orders.delivered-file.raw', [$order, $deliveredFile]);
+            $downloadUrl = route('orders.delivered-file', [
+                'order' => $order,
+                'deliveredFile' => $deliveredFile,
+                'download' => 1,
+                'filename' => $deliveredFile->original_name,
+            ]);
+
+            return response()
+                ->view('orders.delivered-file-viewer', compact(
+                    'order',
+                    'deliveredFile',
+                    'isPdf',
+                    'wordPreviewHtml',
+                    'backUrl',
+                    'rawUrl',
+                    'downloadUrl'
+                ))
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         }
 
         if (blank($deliveredFile->customer_downloaded_at)) {
@@ -130,5 +179,13 @@ class CustomerOrderController extends Controller
         }
 
         return Response::download($absolutePath, $deliveredFile->original_name);
+    }
+
+    private function authorizeInvoice(Order $order): void
+    {
+        abort_unless($order->user_id === Auth::id(), 403);
+        abort_unless($order->payment_status === 'paid', 404);
+
+        $order->load(['user', 'files', 'productItems']);
     }
 }

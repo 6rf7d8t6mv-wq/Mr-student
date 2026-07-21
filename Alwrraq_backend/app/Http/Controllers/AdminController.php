@@ -759,7 +759,7 @@ class AdminController extends Controller
             ->with('status', 'تم فتح الطلب.');
     }
 
-    public function downloadDeliveredFile(OrderDeliveredFile $deliveredFile)
+    public function downloadDeliveredFile(OrderDeliveredFile $deliveredFile, WordPreviewService $wordPreview)
     {
         $this->ensureAdmin();
         $this->ensurePermission('delivered_files_download');
@@ -768,11 +768,49 @@ class AdminController extends Controller
 
         abort_unless(File::isFile($absolutePath), 404);
 
-        if (request()->boolean('view')) {
+        if (request()->boolean('raw') || request()->routeIs('admin.delivered-files.raw')) {
             return response()->file($absolutePath, [
                 'Content-Type' => $deliveredFile->mime ?: 'application/octet-stream',
                 'Content-Disposition' => 'inline; filename="'.addslashes($deliveredFile->original_name).'"',
             ]);
+        }
+
+        if (request()->boolean('view') || request()->routeIs('admin.delivered-files.view')) {
+            $order = $deliveredFile->order;
+            $extension = strtolower(pathinfo($deliveredFile->original_name, PATHINFO_EXTENSION));
+            $isPdf = $extension === 'pdf' || $deliveredFile->mime === 'application/pdf';
+            $isWord = in_array($extension, ['docx', 'doc'], true)
+                || in_array($deliveredFile->mime, [
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ], true);
+            $wordPreviewHtml = $isWord && $extension === 'docx'
+                ? $wordPreview->toHtml($absolutePath)
+                : null;
+            $backUrl = route(
+                $order->payment_status === 'paid' ? 'admin.orders' : 'admin.orders.unpaid',
+                ['open_order' => $order->id]
+            );
+            $rawUrl = route('admin.delivered-files.raw', $deliveredFile);
+            $downloadUrl = route('admin.delivered-files.download', [
+                'deliveredFile' => $deliveredFile,
+                'download' => 1,
+                'filename' => $deliveredFile->original_name,
+            ]);
+
+            return response()
+                ->view('orders.delivered-file-viewer', compact(
+                    'order',
+                    'deliveredFile',
+                    'isPdf',
+                    'wordPreviewHtml',
+                    'backUrl',
+                    'rawUrl',
+                    'downloadUrl'
+                ))
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         }
 
         return Response::download($absolutePath, $deliveredFile->original_name);
