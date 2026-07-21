@@ -39,7 +39,9 @@
         .preview-head { padding: 9px 11px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
         .preview-head h2 { margin: 0; font-size: 13px; color: #111827; }
         .preview-head span { color: #64748b; font-size: 9px; font-weight: 900; }
-        .preview-frame { width: 100%; flex: 1; min-height: 760px; border: 0; background: #ffffff; }
+        .pdf-preview { width: 100%; flex: 1; min-height: 760px; padding: 10px; background: #cbd5e1; overflow: auto; }
+        .pdf-page { display: block; max-width: 100%; height: auto; margin: 0 auto 10px; background: #fff; box-shadow: 0 5px 18px rgba(15, 23, 42, .18); }
+        .pdf-status { padding: 30px 12px; color: #475569; font-weight: 900; text-align: center; }
         .word-preview { flex: 1; min-height: 760px; padding: clamp(22px, 4vw, 48px); overflow: auto; background: #ffffff; color: #111827; font-family: Arial, Tahoma, sans-serif; font-size: 15px; line-height: 1.9; }
         .word-preview p { margin: 0 0 11px; white-space: pre-wrap; }
         .word-table-wrap { width: 100%; margin: 14px 0; overflow-x: auto; }
@@ -54,7 +56,7 @@
         @media (max-width: 900px) {
             .viewer-shell { grid-template-columns: 1fr; }
             .info-panel { position: static; }
-            .preview-frame { min-height: 620px; }
+            .pdf-preview { min-height: 620px; }
             .word-preview { min-height: 620px; }
             .brand { min-height: 44px; }
             .meta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -80,7 +82,7 @@
             .preview-head { padding: 7px 8px; }
             .preview-head h2 { font-size: 11px; }
             .preview-head span { font-size: 8px; }
-            .preview-frame { min-height: 560px; }
+            .pdf-preview { min-height: 560px; }
             .word-preview { min-height: 560px; padding: 16px 12px; font-size: 13px; }
         }
         @media (min-width: 1100px) {
@@ -104,7 +106,7 @@
             .page { padding: 0; }
             .viewer-shell { display: block; max-width: none; }
             .preview-panel { border: 0; box-shadow: none; min-height: 100vh; }
-            .preview-frame { min-height: 100vh; }
+            .pdf-preview { min-height: 100vh; }
         }
     </style>
 </head>
@@ -200,7 +202,9 @@
                 </div>
 
                 @if ($isPdf)
-                    <iframe id="filePreview" class="preview-frame" src="{{ route('admin.files.view', ['file' => $file, 'raw' => 1]) }}"></iframe>
+                    <div class="pdf-preview" id="adminPdfPreview">
+                        <div class="pdf-status" id="adminPdfStatus">جاري تحميل ملف PDF...</div>
+                    </div>
                 @elseif ($wordPreviewHtml)
                     <article class="word-preview" dir="auto">{!! $wordPreviewHtml !!}</article>
                 @else
@@ -219,6 +223,14 @@
         <div class="invoice-print-source" aria-hidden="true">
             @include('shared.invoice', ['order' => $order, 'invoiceId' => 'adminFileInvoice'.$order->id])
         </div>
+    @endif
+
+    @if ($isPdf)
+        @include('shared.pdf-preview', [
+            'pdfPreviewId' => 'adminPdfPreview',
+            'pdfStatusId' => 'adminPdfStatus',
+            'pdfUrl' => route('admin.files.view', ['file' => $file, 'raw' => 1]),
+        ])
     @endif
 
     <script>

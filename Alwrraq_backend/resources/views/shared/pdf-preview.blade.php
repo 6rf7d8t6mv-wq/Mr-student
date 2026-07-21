@@ -1,0 +1,53 @@
+<script src="{{ asset('vendor/pdfjs/pdf.min.js') }}"></script>
+<script>
+    window.addEventListener('load', async () => {
+        const preview = document.getElementById(@json($pdfPreviewId));
+        const status = document.getElementById(@json($pdfStatusId));
+        if (!preview || !status) return;
+
+        try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = @json(asset('vendor/pdfjs/pdf.worker.min.js'));
+            const response = await fetch(@json($pdfUrl), {
+                credentials: 'same-origin',
+                cache: 'no-store',
+                headers: { Accept: 'application/pdf' },
+            });
+            if (!response.ok) {
+                throw new Error(`PDF request failed: ${response.status}`);
+            }
+
+            const pdfBytes = new Uint8Array(await response.arrayBuffer());
+            const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+            const availableWidth = Math.max(280, preview.clientWidth - 20);
+            const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+            status.remove();
+
+            for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+                const page = await pdf.getPage(pageNumber);
+                const baseViewport = page.getViewport({ scale: 1 });
+                const viewport = page.getViewport({ scale: availableWidth / baseViewport.width });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                canvas.className = 'pdf-page';
+                canvas.width = Math.floor(viewport.width * pixelRatio);
+                canvas.height = Math.floor(viewport.height * pixelRatio);
+                canvas.style.width = `${Math.floor(viewport.width)}px`;
+                canvas.style.height = `${Math.floor(viewport.height)}px`;
+                preview.appendChild(canvas);
+
+                await page.render({
+                    canvasContext: context,
+                    viewport,
+                    transform: pixelRatio === 1 ? null : [pixelRatio, 0, 0, pixelRatio, 0, 0],
+                }).promise;
+            }
+        } catch (error) {
+            if (!status.isConnected) {
+                preview.replaceChildren(status);
+            }
+            status.textContent = @json($pdfErrorMessage ?? 'تعذر عرض ملف PDF. حاول مرة أخرى.');
+        }
+    });
+</script>

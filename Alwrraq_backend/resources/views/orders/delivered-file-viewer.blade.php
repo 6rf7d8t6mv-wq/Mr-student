@@ -100,49 +100,12 @@
         </div>
     </div>
     @if ($isPdf)
-        <script src="{{ asset('vendor/pdfjs/pdf.min.js') }}"></script>
-        <script>
-            window.addEventListener('load', async () => {
-                const preview = document.getElementById('pdfPreview');
-                const status = document.getElementById('pdfStatus');
-
-                try {
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = @json(asset('vendor/pdfjs/pdf.worker.min.js'));
-                    const pdf = await pdfjsLib.getDocument(preview.dataset.pdfUrl).promise;
-                    const availableWidth = Math.max(280, preview.clientWidth - 20);
-                    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-
-                    status.remove();
-
-                    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-                        const page = await pdf.getPage(pageNumber);
-                        const baseViewport = page.getViewport({ scale: 1 });
-                        const scale = availableWidth / baseViewport.width;
-                        const viewport = page.getViewport({ scale });
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-
-                        canvas.className = 'pdf-page';
-                        canvas.width = Math.floor(viewport.width * pixelRatio);
-                        canvas.height = Math.floor(viewport.height * pixelRatio);
-                        canvas.style.width = `${Math.floor(viewport.width)}px`;
-                        canvas.style.height = `${Math.floor(viewport.height)}px`;
-                        preview.appendChild(canvas);
-
-                        await page.render({
-                            canvasContext: context,
-                            viewport,
-                            transform: pixelRatio === 1 ? null : [pixelRatio, 0, 0, pixelRatio, 0, 0],
-                        }).promise;
-                    }
-                } catch (error) {
-                    if (! status.isConnected) {
-                        preview.replaceChildren(status);
-                    }
-                    status.textContent = 'تعذر عرض الملف هنا. يمكنك تحميل الملف من زر تحميل الملف المستلم.';
-                }
-            });
-        </script>
+        @include('shared.pdf-preview', [
+            'pdfPreviewId' => 'pdfPreview',
+            'pdfStatusId' => 'pdfStatus',
+            'pdfUrl' => $rawUrl,
+            'pdfErrorMessage' => 'تعذر عرض ملف PDF. حاول مرة أخرى أو استخدم زر تحميل الملف المستلم.',
+        ])
     @endif
     @include('shared.language-tools')
 </body>

@@ -30,7 +30,9 @@
         .preview { min-height: calc(100vh - 48px); display: flex; flex-direction: column; }
         .preview-head { padding: 13px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
         .preview-head h2 { margin: 0; font-size: 17px; }
-        .preview-frame { width: 100%; flex: 1; min-height: 720px; border: 0; background: #ffffff; }
+        .pdf-preview { width: 100%; flex: 1; min-height: 720px; padding: 10px; background: #cbd5e1; overflow: auto; }
+        .pdf-page { display: block; max-width: 100%; height: auto; margin: 0 auto 10px; background: #fff; box-shadow: 0 5px 18px rgba(15, 23, 42, .18); }
+        .pdf-status { padding: 30px 12px; color: #475569; font-weight: 900; text-align: center; }
         .word-preview { flex: 1; min-height: 720px; padding: clamp(22px, 5vw, 54px); overflow: auto; background: #ffffff; color: #111827; font-family: Arial, Tahoma, sans-serif; font-size: 16px; line-height: 1.9; }
         .word-preview p { margin: 0 0 12px; white-space: pre-wrap; }
         .word-table-wrap { width: 100%; margin: 16px 0; overflow-x: auto; }
@@ -43,7 +45,7 @@
         .unsupported-box p { margin: 0; color: #64748b; font-weight: 800; line-height: 1.8; }
         @media (max-width: 860px) {
             .viewer { grid-template-columns: 1fr; }
-            .preview-frame { min-height: 560px; }
+            .pdf-preview { min-height: 560px; }
         }
     </style>
 </head>
@@ -88,7 +90,9 @@
                 </div>
 
                 @if ($isPdf)
-                    <iframe class="preview-frame" src="{{ route('orders.file.view', ['order' => $order, 'file' => $file, 'raw' => 1]) }}"></iframe>
+                    <div class="pdf-preview" id="uploadedPdfPreview">
+                        <div class="pdf-status" id="uploadedPdfStatus">جاري تحميل ملف PDF...</div>
+                    </div>
                 @elseif ($wordPreviewHtml)
                     <article class="word-preview" dir="auto">{!! $wordPreviewHtml !!}</article>
                 @else
@@ -102,6 +106,13 @@
             </main>
         </div>
     </div>
+    @if ($isPdf)
+        @include('shared.pdf-preview', [
+            'pdfPreviewId' => 'uploadedPdfPreview',
+            'pdfStatusId' => 'uploadedPdfStatus',
+            'pdfUrl' => route('orders.file.view', ['order' => $order, 'file' => $file, 'raw' => 1]),
+        ])
+    @endif
     @include('shared.language-tools')
 </body>
 </html>

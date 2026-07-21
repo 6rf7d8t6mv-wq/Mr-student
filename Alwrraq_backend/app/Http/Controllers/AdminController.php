@@ -633,9 +633,12 @@ class AdminController extends Controller
         abort_unless(is_file($absolutePath), 404);
 
         if ($request->boolean('raw')) {
+            $inlineMime = strtolower(pathinfo($file->original_name, PATHINFO_EXTENSION)) === 'pdf'
+                ? 'application/pdf'
+                : (File::mimeType($absolutePath) ?: 'application/octet-stream');
+
             return response()->file($absolutePath, [
-                'Content-Type' => File::mimeType($absolutePath) ?: 'application/octet-stream',
-                'Content-Disposition' => 'inline; filename="'.addslashes($file->original_name).'"',
+                'Content-Type' => $inlineMime,
             ]);
         }
 
@@ -769,9 +772,12 @@ class AdminController extends Controller
         abort_unless(File::isFile($absolutePath), 404);
 
         if (request()->boolean('raw') || request()->routeIs('admin.delivered-files.raw')) {
+            $inlineMime = strtolower(pathinfo($deliveredFile->original_name, PATHINFO_EXTENSION)) === 'pdf'
+                ? 'application/pdf'
+                : ($deliveredFile->mime ?: File::mimeType($absolutePath) ?: 'application/octet-stream');
+
             return response()->file($absolutePath, [
-                'Content-Type' => $deliveredFile->mime ?: 'application/octet-stream',
-                'Content-Disposition' => 'inline; filename="'.addslashes($deliveredFile->original_name).'"',
+                'Content-Type' => $inlineMime,
             ]);
         }
 
